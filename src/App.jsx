@@ -1,8 +1,9 @@
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
 import useAuth from './hooks/useAuth';
-import { PublicLayout } from './layouts';
-import { publicRoutes } from './routes';
+import { PrivateLayout, PublicLayout } from './layouts';
+import { privateRoutes, publicRoutes } from './routes';
+import { Fragment } from 'react';
 
 function App() {
     useAuth();
@@ -19,6 +20,27 @@ function App() {
                             Layout = route.layout;
                         } else if (route.layout === null) {
                             Layout = Fragment;
+                        }
+
+                        return (
+                            <Route
+                                key={index}
+                                path={route.path}
+                                element={
+                                    <Layout>
+                                        <Page />
+                                    </Layout>
+                                }
+                            />
+                        );
+                    })}
+
+                    {privateRoutes.map((route, index) => {
+                        const Page = route.component;
+                        let Layout = PrivateLayout;
+
+                        if (route.layout) {
+                            Layout = route.layout;
                         }
 
                         return (
