@@ -1,19 +1,17 @@
 import React from 'react';
 
-const Modal = ({ children, openElement, textSubmit, onSubmit }) => {
+const Modal = ({ children, textSubmit, visible = false, onClose, onSubmit }) => {
     return (
         <>
-            <label htmlFor="my-modal">{openElement}</label>
-
-            <input type="checkbox" id="my-modal" className="modal-toggle" />
+            <input type="checkbox" id="my-modal" className="modal-toggle" checked={visible} onChange={() => {}} />
             <div className="modal z-[1000] ">
                 <div className="modal-box">
                     {children}
                     <div className="modal-action">
                         <div className="flex items-center gap-x-2">
-                            <label htmlFor="my-modal" className="btn btn-neutral text-neutral-content">
+                            <div onClick={onClose} className="btn btn-neutral text-neutral-content">
                                 Đóng
-                            </label>
+                            </div>
                             <button onClick={onSubmit} className="btn btn-primary text-primary-content">
                                 {textSubmit || 'Thực hiện'}
                             </button>

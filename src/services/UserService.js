@@ -13,6 +13,12 @@ const UserServices = {
     getOwn: () => {
         return axiosClient.get('/me');
     },
+    forgotPassword: (email) => {
+        return axiosClient.post('/forgotpassword', { email });
+    },
+    resetPassword: (data) => {
+        return axiosClient.post('/resetpassword', data);
+    },
 };
 
 export default UserServices;

@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import ForgotPasswordModal from '../components/ForgotPasswordModal';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import Swal from 'sweetalert2';
-import { useLocalStorage } from 'usehooks-ts'
+import { useLocalStorage } from 'usehooks-ts';
 import UserServices from '../services/UserService';
 
 const validateSchema = Yup.object({
@@ -13,17 +13,17 @@ const validateSchema = Yup.object({
     password: Yup.string().required('Bạn chưa nhập mật khẩu.').min(6, 'Mật khẩu phải có ít nhất 6 ký tự.'),
 });
 const Login = () => {
-    const [token, setToken] = useLocalStorage('token', true)
-    const navigate = useNavigate()
+    const [token, setToken] = useLocalStorage('token', true);
+    const navigate = useNavigate();
+    const [visible, setVisible] = useState(false);
 
     const { mutate, isPending } = useMutation({
         mutationFn: UserServices.login,
         onSuccess: (data) => {
             Swal.fire('Thành công!', 'Chào mừng bạn đến với DSocial', 'success');
-            setToken(data.data.token)
-            navigate('/')
-            console.log(data.data.token)
-
+            setToken(data.data.token);
+            navigate('/');
+            console.log(data.data.token);
         },
         onError: (error) => {
             if (error?.message) {
@@ -33,7 +33,6 @@ const Login = () => {
             Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
         },
     });
-
 
     const handleSubmit = (values) => {
         mutate(values);
@@ -75,14 +74,16 @@ const Login = () => {
                             />
                             <ErrorMessage name="password" component="div" className="text-error text-sm" />
                             <div className="flex justify-end">
-                                <ForgotPasswordModal />
+                                <span onClick={() => setVisible(true)} className="text-sm link link-hover mt-1">
+                                    Quên mật khẩu?
+                                </span>
                             </div>
                         </div>
 
                         <div className="mt-2">
                             Bạn chưa có tài khoản?{' '}
                             <Link to={'/register'}>
-                                <button className="btn btn-ghost btn-sm text-primary">Đăng ký</button>
+                                <div className="btn btn-ghost btn-sm text-primary">Đăng ký</div>
                             </Link>
                         </div>
 
@@ -93,6 +94,7 @@ const Login = () => {
                     </Form>
                 )}
             </Formik>
+            <ForgotPasswordModal visible={visible} onClose={() => setVisible(false)} />
         </div>
     );
 };

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { FcGoogle } from 'react-icons/fc';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLocalStorage } from 'usehooks-ts';
 import ScreenSpinner from '../components/ScreenSpinner';
 
@@ -8,7 +8,6 @@ const FormLayout = ({ children }) => {
     const [token, setToken] = useLocalStorage('token', '');
 
     const navigate = useNavigate();
-    
 
     useEffect(() => {
         if (token) {
@@ -24,11 +23,13 @@ const FormLayout = ({ children }) => {
                 <div className="flex min-h-screen flex-col md:flex-row">
                     <div className="flex-1 hidden md:flex bg-gradient-to-b relative from-primary to-primary-focus p-4 justify-center">
                         <div className="flex flex-col items-center mt-16">
-                            <div className="avatar">
-                                <div className="w-36 rounded">
-                                    <img src="/logo.png" />
+                            <Link to={'/'}>
+                                <div className="avatar">
+                                    <div className="w-36 rounded">
+                                        <img src="/logo.png" />
+                                    </div>
                                 </div>
-                            </div>
+                            </Link>
                             <h1 className="font-medium text-base-100 text-2xl">Sáng tạo + Kết nối = DSocial</h1>
                             <p className="text-base-100">#Creator #Connect #DSocial</p>
                             <div className="absolute bottom-0">

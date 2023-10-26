@@ -4,6 +4,7 @@ import useAuth from './hooks/useAuth';
 import { PrivateLayout, PublicLayout } from './layouts';
 import { privateRoutes, publicRoutes } from './routes';
 import { Fragment } from 'react';
+import "swiper/css";
 
 function App() {
     useAuth();
