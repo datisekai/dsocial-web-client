@@ -3,6 +3,7 @@ import config from '../config';
 // Layouts
 import { FormLayout, PublicLayout } from '../layouts';
 import ConfirmEmail from '../pages/ConfirmEmail';
+import EditProfile from '../pages/EditProfile';
 import ForgotPassword from '../pages/ForgotPassword';
 import Friend from '../pages/Friend';
 import Group from '../pages/Group';
@@ -28,6 +29,7 @@ const privateRoutes = [
     { path: config.routes.message, component: Message },
     { path: config.routes.group, component: Group },
     { path: config.routes.profile, component: Profile },
+    { path: config.routes.editProfile, component: EditProfile },
 ];
 
 export { privateRoutes, publicRoutes };

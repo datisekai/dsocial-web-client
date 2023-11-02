@@ -21,7 +21,7 @@ const Home = () => {
     };
 
     return (
-        <div>
+        <div className=' px-4 py-2'>
             <h1 className="text-primary font-bold">Home</h1>
             <div className="mt-2">
                 <Feed />

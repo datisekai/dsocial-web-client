@@ -1,5 +1,4 @@
-import React from 'react';
-import { Gallery } from 'react-grid-gallery';
+import React, { useState } from 'react';
 
 const images = [
     {
@@ -20,10 +19,20 @@ const images = [
     {
         src: 'https://c4.staticflickr.com/9/8887/28897124891_98c4fdd82b_b.jpg',
     },
+    {
+        src: 'https://c4.staticflickr.com/9/8887/28897124891_98c4fdd82b_b.jpg',
+    },
+    {
+        src: 'https://c4.staticflickr.com/9/8887/28897124891_98c4fdd82b_b.jpg',
+    },
 ];
-const CardPost = () => {
+
+const CardPost = ({ group }) => {
+    const countViewImage = 6;
+    const [isShowFullImage, setIsShowFullImage] = useState(false);
+
     return (
-        <div className="p-4 bg-base-200 rounded">
+        <div className="p-4 bg-base-200 rounded w-full">
             <div className="flex items-center gap-2">
                 <div className="avatar">
                     <div className="w-12 rounded-full">
@@ -31,7 +40,7 @@ const CardPost = () => {
                     </div>
                 </div>
                 <div>
-                    <p className="font-medium">Tên nhóm</p>
+                    {group && <p className="font-medium">Tên nhóm</p>}
                     <div className="text-sm space-x-2">
                         <span>Datisekai</span>
                         <span>·</span>
@@ -45,9 +54,23 @@ const CardPost = () => {
                 aspernatur eum vero?
             </article>
 
-           <div className='mt-2'>
-           <Gallery images={images} />
-           </div>
+            <div className="mt-2 ">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {(isShowFullImage ? images : [...images].splice(0, countViewImage)).map((image, index) => (
+                        <img src={image.src} key={index} className="w-full h-full" />
+                    ))}
+                </div>
+                {images.length > 5 ? (
+                    <button
+                        onClick={() => setIsShowFullImage(!isShowFullImage)}
+                        className="btn btn-sm md:btn-md btn-ghost mt-2"
+                    >
+                        {!isShowFullImage ? 'Xem thêm' : 'Thu gọn'}
+                    </button>
+                ) : (
+                    <p>No</p>
+                )}
+            </div>
         </div>
     );
 };

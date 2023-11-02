@@ -8,6 +8,7 @@ const routes = {
     message: '/message',
     group: '/group',
     profile: '/profile',
+    editProfile: '/profile/edit',
 };
 
 export default routes;

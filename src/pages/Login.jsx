@@ -94,7 +94,7 @@ const Login = () => {
                     </Form>
                 )}
             </Formik>
-            <ForgotPasswordModal visible={visible} onClose={() => setVisible(false)} />
+            {visible && <ForgotPasswordModal visible={visible} onClose={() => setVisible(false)} />}
         </div>
     );
 };
