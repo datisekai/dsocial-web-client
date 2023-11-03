@@ -19,15 +19,15 @@ const PrivateLayout = ({ children }) => {
 
     useEffect(() => {
         if (!token) {
-            // navigate('/login');
+            navigate('/login');
         }
     }, []);
 
     return (
         <>
-            {/* {!token || !user ? (
+            {!token || !user ? (
                 <ScreenSpinner />
-            ) : ( */}
+            ) : (
                 <div className="min-h-screen">
                     <Header onOpenMenu={() => setVisibleMenu(true)} onOpenFriend={() => setVisibleFriend(true)} />
                     <div className="flex h-[calc(100vh-66px)]">
@@ -44,7 +44,7 @@ const PrivateLayout = ({ children }) => {
                     <DrawerMenu visible={visibleMenu} onClose={() => setVisibleMenu(false)} />
                     <DrawerFriend visible={visibleFriend} onClose={() => setVisibleFriend(false)} />
                 </div>
-            {/* )} */}
+            )}
         </>
     );
 };
