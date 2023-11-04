@@ -10,17 +10,9 @@ const ProfileServices = {
         const result = await axiosClient.get(`/post/user/${userId}`);
         return result.data;
     },
-    acceptFriend: (userId) => {
-        if (!userId) return;
-        return axiosClient.put(`/friend/${userId}`);
-    },
-    deleteFriendRequest: (userId) => {
-        if (!userId) return;
-        return axiosClient.delete(`/friend/request/${userId}`);
-    },
-    deleteFriend: (userId) => {
-        if (!userId) return;
-        return axiosClient.delete(`/friend/${userId}`);
+    updateProfile: (data) => {
+        if (!data) return;
+        return axiosClient.put(`/edit-profile`, data);
     },
 };
 

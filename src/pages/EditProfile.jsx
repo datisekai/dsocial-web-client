@@ -7,38 +7,65 @@ import ChangePasswordModal from '../components/ChangePasswordModal';
 import { ErrorMessage, Field, Formik } from 'formik';
 import * as Yup from 'yup';
 import { useSelector } from 'react-redux';
-
+import { useMutation } from '@tanstack/react-query';
+import ProfileServices from '../services/ProfileService';
+import getDate from '../utils/getDate';
 const validateSchema = Yup.object({
     bio: Yup.string(),
     name: Yup.string().required('Vui lòng nhập tên.').max(50, 'Tên không quá 50 kí tự.'),
-    otherName: Yup.string(),
+    other_name: Yup.string(),
     birthday: Yup.date().required('Vui lòng chọn ngày sinh nhật.'),
     address: Yup.string(),
+    cover_image: Yup.mixed(),
 });
 
 const EditProfile = () => {
     const [visiblePassword, setVisiblePassword] = useState(false);
     const { user } = useSelector((state) => state.user);
 
+    // const { mutate, isPending } = useMutation({
+    //     mutationFn: ProfileServices.updateProfile,
+    //     onSuccess: (data) => {
+    //         Swal.fire('Thành công!', 'Đã thay đổi thông tin', 'success');
+    //     },
+    //     onError: (error) => {
+    //         if (error?.message) {
+    //             return Swal.fire('Thất bại!', error.message, 'error');
+    //         }
+    //         Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
+    //     },
+    // });
     const handleSubmit = (values) => {
         console.log('submit', values);
+        // mutate(values);
     };
+
     return (
         <div>
             <Formik
                 onSubmit={(values) => {
                     handleSubmit(values);
                 }}
-                initialValues={{ bio: '', name: '', otherName: '', birthday: '', address: '' }}
+                initialValues={{
+                    bio: user.bio || '',
+                    name: user.name || '',
+                    other_name: user.other_name || '',
+                    birthday: user.birthday != null ? getDate(user.birthday) : null,
+                    address: user.address || '',
+                    cover_image: user.cover_image || '',
+                }}
                 validationSchema={validateSchema}
             >
                 {({ handleSubmit }) => (
                     <>
                         <div className="relative">
-                            <img
-                                className="w-full h-auto aspect-video md:aspect-auto md:h-[250px] object-cover "
-                                src="https://images.unsplash.com/photo-1682685797661-9e0c87f59c60?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwxMXx8fGVufDB8fHx8fA%3D%3D"
-                            />
+                            <div>
+                                <Field type="file" name="cover_image" className="absolute" />
+                                <img
+                                    className="w-full h-auto aspect-video md:aspect-auto md:h-[250px] object-cover "
+                                    src="https://images.unsplash.com/photo-1682685797661-9e0c87f59c60?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwxMXx8fGVufDB8fHx8fA%3D%3D"
+                                />
+                            </div>
 
                             <div className="absolute px-4 bottom-[-40px] left-0 right-0 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
@@ -80,7 +107,7 @@ const EditProfile = () => {
                                     <Field
                                         type="text"
                                         name="name"
-                                        placeholder="Type here"
+                                        placeholder="Tên của bạn"
                                         className="input input-bordered w-full max-w-xs"
                                     />
                                     <ErrorMessage name="name" component="div" className="text-error text-sm" />
@@ -90,7 +117,7 @@ const EditProfile = () => {
                                     <p className="font-bold text-sm text-primary mb-1">Biệt danh (tên gọi khác)</p>
                                     <Field
                                         type="text"
-                                        placeholder="Type here"
+                                        placeholder="Biệt danh"
                                         name="otherName"
                                         className="input input-bordered w-full max-w-xs"
                                     />
@@ -110,7 +137,7 @@ const EditProfile = () => {
                                     <p className="font-bold text-sm text-primary mb-1">Địa chỉ</p>
                                     <Field
                                         type="text"
-                                        placeholder="Type here"
+                                        placeholder="Địa chỉ"
                                         name="address"
                                         className="input input-bordered w-full max-w-xs"
                                     />
