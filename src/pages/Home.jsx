@@ -21,7 +21,7 @@ const Home = () => {
     };
 
     return (
-        <div className=' px-4 py-2'>
+        <div className=" px-4 py-2">
             <h1 className="text-primary font-bold">Home</h1>
             <div className="mt-2">
                 <Feed />
@@ -49,24 +49,29 @@ const Home = () => {
                                 <HiOutlineVideoCamera size={25} />
                             </div>
                         </label>
-                        <div className='relative'>
-                        <Tippy
-                            interactive={true}
-                            visible={showEmoji}
-                            onClickOutside={() => setShowEmoji(false)}
-                            placement='bottom'
-                            render={(attrs) => (
-                                <div {...attrs} className="mb-2">
-                                    <EmojiPicker emojiVersion={'1.0'} height={"350px"} onEmojiClick={handleEmojiClick} />
+                        <div className="relative">
+                            <Tippy
+                                interactive={true}
+                                visible={showEmoji}
+                                onClickOutside={() => setShowEmoji(false)}
+                                placement="bottom"
+                                render={(attrs) => (
+                                    <div {...attrs} className="mb-2">
+                                        <EmojiPicker
+                                            emojiVersion={'1.0'}
+                                            height={'350px'}
+                                            onEmojiClick={handleEmojiClick}
+                                        />
+                                    </div>
+                                )}
+                            >
+                                <div className="tooltip" data-tip="Cảm xúc">
+                                    <div className="btn btn-sm btn-ghost" onClick={() => setShowEmoji(!showEmoji)}>
+                                        <PiSmileyWinkLight size={25} />
+                                    </div>
                                 </div>
-                            )}
-                        >
-                            <div className="tooltip" data-tip="Cảm xúc">
-                                <div className="btn btn-sm btn-ghost" onClick={() => setShowEmoji(!showEmoji)}>
-                                    <PiSmileyWinkLight size={25} />
-                                </div>
-                            </div>
-                        </Tippy></div>
+                            </Tippy>
+                        </div>
                     </div>
                 </div>
                 <div className="flex justify-end mt-4">
@@ -74,8 +79,8 @@ const Home = () => {
                 </div>
             </div>
 
-            <div className='mt-8 space-y-2'>
-             {[1,2,3,4,5,6,7,8,9,10].map((item,index) => <CardPost key={index}/>)} 
+            <div className="mt-8 space-y-2">
+                {/* {[1,2,3,4,5,6,7,8,9,10].map((item,index) => <CardPost key={index}/>)}  */}
             </div>
         </div>
     );

@@ -73,7 +73,7 @@ const DetailGroup = () => {
             <div className="mt-[60px] px-4">
                 <div className="flex items-center gap-2 flex-wrap">
                     {tabs.map((tab, index) => (
-                        <Link to={tab.action ? `/group/${id}?action=${tab.action}` : `/group/${id}`}>
+                        <Link key={index} to={tab.action ? `/group/${id}?action=${tab.action}` : `/group/${id}`}>
                             <button className={`btn btn-sm ${action === tab.action ? 'btn-primary' : ''}`}>
                                 {tab.title}
                             </button>
@@ -141,16 +141,16 @@ const DetailGroup = () => {
                     </div>
 
                     <div className="mt-8 space-y-2">
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item, index) => (
+                        {/* {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((item, index) => (
                             <CardPost key={index} />
-                        ))}
+                        ))} */}
                     </div>
                 </div>
             )}
 
             {action == 'members' && (
                 <div className="px-4 mt-4">
-                    {[1, 2, 3, 4].map((item,index) => (
+                    {[1, 2, 3, 4].map((item, index) => (
                         <div key={index} className="flex items-center justify-between border-b py-2">
                             <div className="flex items-center gap-2">
                                 <img
