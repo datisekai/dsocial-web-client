@@ -9,6 +9,7 @@ const routes = {
     group: '/group',
     profile: '/profile',
     editProfile: '/profile/edit',
+    groupDetail: '/group/:id',
 };
 
 export default routes;
