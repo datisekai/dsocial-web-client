@@ -5,6 +5,7 @@ import FriendServices from '../services/FriendService';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import Swal from 'sweetalert2';
+import getImage from '../utils/getImage';
 
 const tabs = [
     {
@@ -19,7 +20,7 @@ const tabs = [
 const Friend = () => {
     const query = useQueryParams();
     const queryClient = useQueryClient();
-    const [itemUser, setItemUser] = useState({});
+    const [itemUser, setItemUser] = useState(null);
 
     const { user } = useSelector((state) => state.user);
 
@@ -57,6 +58,7 @@ const Friend = () => {
                         pagination: currentFriendResq.pagination,
                     };
                     queryClient.setQueryData(['friendRequests', user.id], newDataFriendRequest);
+                    setItemUser(null);
                 }
             }
         },
@@ -81,6 +83,7 @@ const Friend = () => {
                 };
                 console.log(newDataFriendRequest);
                 queryClient.setQueryData(['friendRequests', user.id], newDataFriendRequest);
+                setItemUser(null);
             }
         },
         onError: (error) => {
@@ -103,6 +106,7 @@ const Friend = () => {
                     pagination: currentFriend.pagination,
                 };
                 queryClient.setQueryData(['friends', user.id], newDataFriend);
+                setItemUser(null);
             }
         },
         onError: (error) => {
@@ -127,7 +131,6 @@ const Friend = () => {
         setItemUser(values);
         mutateDelFriend(values.id);
     };
-    console.log(dataFriendRequest, isLoadingFriendRequest);
     return (
         <div className="flex flex-col md:flex-row  px-4 py-2">
             <ul className="w-full border-r md:w-[150px] flex flex-row md:flex-col">
@@ -156,7 +159,7 @@ const Friend = () => {
                                         <div className="flex items-center gap-2">
                                             <img
                                                 className="rounded-full w-[70px] h-[70px]"
-                                                src={`${item.avatar}`}
+                                                src={`${getImage(item.avatar)}`}
                                                 alt=""
                                             />
                                             <h2 className="font-bold">{item.name}</h2>
@@ -194,7 +197,7 @@ const Friend = () => {
                                             <div className="flex items-center gap-2">
                                                 <img
                                                     className="rounded-full w-[70px] h-[70px]"
-                                                    src={`${item.avatar}`}
+                                                    src={`${getImage(item.avatar)}`}
                                                     alt=""
                                                 />
                                                 <h2 className="font-bold">{item.name}</h2>
