@@ -12,9 +12,23 @@ const GroupServices = {
         const result = await axiosClient.get(`/group/own`);
         return result.data;
     },
-    joinGroup: async (groupId) => {
+    joinGroup: async () => {
+        const result = await axiosClient.post(`/group-user`);
+        return result.data;
+    },
+    getDetailGroup: async (groupId) => {
         if (!groupId) return;
-        const result = await axiosClient.post(`/group-user`, groupId);
+        const result = await axiosClient.get(`/group/detail/${groupId}`);
+        return result.data;
+    },
+    getPostDetailGroup: async (groupId) => {
+        if (!groupId) return;
+        const result = await axiosClient.get(`/post/group/${groupId}`);
+        return result.data;
+    },
+    kickUser: async (data) => {
+        if (!data) return;
+        const result = await axiosClient.delete(`/group-user/kick`, { data });
         return result.data;
     },
 };

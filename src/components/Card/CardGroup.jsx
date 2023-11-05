@@ -39,7 +39,7 @@ const CardGroup = ({ group, isJoin }) => {
                 }
             }
 
-            Swal.fire('Thành công!', 'Đã tham gia nhóm', 'success');
+            Swal.fire('Thành công!', data.message, 'success');
             setCurrentGroup(null);
         },
         onError: (error) => {

@@ -45,20 +45,20 @@ const Friend = () => {
             if (currentFriend) {
                 const newDataFriend = {
                     success: currentFriend.success,
-                    data: [...currentFriend.data, data.data.data],
+                    data: [...currentFriend.data, data.data],
                     pagination: currentFriend.pagination,
                 };
                 queryClient.setQueryData(['friends', user.id], newDataFriend);
                 if (currentFriendResq) {
                     const newDataFriendRequest = {
                         success: currentFriendResq.success,
-                        data: currentFriendResq.data.filter((item) => item.id !== data.data.data.id),
+                        data: currentFriendResq.data.filter((item) => item.id !== data.data.id),
                         pagination: currentFriendResq.pagination,
                     };
                     queryClient.setQueryData(['friendRequests', user.id], newDataFriendRequest);
                 }
             }
-            Swal.fire('Thành công!', 'Đã đồng ý kết bạn', 'success');
+            Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -75,12 +75,12 @@ const Friend = () => {
             if (currentFriendResq) {
                 const newDataFriendRequest = {
                     success: currentFriendResq.success,
-                    data: currentFriendResq.data.filter((item) => item.id !== data.data.data.id),
+                    data: currentFriendResq.data.filter((item) => item.id !== data.data.id),
                     pagination: currentFriendResq.pagination,
                 };
                 queryClient.setQueryData(['friendRequests', user.id], newDataFriendRequest);
             }
-            Swal.fire('Thành công!', 'Đã xóa lời mời kết bạn', 'success');
+            Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -97,12 +97,12 @@ const Friend = () => {
             if (currentFriend) {
                 const newDataFriend = {
                     success: currentFriend.success,
-                    data: currentFriend.data.filter((item) => item.id !== data.data.data.id),
+                    data: currentFriend.data.filter((item) => item.id !== data.data.id),
                     pagination: currentFriend.pagination,
                 };
                 queryClient.setQueryData(['friends', user.id], newDataFriend);
             }
-            Swal.fire('Thành công!', 'Đã xóa bạn', 'success');
+            Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {

@@ -9,17 +9,20 @@ const FriendServices = {
         const result = await axiosClient.get(`/friend/requests`);
         return result.data;
     },
-    acceptFriend: (userId) => {
+    acceptFriend: async (userId) => {
         if (!userId) return;
-        return axiosClient.put(`/friend/${userId}`);
+        const result = await axiosClient.put(`/friend/${userId}`);
+        return result;
     },
-    deleteFriendRequest: (userId) => {
+    deleteFriendRequest: async (userId) => {
         if (!userId) return;
-        return axiosClient.delete(`/friend/request/${userId}`);
+        const result = await axiosClient.delete(`/friend/request/${userId}`);
+        return result;
     },
-    deleteFriend: (userId) => {
+    deleteFriend: async (userId) => {
         if (!userId) return;
-        return axiosClient.delete(`/friend/${userId}`);
+        const result = await axiosClient.delete(`/friend/${userId}`);
+        return result;
     },
 };
 
