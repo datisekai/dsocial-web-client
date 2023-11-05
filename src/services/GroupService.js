@@ -12,6 +12,11 @@ const GroupServices = {
         const result = await axiosClient.get(`/group/own`);
         return result.data;
     },
+    joinGroup: async (groupId) => {
+        if (!groupId) return;
+        const result = await axiosClient.post(`/group-user`, groupId);
+        return result.data;
+    },
 };
 
 export default GroupServices;

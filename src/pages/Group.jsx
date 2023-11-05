@@ -22,7 +22,6 @@ const tabs = [
 ];
 const Group = () => {
     const query = useQueryParams();
-    const { user } = useSelector((state) => state.user);
     const action = query.get('action') || '';
     const { data: dataAllGroups, isLoading: isLoadingAllGroups } = useQuery({
         queryKey: ['allgroups'],

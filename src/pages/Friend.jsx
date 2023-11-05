@@ -20,7 +20,6 @@ const tabs = [
 const Friend = () => {
     const query = useQueryParams();
     const queryClient = useQueryClient();
-    const [itemUser, setItemUser] = useState(null);
 
     const { user } = useSelector((state) => state.user);
 
@@ -41,26 +40,25 @@ const Friend = () => {
     const { mutate: mutateAcceptFriend, isPending: isPendingAcceptF } = useMutation({
         mutationFn: FriendServices.acceptFriend,
         onSuccess: (data) => {
-            Swal.fire('Thành công!', 'Đã đồng ý kết bạn', 'success');
             const currentFriend = queryClient.getQueryData(['friends', user.id]);
             const currentFriendResq = queryClient.getQueryData(['friendRequests', user.id]);
             if (currentFriend) {
                 const newDataFriend = {
                     success: currentFriend.success,
-                    data: [...currentFriend.data, itemUser],
+                    data: [...currentFriend.data, data.data.data],
                     pagination: currentFriend.pagination,
                 };
                 queryClient.setQueryData(['friends', user.id], newDataFriend);
                 if (currentFriendResq) {
                     const newDataFriendRequest = {
                         success: currentFriendResq.success,
-                        data: currentFriendResq.data.filter((item) => item.id !== itemUser.id),
+                        data: currentFriendResq.data.filter((item) => item.id !== data.data.data.id),
                         pagination: currentFriendResq.pagination,
                     };
                     queryClient.setQueryData(['friendRequests', user.id], newDataFriendRequest);
-                    setItemUser(null);
                 }
             }
+            Swal.fire('Thành công!', 'Đã đồng ý kết bạn', 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -73,18 +71,16 @@ const Friend = () => {
     const { mutate: mutateDelFriendReq, isPending: isPendingDelFResq } = useMutation({
         mutationFn: FriendServices.deleteFriendRequest,
         onSuccess: (data) => {
-            Swal.fire('Thành công!', 'Đã xóa lời mời kết bạn', 'success');
             const currentFriendResq = queryClient.getQueryData(['friendRequests', user.id]);
             if (currentFriendResq) {
                 const newDataFriendRequest = {
                     success: currentFriendResq.success,
-                    data: currentFriendResq.data.filter((item) => item.id !== itemUser.id),
+                    data: currentFriendResq.data.filter((item) => item.id !== data.data.data.id),
                     pagination: currentFriendResq.pagination,
                 };
-                console.log(newDataFriendRequest);
                 queryClient.setQueryData(['friendRequests', user.id], newDataFriendRequest);
-                setItemUser(null);
             }
+            Swal.fire('Thành công!', 'Đã xóa lời mời kết bạn', 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -97,17 +93,16 @@ const Friend = () => {
     const { mutate: mutateDelFriend, isPending: isPendingDelF } = useMutation({
         mutationFn: FriendServices.deleteFriend,
         onSuccess: (data) => {
-            Swal.fire('Thành công!', 'Đã xóa bạn', 'success');
             const currentFriend = queryClient.getQueryData(['friends', user.id]);
             if (currentFriend) {
                 const newDataFriend = {
                     success: currentFriend.success,
-                    data: currentFriend.data.filter((item) => item.id !== itemUser.id),
+                    data: currentFriend.data.filter((item) => item.id !== data.data.data.id),
                     pagination: currentFriend.pagination,
                 };
                 queryClient.setQueryData(['friends', user.id], newDataFriend);
-                setItemUser(null);
             }
+            Swal.fire('Thành công!', 'Đã xóa bạn', 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -118,17 +113,14 @@ const Friend = () => {
     });
 
     const handleAcceptFriend = (values) => {
-        setItemUser(values);
         mutateAcceptFriend(values.id);
     };
 
     const handleDelFriendReq = (values) => {
-        setItemUser(values);
         mutateDelFriendReq(values.id);
     };
 
     const handleDelFriend = (values) => {
-        setItemUser(values);
         mutateDelFriend(values.id);
     };
     return (
@@ -205,6 +197,7 @@ const Friend = () => {
                                             <button
                                                 className="btn btn-sm md:btn-md"
                                                 onClick={() => handleDelFriend(item)}
+                                                disabled={isPendingDelF}
                                             >
                                                 {isPendingDelF && <span className="loading loading-spinner"></span>}
                                                 Hủy bạn bè
