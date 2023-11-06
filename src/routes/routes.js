@@ -2,6 +2,7 @@ import config from '../config';
 
 // Layouts
 import { FormLayout, PublicLayout } from '../layouts';
+import MessageLayout from '../layouts/MessageLayout';
 import ConfirmEmail from '../pages/ConfirmEmail';
 import DetailGroup from '../pages/DetailGroup';
 import EditProfile from '../pages/EditProfile';
@@ -27,7 +28,7 @@ const publicRoutes = [
 const privateRoutes = [
     { path: config.routes.home, component: Home },
     { path: config.routes.friend, component: Friend },
-    { path: config.routes.message, component: Message },
+    { path: config.routes.message, component: Message, layout: MessageLayout },
     { path: config.routes.group, component: Group },
     { path: config.routes.profile, component: Profile },
     { path: config.routes.editProfile, component: EditProfile },

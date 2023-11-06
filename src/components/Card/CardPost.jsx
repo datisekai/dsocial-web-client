@@ -107,8 +107,6 @@ const CardPost = ({ post }) => {
                             placeholder={`${user.name ? `${user.name} ơi,` : ''} bạn đang nghĩ gì thế?`}
                         ></textarea>
 
-                        <input type="file" className="hidden" id="fileImage" accept="image/*" />
-                        <input type="file" className="hidden" id="fileVideo" accept="video/*" />
                         <div className="flex items-center">
                             <div className="relative">
                                 <Tippy
