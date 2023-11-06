@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { FaRegAddressCard } from 'react-icons/fa';
 import { LiaBirthdayCakeSolid } from 'react-icons/lia';
 import { Link } from 'react-router-dom';
@@ -10,19 +10,40 @@ import { useSelector } from 'react-redux';
 import { useMutation } from '@tanstack/react-query';
 import ProfileServices from '../services/ProfileService';
 import getDate from '../utils/getDate';
+import getImage from '../utils/getImage';
+import { GoPencil } from 'react-icons/go';
 const validateSchema = Yup.object({
     bio: Yup.string(),
     name: Yup.string().required('Vui lòng nhập tên.').max(50, 'Tên không quá 50 kí tự.'),
     other_name: Yup.string(),
     birthday: Yup.date().required('Vui lòng chọn ngày sinh nhật.'),
     address: Yup.string(),
-    cover_image: Yup.mixed(),
 });
 
 const EditProfile = () => {
     const [visiblePassword, setVisiblePassword] = useState(false);
     const { user } = useSelector((state) => state.user);
 
+    const [coverImage, setCoverImage] = useState(null);
+    const [avatarImage, setAvatarImage] = useState(null);
+
+    const previewImage = useMemo(() => {
+        if (!coverImage) {
+            return user.cover_image
+                ? getImage(user.cover_image)
+                : 'https://images.unsplash.com/photo-1682685797661-9e0c87f59c60?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwxMXx8fGVufDB8fHx8fA%3D%3D';
+        }
+
+        return URL.createObjectURL(coverImage);
+    }, [coverImage]);
+
+    const previewAvatar = useMemo(() => {
+        if (!avatarImage) {
+            return getImage(user.avatar);
+        }
+
+        return URL.createObjectURL(avatarImage);
+    }, [avatarImage]);
     // const { mutate, isPending } = useMutation({
     //     mutationFn: ProfileServices.updateProfile,
     //     onSuccess: (data) => {
@@ -36,8 +57,28 @@ const EditProfile = () => {
     //     },
     // });
     const handleSubmit = (values) => {
-        console.log('submit', values);
-        // mutate(values);
+        let cover_image = user.cover_image;
+        let avatar = user.avatar
+        //TODO
+        if (coverImage) {
+            const formData = new FormData();
+            formData.append('file', coverImage);
+            //TODO
+            //CALL API UPLOAD & gửi formData lên để lấy url image;
+            //gán lại cover_image = url vừa lấy được
+        }
+
+        if (avatarImage) {
+            const formData = new FormData();
+            formData.append('file', avatarImage);
+            //TODO
+            //CALL API UPLOAD & gửi formData lên để lấy url image;
+            //gán lại avatar = url vừa lấy được
+        }
+
+        const payload = { ...values, cover_image, avatar };
+        console.log('submit', payload);
+        // mutate(payload);
     };
 
     return (
@@ -59,21 +100,43 @@ const EditProfile = () => {
                 {({ handleSubmit }) => (
                     <>
                         <div className="relative">
-                            <div>
-                                <Field type="file" name="cover_image" className="absolute" />
+                            <div className="flex items-center justify-center">
+                                <input
+                                    type="file"
+                                    className="absolute"
+                                    onChange={(e) => setCoverImage(e.target.files[0])}
+                                    accept="image/*"
+                                />
                                 <img
                                     className="w-full h-auto aspect-video md:aspect-auto md:h-[250px] object-cover "
-                                    src="https://images.unsplash.com/photo-1682685797661-9e0c87f59c60?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwxMXx8fGVufDB8fHx8fA%3D%3D"
+                                    src={previewImage}
                                 />
                             </div>
 
                             <div className="absolute px-4 bottom-[-40px] left-0 right-0 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <img
-                                        className="rounded-full w-[80px] h-[80px] border-primary border-2"
-                                        src="http://fakeimg.pl/50x50?font=lobster"
-                                        alt=""
-                                    />
+                                    <div className="relative">
+                                        <img
+                                            className="rounded-full w-[80px] h-[80px] border-primary border-2"
+                                            src={previewAvatar}
+                                            alt=""
+                                        />
+                                        <div className='absolute inset-0 rounded-full flex items-center justify-center bg-[rgba(0,0,0,0.6)]'>
+                                            <label
+                                                htmlFor="avatar"
+                                                className="cursor-pointer text-white p-1 rounded-full"
+                                            >
+                                                <GoPencil />
+                                            </label>
+                                        </div>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            id="avatar"
+                                            onChange={(e) => setAvatarImage(e.target.files[0])}
+                                        />
+                                    </div>
                                     <div className="">
                                         <h1 className="font-bold text-primary">Thành Đạt</h1>
                                         <p className="text-[#828486]">(datisekai)</p>

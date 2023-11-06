@@ -1,12 +1,20 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import tabs from '../data/tabs';
+import { BiLogOutCircle } from 'react-icons/bi';
+import { removeTokenAndUser } from '../redux/slices/userSlice';
 
 const Sidebar = () => {
     const { user } = useSelector((state) => state.user);
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
 
+    const handleLogout = () => {
+        dispatch(removeTokenAndUser())
+        navigate('/login')
+    }
     return (
         <div className="">
             <div className="flex items-center gap-4">
@@ -36,6 +44,10 @@ const Sidebar = () => {
                         </NavLink>
                     );
                 })}
+                <li onClick={handleLogout} className="sidebar flex hover:font-medium cursor-pointer gap-x-4 items-center py-2">
+                    <BiLogOutCircle />
+                    <span>Đăng xuất</span>
+                </li>
             </ul>
         </div>
     );
