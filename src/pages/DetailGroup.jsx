@@ -13,7 +13,7 @@ import GroupServices from '../services/GroupService';
 import getImage from '../utils/getImage';
 import Swal from 'sweetalert2';
 import { useSelector } from 'react-redux';
-
+import calculateCreatedTime from '../utils/calculateCreatedTime';
 const tabs = [
     {
         action: '',
@@ -120,7 +120,9 @@ const DetailGroup = () => {
                             </div>
                         </div>
 
-                        <button className="btn btn-sm md:btn-md btn-primary">Mời thành viên</button>
+                        <button className="btn btn-sm md:btn-md btn-primary">
+                            {dataDetailGroup?.data.user_own.id == user.id ? 'Xóa nhóm' : 'Rời nhóm'}
+                        </button>
                     </div>
                 </div>
             )}
@@ -216,9 +218,15 @@ const DetailGroup = () => {
                                     <div>
                                         <p className="font-bold">
                                             {item.name}
-                                            {item.id == dataDetailGroup?.data.user_own.id && ' (Own)'}
+                                            {item.id == dataDetailGroup?.data.user_own.id
+                                                ? ' (Chủ nhóm)'
+                                                : ' (Thành viên)'}
                                         </p>
-                                        <p>{item.bio != null && '(' + item.other_name + ')'}</p>
+                                        <p>
+                                            {calculateCreatedTime(item.joined_date) == 'Ngay bây giờ'
+                                                ? 'Vừa vào nhóm'
+                                                : 'Đã tham gia ' + calculateCreatedTime(item.joined_date)}
+                                        </p>
                                     </div>
                                 </div>
                                 {!isLoadingDetailGroup &&

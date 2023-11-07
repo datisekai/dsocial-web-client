@@ -13,6 +13,7 @@ import getDate from '../utils/getDate';
 import getImage from '../utils/getImage';
 import { GoPencil } from 'react-icons/go';
 import { uploadServer } from '../utils/axiosClient';
+import Swal from 'sweetalert2';
 const validateSchema = Yup.object({
     bio: Yup.string(),
     name: Yup.string().required('Vui lòng nhập tên.').max(50, 'Tên không quá 50 kí tự.'),
@@ -30,9 +31,7 @@ const EditProfile = () => {
 
     const previewImage = useMemo(() => {
         if (!coverImage) {
-            return user.cover_image
-                ? getImage(user.cover_image)
-                : 'https://images.unsplash.com/photo-1682685797661-9e0c87f59c60?auto=format&fit=crop&q=60&w=500&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwxMXx8fGVufDB8fHx8fA%3D%3D';
+            return user.cover_image ? getImage(user.cover_image) : getImage(null);
         }
 
         return URL.createObjectURL(coverImage);
@@ -45,33 +44,36 @@ const EditProfile = () => {
 
         return URL.createObjectURL(avatarImage);
     }, [avatarImage]);
-    // const { mutate, isPending } = useMutation({
-    //     mutationFn: ProfileServices.updateProfile,
-    //     onSuccess: (data) => {
-    //         Swal.fire('Thành công!', 'Đã thay đổi thông tin', 'success');
-    //     },
-    //     onError: (error) => {
-    //         if (error?.message) {
-    //             return Swal.fire('Thất bại!', error.message, 'error');
-    //         }
-    //         Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
-    //     },
-    // });
+
+    const { mutate, isPending } = useMutation({
+        mutationFn: ProfileServices.updateProfile,
+        onSuccess: (data) => {
+            Swal.fire('Thành công!', data.message, 'success');
+        },
+        onError: (error) => {
+            if (error?.message) {
+                return Swal.fire('Thất bại!', error.message, 'error');
+            }
+            Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
+        },
+    });
     const handleSubmit = async (values) => {
         let cover_image = user.cover_image;
-        let avatar = user.avatar
+        let avatar = user.avatar;
         //TODO
         if (coverImage) {
-            cover_image = await uploadServer(coverImage)
+            const resultCoverImage = await uploadServer(coverImage);
+            cover_image = resultCoverImage.data;
         }
 
         if (avatarImage) {
-            avatar = await uploadServer(avatarImage)
+            const resultAvatar = await uploadServer(avatarImage);
+            avatar = resultAvatar.data;
         }
 
         const payload = { ...values, cover_image, avatar };
         console.log('submit', payload);
-        // mutate(payload);
+        mutate(values);
     };
 
     return (
@@ -86,7 +88,6 @@ const EditProfile = () => {
                     other_name: user.other_name || '',
                     birthday: user.birthday != null ? getDate(user.birthday) : null,
                     address: user.address || '',
-                    cover_image: user.cover_image || '',
                 }}
                 validationSchema={validateSchema}
             >
@@ -114,7 +115,7 @@ const EditProfile = () => {
                                             src={previewAvatar}
                                             alt=""
                                         />
-                                        <div className='absolute inset-0 rounded-full flex items-center justify-center bg-[rgba(0,0,0,0.6)]'>
+                                        <div className="absolute inset-0 rounded-full flex items-center justify-center bg-[rgba(0,0,0,0.6)]">
                                             <label
                                                 htmlFor="avatar"
                                                 className="cursor-pointer text-white p-1 rounded-full"
@@ -140,7 +141,9 @@ const EditProfile = () => {
                                     className="btn btn-sm md:btn-md btn-primary"
                                     type="button"
                                     onClick={handleSubmit}
+                                    disabled={isPending}
                                 >
+                                    {isPending && <span className="loading loading-spinner"></span>}
                                     Lưu thay đổi
                                 </button>
                             </div>

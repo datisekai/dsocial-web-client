@@ -3,6 +3,7 @@ import { ErrorMessage, Field, Formik } from 'formik';
 import React from 'react';
 import Swal from 'sweetalert2';
 import * as Yup from 'yup';
+import ProfileServices from '../services/ProfileService';
 
 const validateSchema = Yup.object({
     oldPassword: Yup.string().required('Vui lòng nhập mật khẩu cũ.'),
@@ -13,18 +14,21 @@ const validateSchema = Yup.object({
 });
 const ChangePasswordModal = ({ visible = false, onClose }) => {
     const { mutate, isPending } = useMutation({
-        mutationFn: () => {},
+        mutationFn: ProfileServices.changePassword,
         onSuccess: (data) => {
-            Swal.fire('Thành công!', message, 'success');
+            console.log(data);
+            Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
-            const message = error.message;
-            Swal.fire('Lỗi!', message, 'error');
+            if (error?.message) {
+                return Swal.fire('Thất bại!', error.message, 'error');
+            }
+            Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
         },
     });
 
     const handleChangePassword = (values) => {
-        console.log(values);
+        mutate(values);
     };
 
     return (
@@ -34,7 +38,7 @@ const ChangePasswordModal = ({ visible = false, onClose }) => {
                 <div className="modal-box">
                     <Formik
                         onSubmit={(values) => {
-                            console.log('called')
+                            console.log('called');
                             handleChangePassword(values);
                         }}
                         initialValues={{ oldPassword: '', newPassword: '', confirm: '' }}
@@ -80,7 +84,7 @@ const ChangePasswordModal = ({ visible = false, onClose }) => {
                                         </div>
                                         <button
                                             disabled={isPending}
-                                            type='button'
+                                            type="button"
                                             onClick={handleSubmit}
                                             className="btn btn-primary text-primary-content"
                                         >

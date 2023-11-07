@@ -50,7 +50,7 @@ const CardPost = ({ post }) => {
             <div className="flex items-center gap-2">
                 <div className="avatar">
                     <div className="w-12 rounded-full">
-                        <img src={`${post.user_post.avatar}`} />
+                        <img src={getImage(post.user_post.avatar)} />
                     </div>
                 </div>
                 <div>
@@ -142,7 +142,7 @@ const CardPost = ({ post }) => {
                 <div className="space-y-2 mt-4">
                     {parentComments.map((item) => {
                         return (
-                            <div key={item.id} >
+                            <div key={item.id}>
                                 <div className="flex gap-2 py-2">
                                     <img
                                         src={getImage(item.user_comment.avatar)}
@@ -150,7 +150,9 @@ const CardPost = ({ post }) => {
                                         alt=""
                                     />
                                     <div className="">
-                                        <h4 className="font-medium">{item.user_comment.name || item.user_comment.other_name}</h4>
+                                        <h4 className="font-medium">
+                                            {item.user_comment.name || item.user_comment.other_name}
+                                        </h4>
                                         <p>{item.content}</p>
                                         {!showReply.includes(item.id) && getChildrenComment(item.id).length > 0 && (
                                             <div className="text-xs flex items-center link link-hover gap-1 mt-1">

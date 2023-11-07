@@ -10,9 +10,15 @@ const ProfileServices = {
         const result = await axiosClient.get(`/post/user/${userId}`);
         return result.data;
     },
-    updateProfile: (data) => {
+    updateProfile: async (data) => {
         if (!data) return;
-        return axiosClient.put(`/edit-profile`, data);
+        const result = await axiosClient.put(`/edit-profile`, data);
+        return result.data;
+    },
+    changePassword: async (data) => {
+        if (!data) return;
+        const result = await axiosClient.put(`/change-password`, data);
+        return result.data;
     },
 };
 

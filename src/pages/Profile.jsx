@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import ProfileServices from '../services/ProfileService';
 import getImage from '../utils/getImage';
-
+import getDate from '../utils/getDate';
 const Profile = () => {
     const { user } = useSelector((state) => state.user);
 
@@ -31,13 +31,13 @@ const Profile = () => {
                 <div className="relative">
                     <img
                         className="w-full h-auto aspect-video md:aspect-auto md:h-[250px] object-cover "
-                        src={`${getImage(dataProfile.data.cover_image)}`}
+                        src={getImage(dataProfile.data.cover_image)}
                     />
                     <div className="absolute px-4 bottom-[-40px] left-0 right-0 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <img
                                 className="rounded-full w-[80px] h-[80px] border-primary border-2"
-                                src={`${getImage(dataProfile.data.avatar)}`}
+                                src={getImage(dataProfile.data.avatar)}
                                 alt=""
                             />
                             <div className="">
@@ -61,12 +61,12 @@ const Profile = () => {
                             {dataProfile.data.bio && <p>{dataProfile.data.bio}</p>}
                             {dataProfile.data.birthday && (
                                 <div className="flex items-center gap-2">
-                                    <LiaBirthdayCakeSolid size={22} /> <span>{dataProfile.data.birthday}</span>
+                                    <LiaBirthdayCakeSolid size={22} /> <span>{getDate(dataProfile.data.birthday)}</span>
                                 </div>
                             )}
                             {dataProfile.data.address && (
                                 <div className="flex items-center gap-2">
-                                    <FaRegAddressCard size={22} /> <span>Tân Bình, TP.HCM</span>
+                                    <FaRegAddressCard size={22} /> <span>{dataProfile.data.address}</span>
                                 </div>
                             )}
                         </div>

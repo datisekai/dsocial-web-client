@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-console.log(import.meta.env.VITE_APP_SERVER_URL)
+console.log(import.meta.env.VITE_APP_SERVER_URL);
 
 export const axiosClient = axios.create({
     baseURL: import.meta.env.VITE_APP_SERVER_URL,
@@ -18,14 +18,14 @@ export const uploadCloudinary = async (file) => {
     return imageData.data.url;
 };
 
-export const uploadServer = async(file) => {
-    const formData = new FormData()
-    formData.append('file', file)
-    
-    const result = await axiosClient.post('/uploads', formData)
+export const uploadServer = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
 
-    return result.data
-}
+    const result = await axiosClient.post('/upload', formData);
+
+    return result.data;
+};
 
 axiosClient.interceptors.request.use((config) => {
     if (config.url?.indexOf('login') !== -1) {
@@ -51,7 +51,7 @@ axiosClient.interceptors.response.use(
     },
     (error) => {
         console.log(error);
-        if (error?.response?.status === 401 ) {
+        if (error?.response?.status === 401) {
             if (typeof window !== 'undefined') {
                 window.location.href = '/login';
                 localStorage.removeItem('token');
