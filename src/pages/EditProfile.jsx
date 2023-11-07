@@ -12,6 +12,7 @@ import ProfileServices from '../services/ProfileService';
 import getDate from '../utils/getDate';
 import getImage from '../utils/getImage';
 import { GoPencil } from 'react-icons/go';
+import { uploadServer } from '../utils/axiosClient';
 const validateSchema = Yup.object({
     bio: Yup.string(),
     name: Yup.string().required('Vui lòng nhập tên.').max(50, 'Tên không quá 50 kí tự.'),
@@ -56,24 +57,16 @@ const EditProfile = () => {
     //         Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
     //     },
     // });
-    const handleSubmit = (values) => {
+    const handleSubmit = async (values) => {
         let cover_image = user.cover_image;
         let avatar = user.avatar
         //TODO
         if (coverImage) {
-            const formData = new FormData();
-            formData.append('file', coverImage);
-            //TODO
-            //CALL API UPLOAD & gửi formData lên để lấy url image;
-            //gán lại cover_image = url vừa lấy được
+            cover_image = await uploadServer(coverImage)
         }
 
         if (avatarImage) {
-            const formData = new FormData();
-            formData.append('file', avatarImage);
-            //TODO
-            //CALL API UPLOAD & gửi formData lên để lấy url image;
-            //gán lại avatar = url vừa lấy được
+            avatar = await uploadServer(avatarImage)
         }
 
         const payload = { ...values, cover_image, avatar };

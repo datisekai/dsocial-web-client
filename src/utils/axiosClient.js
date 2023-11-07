@@ -18,6 +18,15 @@ export const uploadCloudinary = async (file) => {
     return imageData.data.url;
 };
 
+export const uploadServer = async(file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    
+    const result = await axiosClient.post('/uploads', formData)
+
+    return result.data
+}
+
 axiosClient.interceptors.request.use((config) => {
     if (config.url?.indexOf('login') !== -1) {
         return config;
