@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { kFormatter } from '../utils/common';
 import useQueryParams from '../hooks/useQueryParams';
 import Tippy from '@tippyjs/react/headless';
@@ -30,6 +30,7 @@ const DetailGroup = () => {
     const query = useQueryParams();
     const queryClient = useQueryClient();
     const { user } = useSelector((state) => state.user);
+    const navigate = useNavigate();
 
     const { data: dataDetailGroup, isLoading: isLoadingDetailGroup } = useQuery({
         queryKey: ['detailgroup'],
@@ -45,7 +46,7 @@ const DetailGroup = () => {
         },
     });
 
-    const { mutate, isPending } = useMutation({
+    const { mutate: mutateKickUser, isPending: isPendingKickUser } = useMutation({
         mutationFn: GroupServices.kickUser,
         onSuccess: (data) => {
             const currentDetailGroup = queryClient.getQueryData(['detailgroup']);
@@ -71,6 +72,33 @@ const DetailGroup = () => {
         },
     });
 
+    const { mutate: mutateOutUser, isPending: isPendingOutUser } = useMutation({
+        mutationFn: GroupServices.outGroup,
+        onSuccess: (data) => {
+            const currentDetailGroup = queryClient.getQueryData(['detailgroup']);
+
+            if (currentDetailGroup) {
+                const newDataDetailGroup = {
+                    success: currentDetailGroup.success,
+                    data: {
+                        ...currentDetailGroup.data,
+                        users_joined: currentDetailGroup.data.users_joined.filter((item) => item.id !== data.data.id),
+                    },
+                };
+                queryClient.setQueryData(['detailgroup'], newDataDetailGroup);
+            }
+            console.log(currentDetailGroup);
+            Swal.fire('Thành công!', data.message, 'success');
+            navigate('/group');
+        },
+        onError: (error) => {
+            if (error?.message) {
+                return Swal.fire('Thất bại!', error.message, 'error');
+            }
+            Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
+        },
+    });
+
     const inputRef = React.useRef(null);
 
     const [showEmoji, setShowEmoji] = React.useState(false);
@@ -82,9 +110,11 @@ const DetailGroup = () => {
     };
     const action = query.get('action') || '';
 
-    const handleSubmit = (values) => {
-        console.log({ groupId: id, userId: values.id + '' });
-        mutate({ groupId: id, userId: values.id + '' });
+    const handleSubmitKickUser = (values) => {
+        mutateKickUser({ groupId: id, userId: values.id + '' });
+    };
+    const handleSubmiitOutGroup = () => {
+        mutateOutUser({ groupId: id });
     };
     console.log(dataDetailGroup);
     return (
@@ -120,9 +150,17 @@ const DetailGroup = () => {
                             </div>
                         </div>
 
-                        <button className="btn btn-sm md:btn-md btn-primary">
-                            {dataDetailGroup?.data.user_own.id == user.id ? 'Xóa nhóm' : 'Rời nhóm'}
-                        </button>
+                        {dataDetailGroup?.data.user_own.id == user.id ? (
+                            <button className="btn btn-sm md:btn-md btn-primary">Xóa nhóm</button>
+                        ) : (
+                            <button
+                                className="btn btn-sm md:btn-md btn-primary"
+                                disabled={isPendingOutUser}
+                                onClick={() => handleSubmiitOutGroup(dataDetailGroup?.data.id)}
+                            >
+                                {isPendingKickUser && <span className="loading loading-spinner"></span>}Rời nhóm
+                            </button>
+                        )}
                     </div>
                 </div>
             )}
@@ -234,10 +272,10 @@ const DetailGroup = () => {
                                 item.id != user.id ? (
                                     <button
                                         className="btn btn-ghost btn-sm md:btn-md"
-                                        disabled={isPending}
-                                        onClick={() => handleSubmit(item)}
+                                        disabled={isPendingKickUser}
+                                        onClick={handleSubmitKickUser}
                                     >
-                                        {isPending && <span className="loading loading-spinner"></span>}
+                                        {isPendingKickUser && <span className="loading loading-spinner"></span>}
                                         Xóa
                                     </button>
                                 ) : (
