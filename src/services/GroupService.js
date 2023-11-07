@@ -37,6 +37,11 @@ const GroupServices = {
         const result = await axiosClient.delete(`/group-user`, { data });
         return result.data;
     },
+    deleteGroup: async (groupId) => {
+        if (!groupId) return;
+        const result = await axiosClient.delete(`/group/${groupId}`);
+        return result.data;
+    },
 };
 
 export default GroupServices;

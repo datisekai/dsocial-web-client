@@ -72,7 +72,7 @@ const DetailGroup = () => {
         },
     });
 
-    const { mutate: mutateOutUser, isPending: isPendingOutUser } = useMutation({
+    const { mutate: mutateOutGroup, isPending: isPendingOutGroup } = useMutation({
         mutationFn: GroupServices.outGroup,
         onSuccess: (data) => {
             const currentDetailGroup = queryClient.getQueryData(['detailgroup']);
@@ -99,6 +99,20 @@ const DetailGroup = () => {
         },
     });
 
+    const { mutate: mutateDeleteGroup, isPending: isPendingDeleteGroup } = useMutation({
+        mutationFn: GroupServices.deleteGroup,
+        onSuccess: (data) => {
+            Swal.fire('Thành công!', data.message, 'success');
+            navigate('/group');
+        },
+        onError: (error) => {
+            if (error?.message) {
+                return Swal.fire('Thất bại!', error.message, 'error');
+            }
+            Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
+        },
+    });
+
     const inputRef = React.useRef(null);
 
     const [showEmoji, setShowEmoji] = React.useState(false);
@@ -114,9 +128,11 @@ const DetailGroup = () => {
         mutateKickUser({ groupId: id, userId: values.id + '' });
     };
     const handleSubmiitOutGroup = () => {
-        mutateOutUser({ groupId: id });
+        mutateOutGroup({ groupId: id });
     };
-    console.log(dataDetailGroup);
+    const handleSubmiitDeleteGroup = () => {
+        mutateDeleteGroup(id);
+    };
     return (
         <div>
             {!isLoadingDetailGroup && (
@@ -151,14 +167,22 @@ const DetailGroup = () => {
                         </div>
 
                         {dataDetailGroup?.data.user_own.id == user.id ? (
-                            <button className="btn btn-sm md:btn-md btn-primary">Xóa nhóm</button>
+                            <button
+                                className="btn btn-sm md:btn-md btn-primary"
+                                disabled={isPendingDeleteGroup}
+                                onClick={handleSubmiitDeleteGroup}
+                            >
+                                {isPendingDeleteGroup && <span className="loading loading-spinner"></span>}
+                                Xóa nhóm
+                            </button>
                         ) : (
                             <button
                                 className="btn btn-sm md:btn-md btn-primary"
-                                disabled={isPendingOutUser}
+                                disabled={isPendingOutGroup}
                                 onClick={() => handleSubmiitOutGroup(dataDetailGroup?.data.id)}
                             >
-                                {isPendingKickUser && <span className="loading loading-spinner"></span>}Rời nhóm
+                                {isPendingOutGroup && <span className="loading loading-spinner"></span>}
+                                Rời nhóm
                             </button>
                         )}
                     </div>
