@@ -45,7 +45,7 @@ const Friend = () => {
             if (currentFriend) {
                 const newDataFriend = {
                     success: currentFriend.success,
-                    data: [...currentFriend.data, data.data],
+                    data: [data.data, ...currentFriend.data],
                     pagination: currentFriend.pagination,
                 };
                 queryClient.setQueryData(['friends', user.id], newDataFriend);

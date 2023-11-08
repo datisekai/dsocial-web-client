@@ -17,7 +17,7 @@ const CardGroup = ({ group, isJoin }) => {
             if (currentAllGroupsJoined) {
                 const newDataAllGroupsJoined = {
                     success: currentAllGroupsJoined.success,
-                    data: [...currentAllGroupsJoined.data, newCurrentGroups],
+                    data: [newCurrentGroups, ...currentAllGroupsJoined.data],
                     pagination: currentAllGroupsJoined.pagination,
                 };
                 queryClient.setQueryData(['allgroupsjoined'], newDataAllGroupsJoined);

@@ -41,6 +41,18 @@ const Home = () => {
         mutationFn: PostServices.createPost,
         onSuccess: (data) => {
             const currenPostHome = queryClient.getQueryData(['home']);
+            if (currenPostHome) {
+                console.log(data.data);
+                const newPostHome = {
+                    success: currenPostHome.success,
+                    data: [data.data, ...currenPostHome.data],
+                    pagination: currenPostHome.pagination,
+                };
+                queryClient.setQueryData(['home'], newPostHome);
+                console.log(currenPostHome.data);
+            }
+            setTextMessage('');
+            setFilePost([]);
             Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
@@ -58,9 +70,7 @@ const Home = () => {
             files = resultFilePost.data;
         }
 
-        console.log(files);
         const payload = { html: textMessage, image: files };
-        console.log('>>' + payload.image);
         mutate(payload);
     };
     return (
