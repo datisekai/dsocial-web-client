@@ -5,22 +5,22 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import tabs from '../data/tabs';
 import { BiLogOutCircle } from 'react-icons/bi';
 import { removeTokenAndUser } from '../redux/slices/userSlice';
-
+import getImage from '../utils/getImage';
 const Sidebar = () => {
     const { user } = useSelector((state) => state.user);
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const handleLogout = () => {
-        dispatch(removeTokenAndUser())
-        navigate('/login')
-    }
+        dispatch(removeTokenAndUser());
+        navigate('/login');
+    };
     return (
         <div className="">
             <div className="flex items-center gap-4">
                 <div className="avatar ">
                     <div className="w-12 rounded-full">
-                        <img src={user?.avatar} />
+                        <img src={getImage(user?.avatar)} />
                     </div>
                 </div>
                 <div>
@@ -44,7 +44,10 @@ const Sidebar = () => {
                         </NavLink>
                     );
                 })}
-                <li onClick={handleLogout} className="sidebar flex hover:font-medium cursor-pointer gap-x-4 items-center py-2">
+                <li
+                    onClick={handleLogout}
+                    className="sidebar flex hover:font-medium cursor-pointer gap-x-4 items-center py-2"
+                >
                     <BiLogOutCircle />
                     <span>Đăng xuất</span>
                 </li>

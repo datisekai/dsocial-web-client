@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import ProfileServices from '../services/ProfileService';
 import getImage from '../utils/getImage';
 import getDate from '../utils/getDate';
+import PostServices from '../services/PostService';
 const Profile = () => {
     const { user } = useSelector((state) => state.user);
 
@@ -21,7 +22,7 @@ const Profile = () => {
     const { data: dataPost, isLoading: isLoadingPost } = useQuery({
         queryKey: ['posts', user.id],
         queryFn: () => {
-            return ProfileServices.getPostByUserId(user.id);
+            return PostServices.getPostByUserId(user.id);
         },
     });
     console.log(dataPost, isLoadingPost);

@@ -12,7 +12,6 @@ import CardReplyComment from './CardReplyComment';
 
 const CardPost = ({ post }) => {
     const [isShowFullImage, setIsShowFullImage] = useState(false);
-
     const inputRef = React.useRef(null);
 
     const [showEmoji, setShowEmoji] = React.useState(false);
@@ -39,8 +38,6 @@ const CardPost = ({ post }) => {
         return post.comments.filter((item) => item.parent_id == 0);
     }, [post]);
 
-    console.log(parentComments);
-
     const getChildrenComment = (commentId) => {
         return post.comments.filter((item) => item.parent_id == commentId);
     };
@@ -66,8 +63,10 @@ const CardPost = ({ post }) => {
 
             <div className="mt-2 ">
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {(isShowFullImage ? post.images : [...post.images].splice(0, post.images.length)).map(
-                        (item, index) => (
+                    {(isShowFullImage ? post.images : [...post.images].splice(0, 6)).map((item, index) =>
+                        getImage(item.src).includes('.mp4') || getImage(item.src).includes('.mov') ? (
+                            <video controls key={index} className="w-full h-full" src={getImage(item.src)} />
+                        ) : (
                             <img src={getImage(item.src)} key={index} className="w-full h-full" />
                         ),
                     )}
@@ -80,7 +79,7 @@ const CardPost = ({ post }) => {
                         {!isShowFullImage ? 'Xem thêm' : 'Thu gọn'}
                     </button>
                 ) : (
-                    <p>No</p>
+                    ''
                 )}
             </div>
 

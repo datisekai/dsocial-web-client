@@ -14,6 +14,7 @@ import getImage from '../utils/getImage';
 import Swal from 'sweetalert2';
 import { useSelector } from 'react-redux';
 import calculateCreatedTime from '../utils/calculateCreatedTime';
+import PostServices from '../services/PostService';
 const tabs = [
     {
         action: '',
@@ -42,7 +43,7 @@ const DetailGroup = () => {
     const { data: dataPostDetailGroup, isLoading: isLoadingPostDetailGroup } = useQuery({
         queryKey: ['postdetailgroup'],
         queryFn: () => {
-            return GroupServices.getPostDetailGroup(id);
+            return PostServices.getPostDetailGroup(id);
         },
     });
 

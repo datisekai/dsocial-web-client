@@ -22,11 +22,7 @@ const GroupServices = {
         const result = await axiosClient.get(`/group/detail/${groupId}`);
         return result.data;
     },
-    getPostDetailGroup: async (groupId) => {
-        if (!groupId) return;
-        const result = await axiosClient.get(`/post/group/${groupId}`);
-        return result.data;
-    },
+
     kickUser: async (data) => {
         if (!data) return;
         const result = await axiosClient.delete(`/group-user/kick`, { data });

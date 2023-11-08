@@ -26,6 +26,17 @@ export const uploadServer = async (file) => {
 
     return result.data;
 };
+export const uploadsServer = async (files) => {
+    const formData = new FormData();
+
+    for (let i = 0; i < files.length; i++) {
+        formData.append('file', files[i]);
+    }
+
+    const result = await axiosClient.post('/uploads', formData);
+
+    return result.data;
+};
 
 axiosClient.interceptors.request.use((config) => {
     if (config.url?.indexOf('login') !== -1) {

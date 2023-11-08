@@ -2,7 +2,7 @@ import React from 'react';
 import tabs from '../../data/tabs';
 import { NavLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-
+import getImage from '../../utils/getImage';
 const DrawerMenu = ({ visible, onClose }) => {
     const { user } = useSelector((state) => state.user);
     return (
@@ -15,7 +15,7 @@ const DrawerMenu = ({ visible, onClose }) => {
                     <div className="flex items-center gap-4">
                         <div className="avatar ">
                             <div className="w-12 rounded-full">
-                                <img src={user?.avatar} />
+                                <img src={getImage(user?.avatar)} />
                             </div>
                         </div>
                         <div>
