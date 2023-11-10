@@ -14,9 +14,19 @@ const PostServices = {
         const result = await axiosClient.get(`/post/group/${groupId}`);
         return result.data;
     },
-    addComment: async (groupId) => {
-        if (!groupId) return;
-        const result = await axiosClient.get(`/post/group/${groupId}`);
+    createComment: async (data) => {
+        if (!data) return;
+        const result = await axiosClient.post(`/post-comment`, data);
+        return result.data;
+    },
+    createReaction: async (data) => {
+        if (!data) return;
+        const result = await axiosClient.post(`/post-reaction`, data);
+        return result.data;
+    },
+    deleteReaction: async (id) => {
+        if (!id) return;
+        const result = await axiosClient.delete(`/post-reaction/${id}`);
         return result.data;
     },
     createPost: async (data) => {

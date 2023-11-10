@@ -211,7 +211,7 @@ const DetailGroup = () => {
                                 value={textMessage}
                                 onChange={(e) => setTextMessage(e.target.value)}
                                 className="textarea w-full outline-none rounded"
-                                // placeholder={`${user.name ? `${user.name} ơi,` : ''} bạn đang nghĩ gì thế?`}
+                                placeholder={`${user.name ? `${user.name} ơi,` : ''} bạn đang nghĩ gì thế?`}
                             ></textarea>
 
                             <input type="file" className="hidden" id="fileImage" accept="image/*" />

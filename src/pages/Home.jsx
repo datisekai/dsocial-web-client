@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import Feed from '../components/Feed';
 import { useSelector } from 'react-redux';
-import { IoMdImages } from 'react-icons/io';
+import { IoMdCloseCircle, IoMdImages } from 'react-icons/io';
 import { PiSmileyWinkLight } from 'react-icons/pi';
 import { HiOutlineVideoCamera } from 'react-icons/hi';
 import Tippy from '@tippyjs/react/headless';
@@ -33,7 +33,7 @@ const Home = () => {
     });
 
     const handleEmojiClick = (emojiData, event) => {
-        setTextMessage(textMessage + emojiData.emoji);
+        setTextMessage((preText) => preText + emojiData.emoji);
         inputRef?.current?.focus();
     };
 
@@ -69,9 +69,11 @@ const Home = () => {
             const resultFilePost = await uploadsServer(filePost);
             files = resultFilePost.data;
         }
-
-        const payload = { html: textMessage, image: files };
+        const payload = { html: textMessage.replace(/\n/g, '<br/>'), image: files };
         mutate(payload);
+    };
+    const handleDeleteFile = (indexDel) => {
+        setFilePost(filePost.filter((item, index) => index !== indexDel));
     };
     return (
         <div className=" px-4 py-2">
@@ -88,39 +90,51 @@ const Home = () => {
                         className="textarea w-full outline-none rounded"
                         placeholder={`${user.name ? `${user.name} ơi,` : ''} bạn đang nghĩ gì thế?`}
                     ></textarea>
-                    <div className="overflow-auto h-auto flex w-full">
+                    <div className="overflow-auto h-auto flex w-full flex-wrap">
                         {previewImage?.map((item, index) => {
                             return item.type === 'image' ? (
-                                <img
-                                    key={index}
-                                    className="w-[250px] h-auto aspect-square md:aspect-auto md:h-[250px] object-cover"
-                                    src={item.file}
-                                />
+                                <div key={index} className="relative">
+                                    <IoMdCloseCircle
+                                        onClick={() => handleDeleteFile(index)}
+                                        className="absolute right-0 text-2xl cursor-pointer text-[#6419E6]"
+                                    />
+                                    <img
+                                        className="w-[130px] md:w-[180px] h-auto aspect-square md:h-[180px] object-cover"
+                                        src={item.file}
+                                    />
+                                </div>
                             ) : (
-                                <video
-                                    controls
-                                    key={index}
-                                    className="border-none w-[350px] h-auto aspect-video md:aspect-auto md:h-[250px] object-cover"
-                                    src={item.file}
-                                    type={item.type}
-                                />
+                                <div key={index} className="relative">
+                                    <IoMdCloseCircle
+                                        onClick={() => handleDeleteFile(index)}
+                                        className="z-[9999] absolute right-0 text-2xl cursor-pointer text-[#6419E6]"
+                                    />
+                                    <video
+                                        controls
+                                        className="w-[130px] md:w-[180px] h-auto aspect-square md:h-[180px] object-cover"
+                                        src={item.file}
+                                        type={item.type}
+                                    />
+                                </div>
                             );
                         })}
                     </div>
 
                     <input
+                        multiple
                         type="file"
                         className="hidden"
                         id="fileImage"
                         accept="image/*"
-                        onChange={(e) => e.target.files[0] && setFilePost([...filePost, e.target.files[0]])}
+                        onChange={(e) => e.target.files[0] && setFilePost([...filePost, ...e.target.files])}
                     />
                     <input
+                        multiple
                         type="file"
                         className="hidden"
                         id="fileVideo"
                         accept="video/mp4, video/mov"
-                        onChange={(e) => e.target.files[0] && setFilePost([...filePost, e.target.files[0]])}
+                        onChange={(e) => e.target.files[0] && setFilePost([...filePost, ...e.target.files])}
                     />
                     <div className="flex items-center">
                         <label htmlFor="fileImage" className="tooltip" data-tip="Hình ảnh">
