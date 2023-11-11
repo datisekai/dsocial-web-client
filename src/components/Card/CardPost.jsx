@@ -13,6 +13,7 @@ import Swal from 'sweetalert2';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PostServices from '../../services/PostService';
 import { useLocation } from 'react-router-dom';
+import CardComment from './CardComment';
 
 const CardPost = ({ post }) => {
     const [isShowFullImage, setIsShowFullImage] = useState(false);
@@ -30,9 +31,6 @@ const CardPost = ({ post }) => {
         inputRef?.current?.focus();
     };
 
-    const [showReply, setShowReply] = useState([]);
-
-    const [showComment, setShowComment] = useState([]);
     const [iconId, setIconId] = useState(0);
     const isLiked = useMemo(() => {
         let isChecked = false;
@@ -48,12 +46,9 @@ const CardPost = ({ post }) => {
         return false;
     }, [post]);
     const parentComments = useMemo(() => {
-        return post.comments.reverse().filter((item) => item.parent_id == 0);
+        return post.comments.filter((item) => item.parent_id == 0);
     }, [post]);
 
-    const getChildrenComment = (commentId) => {
-        return post.comments.reverse().filter((item) => item.parent_id == commentId);
-    };
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createComment,
         onSuccess: (data) => {
@@ -69,7 +64,8 @@ const CardPost = ({ post }) => {
                         if (item.id === data.data.post_id) {
                             return {
                                 ...item,
-                                comments: [...item.comments, data.data],
+                                count_comment: item.count_comment + 1,
+                                comments: [data.data, ...item.comments],
                             };
                         }
                         return item;
@@ -80,6 +76,18 @@ const CardPost = ({ post }) => {
                     ? queryClient.setQueryData(['home'], newPost)
                     : queryClient.setQueryData(['postdetailgroup'], newPost);
             }
+            console.log(
+                currenPost.data.map((item) => {
+                    if (item.id === data.data.post_id) {
+                        return {
+                            ...item,
+                            count_comment: item.count_comment + 1,
+                            comments: [data.data, ...item.comments],
+                        };
+                    }
+                    return item;
+                }),
+            );
             setTextMessage('');
             Swal.fire('Thành công!', data.message, 'success');
         },
@@ -90,7 +98,7 @@ const CardPost = ({ post }) => {
             Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
         },
     });
-    console.log(post);
+
     const { mutate: mutateReaction, isPending: isPendingReaction } = useMutation({
         mutationFn: PostServices.createReaction,
         onSuccess: (data) => {
@@ -100,13 +108,13 @@ const CardPost = ({ post }) => {
                     : queryClient.getQueryData(['postdetailgroup']);
 
             if (currenPost) {
-                console.log(post);
                 const newPost = {
                     success: currenPost.success,
                     data: currenPost.data.map((item) => {
                         if (item.id === data.data.post_id) {
                             return {
                                 ...item,
+                                count_reaction: item.count_reaction + 1,
                                 reactions: [...item.reactions, data.data],
                             };
                         }
@@ -130,20 +138,19 @@ const CardPost = ({ post }) => {
     const { mutate: mutateReactionDel, isPending: isPendingReactionDel } = useMutation({
         mutationFn: PostServices.deleteReaction,
         onSuccess: (data) => {
-            console.log(data.data);
             const currenPost =
                 query.pathname === '/'
                     ? queryClient.getQueryData(['home'])
                     : queryClient.getQueryData(['postdetailgroup']);
 
             if (currenPost) {
-                console.log(post);
                 const newPost = {
                     success: currenPost.success,
                     data: currenPost.data.map((item) => {
                         if (item.id === data.data.post_id) {
                             return {
                                 ...item,
+                                count_reaction: item.count_reaction - 1,
                                 reactions: item.reactions.filter((item) => item.id !== data.data.id),
                             };
                         }
@@ -181,6 +188,7 @@ const CardPost = ({ post }) => {
     const handleDeleteReaction = () => {
         mutateReactionDel(iconId);
     };
+    const [showComment, setShowComment] = useState(false);
 
     return (
         <div className="p-4 bg-base-200 rounded w-full">
@@ -230,9 +238,11 @@ const CardPost = ({ post }) => {
                     ) : (
                         <AiOutlineHeart size={23} onClick={handleCreateReaction} />
                     )}
+                    <span>{post.count_reaction}</span>
                 </button>
                 <button className="btn btn-sm" onClick={() => inputRef?.current?.focus()}>
                     <BiCommentDetail size={20} />
+                    <span>{post.count_comment}</span>
                 </button>
                 {/* <button className="btn btn-sm">
                     <BsShare size={20} />
@@ -286,39 +296,27 @@ const CardPost = ({ post }) => {
 
                 <h3>Bình luận</h3>
                 <div className="space-y-2 mt-4">
-                    {parentComments.map((item) => {
-                        return (
-                            <div key={item.id}>
-                                <div className="flex gap-2 py-2">
-                                    <img
-                                        src={getImage(item.user_comment.avatar)}
-                                        className="w-[40px] h-[40px] rounded-full"
-                                        alt=""
-                                    />
-                                    <div className="">
-                                        <h4 className="font-medium">
-                                            {item.user_comment.name || item.user_comment.other_name}
-                                        </h4>
-                                        <p dangerouslySetInnerHTML={{ __html: item.content }}></p>
-                                        {!showReply.includes(item.id) && getChildrenComment(item.id).length > 0 && (
-                                            <div className="text-xs flex items-center link link-hover gap-1 mt-1">
-                                                <BsArrowReturnRight />{' '}
-                                                <span onClick={() => setShowReply([...showReply, item.id])}>
-                                                    Xem {getChildrenComment(item.id).length} phản hồi
-                                                </span>
-                                            </div>
-                                        )}
-                                        <div className="ml-4">
-                                            {showReply.includes(item.id) &&
-                                                getChildrenComment(item.id).map((repComment) => (
-                                                    <CardReplyComment comment={repComment} key={repComment.id} />
-                                                ))}
-                                        </div>
-                                    </div>
+                    {parentComments.length == 0 && <p>Không có bình luận</p>}
+                    {parentComments.length <= 5 ? (
+                        parentComments.map((item) => {
+                            return <CardComment comment={item} key={item.id} post={post} />;
+                        })
+                    ) : (
+                        <>
+                            {parentComments.slice(0, 5).map((item) => {
+                                return <CardComment comment={item} key={item.id} post={post} />;
+                            })}
+                            {!showComment ? (
+                                <div className="link link-hover" onClick={() => setShowComment(true)}>
+                                    Xem tất cả bình luận
                                 </div>
-                            </div>
-                        );
-                    })}
+                            ) : (
+                                parentComments.slice(5, parentComments.length).map((item) => {
+                                    return <CardComment comment={item} key={item.id} post={post} />;
+                                })
+                            )}
+                        </>
+                    )}
                 </div>
             </div>
         </div>

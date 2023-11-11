@@ -93,7 +93,7 @@ const Home = () => {
                     <div className="overflow-auto h-auto flex w-full flex-wrap">
                         {previewImage?.map((item, index) => {
                             return item.type === 'image' ? (
-                                <div key={index} className="relative">
+                                <div key={index} className="relative ml-2">
                                     <IoMdCloseCircle
                                         onClick={() => handleDeleteFile(index)}
                                         className="absolute right-0 text-2xl cursor-pointer text-[#6419E6]"
