@@ -57,7 +57,9 @@ const Group = () => {
         <div className="px-4 py-2">
             <div className="flex items-center justify-between">
                 <h1 className="text-primary font-bold">Nhóm</h1>
-                <button className="btn btn-primary btn-sm md:btn-md">Tạo nhóm</button>
+                <Link to={'/group/create'}>
+                    <button className="btn btn-primary btn-sm md:btn-md">Tạo nhóm</button>
+                </Link>
             </div>
 
             <div className="flex items-center gap-2 flex-wrap mt-4">

@@ -4,8 +4,8 @@ const initialState = {
     user: null,
     token: null,
 };
-
 export const userSlice = createSlice({
+    // action creator
     name: 'user',
     initialState,
     reducers: {
@@ -19,7 +19,7 @@ export const userSlice = createSlice({
         removeTokenAndUser: (state) => {
             state.user = null;
             state.token = null;
-            localStorage.removeItem('token')
+            localStorage.removeItem('token');
         },
         setTokenAndUser: (state, action) => {
             const { user = null, token = null } = action.payload;

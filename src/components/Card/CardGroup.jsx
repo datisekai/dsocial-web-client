@@ -3,6 +3,7 @@ import { kFormatter } from '../../utils/common';
 import { Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import GroupServices from '../../services/GroupService';
+import getImage from '../../utils/getImage';
 import Swal from 'sweetalert2';
 
 const CardGroup = ({ group, isJoin }) => {
@@ -56,7 +57,7 @@ const CardGroup = ({ group, isJoin }) => {
     return (
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-                <img className="w-[60px] h-[60px] rounded-full " src="https://dummyimage.com/200x200.gif" alt="" />
+                <img className="w-[60px] h-[60px] rounded-full " src={getImage(group.avatar)} alt="" />
                 <div>
                     <h2 className="text-title">{group.name}</h2>
                     <p>{kFormatter(group.users_joined.length)} thành viên</p>

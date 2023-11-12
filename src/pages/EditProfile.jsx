@@ -1,8 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { FaRegAddressCard } from 'react-icons/fa';
-import { LiaBirthdayCakeSolid } from 'react-icons/lia';
-import { Link } from 'react-router-dom';
-import Modal from '../components/Modal';
 import ChangePasswordModal from '../components/Modal/ChangePasswordModal';
 import { ErrorMessage, Field, Formik } from 'formik';
 import * as Yup from 'yup';
@@ -14,10 +10,12 @@ import getImage from '../utils/getImage';
 import { GoPencil } from 'react-icons/go';
 import { uploadServer } from '../utils/axiosClient';
 import Swal from 'sweetalert2';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../redux/slices/userSlice';
 const validateSchema = Yup.object({
     bio: Yup.string(),
     name: Yup.string().required('Vui lòng nhập tên.').max(50, 'Tên không quá 50 kí tự.'),
-    other_name: Yup.string(),
+    otherName: Yup.string(),
     birthday: Yup.date().required('Vui lòng chọn ngày sinh nhật.'),
     address: Yup.string(),
 });
@@ -25,17 +23,17 @@ const validateSchema = Yup.object({
 const EditProfile = () => {
     const [visiblePassword, setVisiblePassword] = useState(false);
     const { user } = useSelector((state) => state.user);
-
-    const [coverImage, setCoverImage] = useState(null);
+    const dispatch = useDispatch();
+    const [cover_image, setCover_Image] = useState(null);
     const [avatarImage, setAvatarImage] = useState(null);
 
     const previewImage = useMemo(() => {
-        if (!coverImage) {
+        if (!cover_image) {
             return user.cover_image ? getImage(user.cover_image) : getImage(null);
         }
 
-        return URL.createObjectURL(coverImage);
-    }, [coverImage]);
+        return URL.createObjectURL(cover_image);
+    }, [cover_image]);
 
     const previewAvatar = useMemo(() => {
         if (!avatarImage) {
@@ -48,6 +46,7 @@ const EditProfile = () => {
     const { mutate, isPending } = useMutation({
         mutationFn: ProfileServices.updateProfile,
         onSuccess: (data) => {
+            dispatch(setUser(data.data));
             Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
@@ -58,12 +57,12 @@ const EditProfile = () => {
         },
     });
     const handleSubmit = async (values) => {
-        let cover_image = user.cover_image;
+        let coverImage = user.cover_image;
         let avatar = user.avatar;
         //TODO
-        if (coverImage) {
-            const resultCoverImage = await uploadServer(coverImage);
-            cover_image = resultCoverImage.data;
+        if (cover_image) {
+            const resultCoverImage = await uploadServer(cover_image);
+            coverImage = resultCoverImage.data;
         }
 
         if (avatarImage) {
@@ -71,7 +70,7 @@ const EditProfile = () => {
             avatar = resultAvatar.data;
         }
 
-        const payload = { ...values, cover_image, avatar };
+        const payload = { ...values, coverImage, avatar };
         console.log('submit', payload);
         mutate(payload);
     };
@@ -85,7 +84,7 @@ const EditProfile = () => {
                 initialValues={{
                     bio: user.bio || '',
                     name: user.name || '',
-                    other_name: user.other_name || '',
+                    otherName: user.other_name || '',
                     birthday: user.birthday != null ? getDate(user.birthday) : null,
                     address: user.address || '',
                 }}
@@ -98,7 +97,7 @@ const EditProfile = () => {
                                 <input
                                     type="file"
                                     className="absolute"
-                                    onChange={(e) => setCoverImage(e.target.files[0])}
+                                    onChange={(e) => setCover_Image(e.target.files[0])}
                                     accept="image/*"
                                 />
                                 <img
@@ -132,8 +131,10 @@ const EditProfile = () => {
                                         />
                                     </div>
                                     <div className="">
-                                        <h1 className="font-bold text-primary">Thành Đạt</h1>
-                                        <p className="text-[#828486]">(datisekai)</p>
+                                        <h1 className="font-bold text-primary">{user.name}</h1>
+                                        <p className="text-[#828486]">
+                                            {user.other_name ? '(' + user.other_name + ')' : ''}
+                                        </p>
                                     </div>
                                 </div>
 

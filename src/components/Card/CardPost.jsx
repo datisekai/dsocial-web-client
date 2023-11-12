@@ -208,29 +208,27 @@ const CardPost = ({ post }) => {
         });
     };
 
-    console.log(post);
-
     return (
         <div className="p-4 bg-base-200 rounded w-full">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    {!post.group.id && (
+                    {!post.group.id ? (
                         <div className="avatar">
                             <div className="w-12 rounded-full">
                                 <img src={getImage(post.user_post.avatar)} />
                             </div>
                         </div>
+                    ) : (
+                        <div className="relative">
+                            <img className="w-12" src={getImage(post.group.avatar)} />
+                            <div className="absolute right-[-4px] bottom-[-4px] border border-primary rounded-full">
+                                <img className="w-6 h-6 rounded-full" src={getImage(post.user_post.avatar)} />
+                            </div>
+                        </div>
                     )}
 
-                    <div className="relative">
-                        <img className="w-12" src={getImage(post.group.avatar)} />
-                        <div className="absolute right-[-4px] bottom-[-4px] border border-primary rounded-full">
-                            <img className="w-6 h-6 rounded-full" src={getImage(post.user_post.avatar)} />
-                        </div>
-                    </div>
-
                     <div>
-                        {post.group.id && <p className="font-medium">nhóm: {post.group.name}</p>}
+                        {post.group.id && <p className="font-medium">{post.group.name}</p>}
                         <div className="text-sm space-x-2">
                             <span>{post.user_post.name}</span>
                             <span>·</span>
@@ -272,9 +270,18 @@ const CardPost = ({ post }) => {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     {(isShowFullImage ? post.images : [...post.images].splice(0, 6)).map((item, index) =>
                         getImage(item.src).includes('.mp4') || getImage(item.src).includes('.mov') ? (
-                            <video controls key={index} className="w-full h-full" src={getImage(item.src)} />
+                            <video
+                                controls
+                                key={index}
+                                className="w-full h-[250px] object-cover aspect-square"
+                                src={getImage(item.src)}
+                            />
                         ) : (
-                            <img src={getImage(item.src)} key={index} className="w-full h-full" />
+                            <img
+                                src={getImage(item.src)}
+                                key={index}
+                                className="w-full h-[250px] object-cover aspect-video"
+                            />
                         ),
                     )}
                 </div>

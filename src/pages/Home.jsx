@@ -111,7 +111,7 @@ const Home = () => {
                                     />
                                     <video
                                         controls
-                                        className="w-[130px] md:w-[180px] h-auto aspect-square md:h-[180px] object-cover"
+                                        className="w-[130px] md:w-[180px] h-auto aspect-video md:h-[180px] object-cover"
                                         src={item.file}
                                         type={item.type}
                                     />

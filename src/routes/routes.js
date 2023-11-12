@@ -4,7 +4,9 @@ import config from '../config';
 import { FormLayout, PublicLayout } from '../layouts';
 import MessageLayout from '../layouts/MessageLayout';
 import ConfirmEmail from '../pages/ConfirmEmail';
+import CreateGroup from '../pages/CreateGroup';
 import DetailGroup from '../pages/DetailGroup';
+import EditGroup from '../pages/EditGroup';
 import EditProfile from '../pages/EditProfile';
 import ForgotPassword from '../pages/ForgotPassword';
 import Friend from '../pages/Friend';
@@ -45,6 +47,14 @@ const privateRoutes = [
     {
         path: config.routes.search,
         component: Search,
+    },
+    {
+        path: config.routes.createGroup,
+        component: CreateGroup,
+    },
+    {
+        path: config.routes.editGroup,
+        component: EditGroup,
     },
 ];
 

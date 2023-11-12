@@ -38,6 +38,16 @@ const GroupServices = {
         const result = await axiosClient.delete(`/group/${groupId}`);
         return result.data;
     },
+    createGroup: async (data) => {
+        if (!data) return;
+        const result = await axiosClient.post(`/group`, data);
+        return result.data;
+    },
+    editGroup: async (data) => {
+        if (!data) return;
+        const result = await axiosClient.put(`/group/${data.id}`, data);
+        return result.data;
+    },
 };
 
 export default GroupServices;

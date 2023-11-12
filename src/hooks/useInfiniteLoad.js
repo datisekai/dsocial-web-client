@@ -10,7 +10,7 @@ const useInfiniteLoad = (getData, queryKey) => {
         isFetchingNextPage,
         isFetchingPreviousPage,
         data,
-        isFetching
+        isFetching,
     } = useInfiniteQuery({
         queryKey: [queryKey],
         queryFn: ({ pageParam = 1 }) => getData({ pageParam }),
@@ -19,7 +19,7 @@ const useInfiniteLoad = (getData, queryKey) => {
             if (nextPage) return +nextPage;
         },
         getPreviousPageParam: (firstPage, allPages) => {
-            const prevPage = lastPage.pagination.prev_page || null;
+            const prevPage = firstPage.pagination.prev_page || null;
             if (prevPage) return +prevPage;
         },
     });
@@ -37,7 +37,7 @@ const useInfiniteLoad = (getData, queryKey) => {
         fetchPreviousPage,
         isFetchingPreviousPage,
         hasPreviousPage,
-        isFetching
+        isFetching,
     };
 };
 

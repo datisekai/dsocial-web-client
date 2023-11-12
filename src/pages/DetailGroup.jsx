@@ -151,14 +151,16 @@ const DetailGroup = () => {
                                     {kFormatter(dataDetailGroup?.data.users_joined.length)} thành viên
                                 </p>
                             </div>
-                            <button className="btn btn-sm md:btn-md">Chỉnh sửa</button>
+                            <Link to={`/group/${id}/edit`}>
+                                <button className="btn btn-sm md:btn-md">Chỉnh sửa</button>
+                            </Link>
                         </div>
                     </div>
                     <div className="absolute px-4 bottom-[-40px] left-0 right-0 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <img
                                 className="rounded-full w-[80px] h-[80px] border-primary border-2"
-                                src={dataDetailGroup?.data.avatar}
+                                src={getImage(dataDetailGroup?.data.avatar)}
                                 alt=""
                             />
                             <div className="">
@@ -275,7 +277,7 @@ const DetailGroup = () => {
                                 <div className="flex items-center gap-2">
                                     <img
                                         className="w-[50px] h-[50px] rounded-full"
-                                        src="https://dummyimage.com/50x50.gif"
+                                        src={getImage(item.avatar)}
                                         alt=""
                                     />
                                     <div>

@@ -12,6 +12,8 @@ const routes = {
     groupDetail: '/group/:id',
     userProfile: '/profile/:userId',
     search: '/search',
+    createGroup: '/group/create',
+    editGroup: '/group/:id/edit',
 };
 
 export default routes;
