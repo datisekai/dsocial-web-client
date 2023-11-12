@@ -16,6 +16,8 @@ import Login from '../pages/Login';
 import Message from '../pages/Message';
 import Profile from '../pages/Profile';
 import Register from '../pages/Register';
+import Search from '../pages/Search';
+import UserProfile from '../pages/UserProfile';
 
 // Public routes
 const publicRoutes = [
@@ -35,6 +37,14 @@ const privateRoutes = [
     {
         path: config.routes.groupDetail,
         component: DetailGroup,
+    },
+    {
+        path: config.routes.userProfile,
+        component: UserProfile,
+    },
+    {
+        path: config.routes.search,
+        component: Search,
     },
 ];
 

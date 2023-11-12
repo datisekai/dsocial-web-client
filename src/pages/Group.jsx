@@ -6,6 +6,8 @@ import CardGroup from '../components/Card/CardGroup';
 import { useQuery } from '@tanstack/react-query';
 import GroupServices from '../services/GroupService';
 import { useSelector } from 'react-redux';
+import useInfiniteLoad from '../hooks/useInfiniteLoad';
+import InfiniteScroll from 'react-infinite-scroll-component';
 const tabs = [
     {
         action: '',
@@ -23,33 +25,34 @@ const tabs = [
 const Group = () => {
     const query = useQueryParams();
     const action = query.get('action') || '';
-    const { data: dataAllGroups, isLoading: isLoadingAllGroups } = useQuery({
-        queryKey: ['allgroups'],
-        queryFn: () => {
-            return GroupServices.getAllGroups();
-        },
-    });
-    console.log(dataAllGroups);
-    const { data: dataAllGroupsJoined, isLoading: isLoadingAllGroupsJoined } = useQuery({
-        queryKey: ['allgroupsjoined'],
-        queryFn: () => {
-            return GroupServices.getAllGroupsJoined();
-        },
-    });
-    const { data: dataAllGroupsOwn, isLoading: isLoadingAllGroupsOwn } = useQuery({
-        queryKey: ['allgroupsown'],
-        queryFn: () => {
-            return GroupServices.getAllGroupsOwn();
-        },
-    });
-    const [groups, setGroups] = useState(null);
-    useEffect(() => {
-        action == ''
-            ? setGroups(dataAllGroupsJoined)
-            : action == 'all'
-            ? setGroups(dataAllGroups)
-            : setGroups(dataAllGroupsOwn);
-    });
+    // const { data: dataAllGroups, isLoading: isLoadingAllGroups } = useQuery({
+    //     queryKey: ['allgroups'],
+    //     queryFn: () => {
+    //         return GroupServices.getAllGroups();
+    //     },
+    // });
+
+    const {
+        data: dataAllGroups,
+        isFetchingNextPage: isLoadingAllGroups,
+        hasNextPage: hasNextpageAllGroups,
+        fetchNextPage: fetchNextPageAllGroups,
+    } = useInfiniteLoad(GroupServices.getAllGroups, 'allGroup');
+
+    const {
+        data: dataJoinGroups,
+        isFetchingNextPage: isLoadingJoinGroups,
+        hasNextPage: hasNextpageJoinGroups,
+        fetchNextPage: fetchNextPageJoinGroups,
+    } = useInfiniteLoad(GroupServices.getAllGroupsJoined, 'joinGroup');
+
+    const {
+        data: dataOwnGroups,
+        isFetchingNextPage: isLoadingOwnGroups,
+        hasNextPage: hasNextpageOwnGroups,
+        fetchNextPage: fetchNextPageOwnGroups,
+    } = useInfiniteLoad(GroupServices.getAllGroupsOwn, 'ownGroup');
+
     return (
         <div className="px-4 py-2">
             <div className="flex items-center justify-between">
@@ -71,14 +74,59 @@ const Group = () => {
                 <input type="text" placeholder="Tìm kiếm nhóm" className="input input-bordered w-full max-w-xs" />
             </div>
 
-            <div className="mt-4 space-y-2">
-                {!isLoadingAllGroups &&
-                    !isLoadingAllGroupsJoined &&
-                    !isLoadingAllGroupsOwn &&
-                    groups?.data.map((group, index) => (
+            {action == 'all' && (
+                <InfiniteScroll
+                    dataLength={dataAllGroups.length}
+                    next={fetchNextPageAllGroups}
+                    hasMore={hasNextpageAllGroups}
+                    className="mt-4 space-y-2"
+                    loader={
+                        <div className="my-2 flex justify-center">
+                            <span className="loading loading-dots loading-md"></span>
+                        </div>
+                    }
+                >
+                    {dataAllGroups.map((group, index) => (
                         <CardGroup key={index} group={group} isJoin={group.is_joined} />
                     ))}
-            </div>
+                </InfiniteScroll>
+            )}
+
+            {action == '' && (
+                <InfiniteScroll
+                    dataLength={dataJoinGroups.length}
+                    next={fetchNextPageJoinGroups}
+                    hasMore={hasNextpageJoinGroups}
+                    className="mt-4 space-y-2"
+                    loader={
+                        <div className="my-2 flex justify-center">
+                            <span className="loading loading-dots loading-md"></span>
+                        </div>
+                    }
+                >
+                    {dataJoinGroups.map((group, index) => (
+                        <CardGroup key={index} group={group} isJoin={group.is_joined} />
+                    ))}
+                </InfiniteScroll>
+            )}
+
+            {action == 'my-group' && (
+                <InfiniteScroll
+                    dataLength={dataOwnGroups.length}
+                    next={fetchNextPageOwnGroups}
+                    hasMore={hasNextpageOwnGroups}
+                    className="mt-4 space-y-2"
+                    loader={
+                        <div className="my-2 flex justify-center">
+                            <span className="loading loading-dots loading-md"></span>
+                        </div>
+                    }
+                >
+                    {dataOwnGroups.map((group, index) => (
+                        <CardGroup key={index} group={group} isJoin={group.is_joined} />
+                    ))}
+                </InfiniteScroll>
+            )}
         </div>
     );
 };

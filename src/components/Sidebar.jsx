@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { NavLink, useNavigate } from 'react-router-dom';
@@ -6,15 +6,14 @@ import tabs from '../data/tabs';
 import { BiLogOutCircle } from 'react-icons/bi';
 import { removeTokenAndUser } from '../redux/slices/userSlice';
 import getImage from '../utils/getImage';
+import useUser from '../hooks/useUser';
 const Sidebar = () => {
-    const { user } = useSelector((state) => state.user);
-    const dispatch = useDispatch();
+    const { user, handleLogout } = useUser();
+
+    const [searchText, setSearchText] = useState('');
+
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        dispatch(removeTokenAndUser());
-        navigate('/login');
-    };
     return (
         <div className="">
             <div className="flex items-center gap-4">
@@ -26,7 +25,14 @@ const Sidebar = () => {
                 <div>
                     <input
                         type="text"
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
                         placeholder="Tìm kiếm trên DSocial"
+                        onKeyUp={(e) => {
+                            if (e.code == 'Enter') {
+                                navigate(`/search?query=${searchText}`);
+                            }
+                        }}
                         className="input input-bordered input-sm w-full max-w-xs"
                     />
                 </div>

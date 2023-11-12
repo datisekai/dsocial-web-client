@@ -1,7 +1,7 @@
 import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import ForgotPasswordModal from '../components/ForgotPasswordModal';
+import ForgotPasswordModal from '../components/Modal/ForgotPasswordModal';
 import { Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import UserServices from '../services/UserService';

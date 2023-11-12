@@ -3,8 +3,11 @@ import tabs from '../../data/tabs';
 import { NavLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import getImage from '../../utils/getImage';
+import useUser from '../../hooks/useUser';
+import { BiLogOutCircle } from 'react-icons/bi';
 const DrawerMenu = ({ visible, onClose }) => {
-    const { user } = useSelector((state) => state.user);
+    const { user, handleLogout } = useUser();
+
     return (
         <div className="drawer">
             <input id="my-drawer" type="checkbox" className="drawer-toggle" onChange={() => {}} checked={visible} />
@@ -38,6 +41,14 @@ const DrawerMenu = ({ visible, onClose }) => {
                                 </NavLink>
                             );
                         })}
+
+                        <div
+                            onClick={handleLogout}
+                            className="flex drawer-menu px-4 space-x-4 justify-start cursor-pointer text-lg items-center py-4"
+                        >
+                            <BiLogOutCircle />
+                            <span>Đăng xuất</span>
+                        </div>
                     </div>
                 </div>
             </div>

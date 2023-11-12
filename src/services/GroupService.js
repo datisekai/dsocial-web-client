@@ -1,15 +1,15 @@
 import { axiosClient } from '../utils/axiosClient';
 const GroupServices = {
-    getAllGroups: async () => {
-        const result = await axiosClient.get('/group');
+    getAllGroups: async ({ pageParam }) => {
+        const result = await axiosClient.get(`/group?page=${pageParam}`);
         return result.data;
     },
-    getAllGroupsJoined: async () => {
-        const result = await axiosClient.get(`/group/joined`);
+    getAllGroupsJoined: async ({ pageParam }) => {
+        const result = await axiosClient.get(`/group/joined?page=${pageParam}`);
         return result.data;
     },
-    getAllGroupsOwn: async () => {
-        const result = await axiosClient.get(`/group/own`);
+    getAllGroupsOwn: async ({ pageParam }) => {
+        const result = await axiosClient.get(`/group/own?page=${pageParam}`);
         return result.data;
     },
     joinGroup: async (data) => {

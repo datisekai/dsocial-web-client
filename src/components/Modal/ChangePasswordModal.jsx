@@ -3,7 +3,7 @@ import { ErrorMessage, Field, Formik } from 'formik';
 import React from 'react';
 import Swal from 'sweetalert2';
 import * as Yup from 'yup';
-import ProfileServices from '../services/ProfileService';
+import ProfileServices from '../../services/ProfileService';
 
 const validateSchema = Yup.object({
     oldPassword: Yup.string().required('Vui lòng nhập mật khẩu cũ.'),

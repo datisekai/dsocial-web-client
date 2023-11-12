@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const CardFriend = ({ avatar, name, id }) => {
     return (
-        <Link to={`/profile?id=${id}`}>
+        <Link to={`/profile/${id}`}>
             <div className="flex items-center gap-4">
                 <div className="avatar ">
                     <div className="w-14 rounded-full">

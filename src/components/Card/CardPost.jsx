@@ -5,7 +5,7 @@ import { AiOutlineHeart, AiOutlineShareAlt, AiFillHeart } from 'react-icons/ai';
 import { BsArrowReturnRight, BsShare } from 'react-icons/bs';
 import Tippy from '@tippyjs/react/headless';
 import EmojiPicker from 'emoji-picker-react';
-import { BiCommentDetail } from 'react-icons/bi';
+import { BiCommentDetail, BiDotsVerticalRounded } from 'react-icons/bi';
 import { PiSmileyWinkLight } from 'react-icons/pi';
 import { useSelector } from 'react-redux';
 import CardReplyComment from './CardReplyComment';
@@ -14,6 +14,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PostServices from '../../services/PostService';
 import { useLocation } from 'react-router-dom';
 import CardComment from './CardComment';
+import useUser from '../../hooks/useUser';
+import UpdatePostModal from '../Modal/UpdatePostModal';
 
 const CardPost = ({ post }) => {
     const [isShowFullImage, setIsShowFullImage] = useState(false);
@@ -23,7 +25,9 @@ const CardPost = ({ post }) => {
     const [textMessage, setTextMessage] = React.useState('');
     const query = useLocation();
 
-    const { user } = useSelector((state) => state.user);
+    const [visibleActivePost, setVisibleActivePost] = useState(false);
+
+    const { user } = useUser();
 
     const queryClient = useQueryClient();
     const handleEmojiClick = (emojiData, event) => {
@@ -190,22 +194,77 @@ const CardPost = ({ post }) => {
     };
     const [showComment, setShowComment] = useState(false);
 
+    const handleDeletePost = () => {
+        Swal.fire({
+            title: 'Bạn có chắc chắn muốn xóa bài viết này?',
+            showDenyButton: true,
+            confirmButtonText: 'Chắc chắn',
+            denyButtonText: `Hủy `,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                //TODO
+                //Xử lý call api xóa
+            }
+        });
+    };
+
+    console.log(post);
+
     return (
         <div className="p-4 bg-base-200 rounded w-full">
-            <div className="flex items-center gap-2">
-                <div className="avatar">
-                    <div className="w-12 rounded-full">
-                        <img src={getImage(post.user_post.avatar)} />
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    {!post.group.id && (
+                        <div className="avatar">
+                            <div className="w-12 rounded-full">
+                                <img src={getImage(post.user_post.avatar)} />
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="relative">
+                        <img className="w-12" src={getImage(post.group.avatar)} />
+                        <div className="absolute right-[-4px] bottom-[-4px] border border-primary rounded-full">
+                            <img className="w-6 h-6 rounded-full" src={getImage(post.user_post.avatar)} />
+                        </div>
+                    </div>
+
+                    <div>
+                        {post.group.id && <p className="font-medium">nhóm: {post.group.name}</p>}
+                        <div className="text-sm space-x-2">
+                            <span>{post.user_post.name}</span>
+                            <span>·</span>
+                            <span>{calculateCreatedTime(post.created_at)}</span>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    {post.group.id && <p className="font-medium">nhóm: {post.group.name}</p>}
-                    <div className="text-sm space-x-2">
-                        <span>{post.user_post.name}</span>
-                        <span>·</span>
-                        <span>{calculateCreatedTime(post.created_at)}</span>
+
+                {post.author_id == user.id && (
+                    <div className="dropdown dropdown-left">
+                        <label tabIndex={0}>
+                            <div className="btn btn-ghost btn-sm">
+                                <BiDotsVerticalRounded size={25} />
+                            </div>
+                        </label>
+                        <ul
+                            tabIndex={0}
+                            className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                        >
+                            <li>
+                                <a
+                                    onClick={() => {
+                                        setVisibleActivePost(true);
+                                    }}
+                                >
+                                    Chỉnh sửa
+                                </a>
+                            </li>
+                            <li>
+                                <a onClick={handleDeletePost}>Xóa</a>
+                            </li>
+                        </ul>
                     </div>
-                </div>
+                )}
             </div>
             <article className="prose lg:prose-xl mt-2" dangerouslySetInnerHTML={{ __html: post.html }}></article>
 
@@ -319,6 +378,9 @@ const CardPost = ({ post }) => {
                     )}
                 </div>
             </div>
+            {visibleActivePost && post && (
+                <UpdatePostModal onClose={() => setVisibleActivePost(false)} post={post} visible={visibleActivePost} />
+            )}
         </div>
     );
 };

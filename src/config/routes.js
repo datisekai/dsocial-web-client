@@ -10,6 +10,8 @@ const routes = {
     profile: '/profile',
     editProfile: '/profile/edit',
     groupDetail: '/group/:id',
+    userProfile: '/profile/:userId',
+    search: '/search',
 };
 
 export default routes;

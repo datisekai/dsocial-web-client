@@ -1,9 +1,9 @@
 import React from 'react';
-import Modal from './Modal';
+import Modal from '../Modal';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useMutation } from '@tanstack/react-query';
-import UserServices from '../services/UserService';
+import UserServices from '../../services/UserService';
 import Swal from 'sweetalert2';
 
 const validateSchema = Yup.object({

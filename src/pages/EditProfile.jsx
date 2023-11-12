@@ -3,7 +3,7 @@ import { FaRegAddressCard } from 'react-icons/fa';
 import { LiaBirthdayCakeSolid } from 'react-icons/lia';
 import { Link } from 'react-router-dom';
 import Modal from '../components/Modal';
-import ChangePasswordModal from '../components/ChangePasswordModal';
+import ChangePasswordModal from '../components/Modal/ChangePasswordModal';
 import { ErrorMessage, Field, Formik } from 'formik';
 import * as Yup from 'yup';
 import { useSelector } from 'react-redux';
