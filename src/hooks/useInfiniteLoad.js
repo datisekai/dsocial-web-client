@@ -10,6 +10,7 @@ const useInfiniteLoad = (getData, queryKey) => {
         isFetchingNextPage,
         isFetchingPreviousPage,
         data,
+        isFetching
     } = useInfiniteQuery({
         queryKey: [queryKey],
         queryFn: ({ pageParam = 1 }) => getData({ pageParam }),
@@ -28,7 +29,16 @@ const useInfiniteLoad = (getData, queryKey) => {
         return data.pages.reduce((pre, cur) => [...pre, ...cur.data], []);
     }, [data]);
 
-    return { fetchNextPage, hasNextPage, data: dataAllPages, isFetchingNextPage, fetchPreviousPage };
+    return {
+        fetchNextPage,
+        hasNextPage,
+        data: dataAllPages,
+        isFetchingNextPage,
+        fetchPreviousPage,
+        isFetchingPreviousPage,
+        hasPreviousPage,
+        isFetching
+    };
 };
 
 export default useInfiniteLoad;
