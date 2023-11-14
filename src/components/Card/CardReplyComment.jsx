@@ -8,10 +8,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PostServices from '../../services/PostService';
 import EmojiPicker from 'emoji-picker-react';
 import Swal from 'sweetalert2';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 const CardReplyComment = ({ comment, commentId }) => {
     const [showReply, setShowReply] = useState([]);
-
+    const { user } = useSelector((state) => state.user);
     const inputRef = React.useRef(null);
     const [textMessage, setTextMessage] = React.useState('');
     const [isShowComment, setIsShowComment] = useState(false);
@@ -77,11 +78,21 @@ const CardReplyComment = ({ comment, commentId }) => {
 
     return (
         <div>
-            {' '}
             <div className="flex gap-2 py-2">
-                <img src={getImage(comment.user_comment.avatar)} className="w-[40px] h-[40px] rounded-full" alt="" />
+                <Link to={user.id == comment.user_comment.id ? '/profile' : `/profile/${user.id}`}>
+                    <img
+                        src={getImage(comment.user_comment.avatar)}
+                        className="w-[40px] h-[40px] rounded-full"
+                        alt=""
+                    />
+                </Link>
                 <div className="">
-                    <h4 className="font-medium">{comment.user_comment.name || comment.user_comment.other_name}</h4>
+                    <Link
+                        to={user.id == comment.user_comment.id ? '/profile' : `/profile/${user.id}`}
+                        className="link link-hover"
+                    >
+                        <h4 className="font-medium">{comment.user_comment.name || comment.user_comment.other_name}</h4>
+                    </Link>
                     <p dangerouslySetInnerHTML={{ __html: comment.content }}></p>
                     <div className="text-xs flex items-center gap-1 mt-1">
                         <span className="mr-4">{calculateCreatedTime(comment.created_at)}</span>

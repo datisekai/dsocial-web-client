@@ -148,14 +148,17 @@ const Friend = () => {
                             {!isLoadingFriendRequest &&
                                 dataFriendRequest?.data.map((item, index) => (
                                     <div key={index} className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <img
-                                                className="rounded-full w-[70px] h-[70px]"
-                                                src={`${getImage(item.avatar)}`}
-                                                alt=""
-                                            />
-                                            <h2 className="font-bold">{item.name}</h2>
-                                        </div>
+                                        <Link to={`/profile/${user.id}`} className="link link-hover">
+                                            <div className="flex items-center gap-2">
+                                                <img
+                                                    className="rounded-full w-[70px] h-[70px]"
+                                                    src={`${getImage(item.avatar)}`}
+                                                    alt=""
+                                                />
+
+                                                <h2 className="font-bold">{item.name}</h2>
+                                            </div>
+                                        </Link>
                                         <div className="flex gap-2 mt-2 md:mt-0 flex-col md:flex-row">
                                             <button
                                                 disabled={isPendingAcceptF}
@@ -186,14 +189,17 @@ const Friend = () => {
                                 dataFriend?.data.map((item, index) => {
                                     return (
                                         <div className="flex items-center justify-between " key={index}>
-                                            <div className="flex items-center gap-2">
-                                                <img
-                                                    className="rounded-full w-[70px] h-[70px]"
-                                                    src={`${getImage(item.avatar)}`}
-                                                    alt=""
-                                                />
-                                                <h2 className="font-bold">{item.name}</h2>
-                                            </div>
+                                            <Link to={`/profile/${user.id}`} className="link link-hover">
+                                                <div className="flex items-center gap-2">
+                                                    <img
+                                                        className="rounded-full w-[70px] h-[70px]"
+                                                        src={`${getImage(item.avatar)}`}
+                                                        alt=""
+                                                    />
+
+                                                    <h2 className="font-bold">{item.name}</h2>
+                                                </div>
+                                            </Link>
                                             <button
                                                 className="btn btn-sm md:btn-md"
                                                 onClick={() => handleDelFriend(item)}

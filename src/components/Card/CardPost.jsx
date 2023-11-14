@@ -12,7 +12,7 @@ import CardReplyComment from './CardReplyComment';
 import Swal from 'sweetalert2';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PostServices from '../../services/PostService';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import CardComment from './CardComment';
 import useUser from '../../hooks/useUser';
 import UpdatePostModal from '../Modal/UpdatePostModal';
@@ -213,24 +213,39 @@ const CardPost = ({ post }) => {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     {!post.group.id ? (
-                        <div className="avatar">
-                            <div className="w-12 rounded-full">
-                                <img src={getImage(post.user_post.avatar)} />
+                        <Link to={user.id == post.user_post.id ? '/profile' : `/profile/${user.id}`}>
+                            <div className="avatar">
+                                <div className="w-12 rounded-full">
+                                    <img src={getImage(post.user_post.avatar)} />
+                                </div>
                             </div>
-                        </div>
+                        </Link>
                     ) : (
                         <div className="relative">
-                            <img className="w-12" src={getImage(post.group.avatar)} />
-                            <div className="absolute right-[-4px] bottom-[-4px] border border-primary rounded-full">
-                                <img className="w-6 h-6 rounded-full" src={getImage(post.user_post.avatar)} />
-                            </div>
+                            <Link to={`/group/${post.group.id}`}>
+                                <img className="w-12" src={getImage(post.group.avatar)} />
+                            </Link>
+                            <Link to={user.id == post.user_post.id ? '/profile' : `/profile/${user.id}`}>
+                                <div className="absolute right-[-4px] bottom-[-4px] border border-primary rounded-full">
+                                    <img className="w-6 h-6 rounded-full" src={getImage(post.user_post.avatar)} />
+                                </div>
+                            </Link>
                         </div>
                     )}
 
                     <div>
-                        {post.group.id && <p className="font-medium">{post.group.name}</p>}
+                        {post.group.id && (
+                            <Link to={`/group/${post.group.id}`} className=" link link-hover">
+                                <p className="font-medium">{post.group.name}</p>
+                            </Link>
+                        )}
                         <div className="text-sm space-x-2">
-                            <span>{post.user_post.name}</span>
+                            <Link
+                                to={user.id == post.user_post.id ? '/profile' : `/profile/${user.id}`}
+                                className="link link-hover"
+                            >
+                                <span>{post.user_post.name}</span>
+                            </Link>
                             <span>·</span>
                             <span>{calculateCreatedTime(post.created_at)}</span>
                         </div>
