@@ -26,7 +26,7 @@ const Home = () => {
     }, [filePost]);
 
     const { data, isLoading } = useQuery({
-        queryKey: ['home'],
+        queryKey: ['posts'],
         queryFn: () => {
             return PostServices.getAllPost();
         },
@@ -40,7 +40,7 @@ const Home = () => {
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createPost,
         onSuccess: (data) => {
-            const currenPostHome = queryClient.getQueryData(['home']);
+            const currenPostHome = queryClient.getQueryData(['posts']);
             if (currenPostHome) {
                 console.log(data.data);
                 const newPostHome = {
@@ -48,7 +48,7 @@ const Home = () => {
                     data: [data.data, ...currenPostHome.data],
                     pagination: currenPostHome.pagination,
                 };
-                queryClient.setQueryData(['home'], newPostHome);
+                queryClient.setQueryData(['posts'], newPostHome);
                 console.log(currenPostHome.data);
             }
             setTextMessage('');

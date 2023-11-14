@@ -20,7 +20,7 @@ const Profile = () => {
     });
 
     const { data: dataPost, isLoading: isLoadingPost } = useQuery({
-        queryKey: ['posts', user.id],
+        queryKey: ['posts'],
         queryFn: () => {
             return PostServices.getPostByUserId(user.id);
         },

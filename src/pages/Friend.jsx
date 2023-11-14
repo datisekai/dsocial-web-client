@@ -148,7 +148,7 @@ const Friend = () => {
                             {!isLoadingFriendRequest &&
                                 dataFriendRequest?.data.map((item, index) => (
                                     <div key={index} className="flex items-center justify-between">
-                                        <Link to={`/profile/${user.id}`} className="link link-hover">
+                                        <Link to={`/profile/${item.id}`} className="link link-hover">
                                             <div className="flex items-center gap-2">
                                                 <img
                                                     className="rounded-full w-[70px] h-[70px]"
@@ -189,7 +189,7 @@ const Friend = () => {
                                 dataFriend?.data.map((item, index) => {
                                     return (
                                         <div className="flex items-center justify-between " key={index}>
-                                            <Link to={`/profile/${user.id}`} className="link link-hover">
+                                            <Link to={`/profile/${item.id}`} className="link link-hover">
                                                 <div className="flex items-center gap-2">
                                                     <img
                                                         className="rounded-full w-[70px] h-[70px]"

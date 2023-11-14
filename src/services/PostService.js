@@ -34,6 +34,16 @@ const PostServices = {
         const result = await axiosClient.post(`/post`, data);
         return result.data;
     },
+    updatePost: async (data) => {
+        if (!data) return;
+        const result = await axiosClient.put(`/post/${data.id}`, data);
+        return result.data;
+    },
+    deletePost: async (postId) => {
+        if (!postId) return;
+        const result = await axiosClient.delete(`/post/${postId}`);
+        return result.data;
+    },
 };
 
 export default PostServices;

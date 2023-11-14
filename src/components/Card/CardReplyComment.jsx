@@ -34,10 +34,7 @@ const CardReplyComment = ({ comment, commentId }) => {
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createComment,
         onSuccess: (data) => {
-            const currenPost =
-                query.pathname === '/'
-                    ? queryClient.getQueryData(['home'])
-                    : queryClient.getQueryData(['postdetailgroup']);
+            const currenPost = queryClient.getQueryData(['posts']);
 
             if (currenPost) {
                 const newPost = {
@@ -54,9 +51,7 @@ const CardReplyComment = ({ comment, commentId }) => {
                     }),
                     pagination: currenPost.pagination,
                 };
-                query.pathname === '/'
-                    ? queryClient.setQueryData(['home'], newPost)
-                    : queryClient.setQueryData(['postdetailgroup'], newPost);
+                queryClient.setQueryData(['posts'], newPost);
             }
             setTextMessage('');
             Swal.fire('Thành công!', data.message, 'success');

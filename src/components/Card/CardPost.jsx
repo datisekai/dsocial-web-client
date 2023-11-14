@@ -12,7 +12,7 @@ import CardReplyComment from './CardReplyComment';
 import Swal from 'sweetalert2';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PostServices from '../../services/PostService';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import CardComment from './CardComment';
 import useUser from '../../hooks/useUser';
 import UpdatePostModal from '../Modal/UpdatePostModal';
@@ -23,7 +23,6 @@ const CardPost = ({ post }) => {
 
     const [showEmoji, setShowEmoji] = React.useState(false);
     const [textMessage, setTextMessage] = React.useState('');
-    const query = useLocation();
 
     const [visibleActivePost, setVisibleActivePost] = useState(false);
 
@@ -56,10 +55,7 @@ const CardPost = ({ post }) => {
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createComment,
         onSuccess: (data) => {
-            const currenPost =
-                query.pathname === '/'
-                    ? queryClient.getQueryData(['home'])
-                    : queryClient.getQueryData(['postdetailgroup']);
+            const currenPost = queryClient.getQueryData(['posts']);
 
             if (currenPost) {
                 const newPost = {
@@ -76,22 +72,8 @@ const CardPost = ({ post }) => {
                     }),
                     pagination: currenPost.pagination,
                 };
-                query.pathname === '/'
-                    ? queryClient.setQueryData(['home'], newPost)
-                    : queryClient.setQueryData(['postdetailgroup'], newPost);
+                queryClient.setQueryData(['posts'], newPost);
             }
-            console.log(
-                currenPost.data.map((item) => {
-                    if (item.id === data.data.post_id) {
-                        return {
-                            ...item,
-                            count_comment: item.count_comment + 1,
-                            comments: [data.data, ...item.comments],
-                        };
-                    }
-                    return item;
-                }),
-            );
             setTextMessage('');
             Swal.fire('Thành công!', data.message, 'success');
         },
@@ -106,10 +88,7 @@ const CardPost = ({ post }) => {
     const { mutate: mutateReaction, isPending: isPendingReaction } = useMutation({
         mutationFn: PostServices.createReaction,
         onSuccess: (data) => {
-            const currenPost =
-                query.pathname === '/'
-                    ? queryClient.getQueryData(['home'])
-                    : queryClient.getQueryData(['postdetailgroup']);
+            const currenPost = queryClient.getQueryData(['posts']);
 
             if (currenPost) {
                 const newPost = {
@@ -126,9 +105,7 @@ const CardPost = ({ post }) => {
                     }),
                     pagination: currenPost.pagination,
                 };
-                query.pathname === '/'
-                    ? queryClient.setQueryData(['home'], newPost)
-                    : queryClient.setQueryData(['postdetailgroup'], newPost);
+                queryClient.setQueryData(['posts'], newPost);
             }
             Swal.fire('Thành công!', data.message, 'success');
         },
@@ -142,10 +119,7 @@ const CardPost = ({ post }) => {
     const { mutate: mutateReactionDel, isPending: isPendingReactionDel } = useMutation({
         mutationFn: PostServices.deleteReaction,
         onSuccess: (data) => {
-            const currenPost =
-                query.pathname === '/'
-                    ? queryClient.getQueryData(['home'])
-                    : queryClient.getQueryData(['postdetailgroup']);
+            const currenPost = queryClient.getQueryData(['posts']);
 
             if (currenPost) {
                 const newPost = {
@@ -162,10 +136,34 @@ const CardPost = ({ post }) => {
                     }),
                     pagination: currenPost.pagination,
                 };
-                query.pathname === '/'
-                    ? queryClient.setQueryData(['home'], newPost)
-                    : queryClient.setQueryData(['postdetailgroup'], newPost);
+                queryClient.setQueryData(['posts'], newPost);
             }
+            Swal.fire('Thành công!', data.message, 'success');
+        },
+        onError: (error) => {
+            if (error?.message) {
+                return Swal.fire('Thất bại!', error.message, 'error');
+            }
+            Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
+        },
+    });
+
+    const { mutate: mutatePostDel, isPending: isPendingPostDel } = useMutation({
+        mutationFn: PostServices.deletePost,
+        onSuccess: (data) => {
+            const currenPost = queryClient.getQueryData(['posts']);
+
+            if (currenPost) {
+                const newPost = {
+                    success: currenPost.success,
+                    data: currenPost.data.filter((item) => {
+                        return item.id !== data.data.id;
+                    }),
+                    pagination: currenPost.pagination,
+                };
+                queryClient.setQueryData(['posts'], newPost);
+            }
+
             Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
@@ -202,8 +200,8 @@ const CardPost = ({ post }) => {
             denyButtonText: `Hủy `,
         }).then((result) => {
             if (result.isConfirmed) {
-                //TODO
-                //Xử lý call api xóa
+                const postId = post.id;
+                mutatePostDel(postId);
             }
         });
     };
