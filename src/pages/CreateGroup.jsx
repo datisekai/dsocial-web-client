@@ -35,7 +35,7 @@ const CreateGroup = () => {
     const { mutate, isPending } = useMutation({
         mutationFn: GroupServices.createGroup,
         onSuccess: (data) => {
-            Swal.fire('Thành công!', data.message, 'success');
+            // Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {

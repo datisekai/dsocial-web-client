@@ -132,7 +132,16 @@ const DetailGroup = () => {
         mutateOutGroup({ groupId: id });
     };
     const handleSubmiitDeleteGroup = () => {
-        mutateDeleteGroup(id);
+        Swal.fire({
+            title: 'Bạn có chắc chắn muốn xóa nhóm này?',
+            showDenyButton: true,
+            confirmButtonText: 'Chắc chắn',
+            denyButtonText: `Hủy `,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                mutateDeleteGroup(id);
+            }
+        });
     };
     return (
         <div>
@@ -151,9 +160,13 @@ const DetailGroup = () => {
                                     {kFormatter(dataDetailGroup?.data.users_joined.length)} thành viên
                                 </p>
                             </div>
-                            <Link to={`/group/${id}/edit`}>
-                                <button className="btn btn-sm md:btn-md">Chỉnh sửa</button>
-                            </Link>
+                            {dataDetailGroup?.data.user_own.id == user.id ? (
+                                <Link to={`/group/${id}/edit`}>
+                                    <button className="btn btn-sm md:btn-md">Chỉnh sửa</button>
+                                </Link>
+                            ) : (
+                                ''
+                            )}
                         </div>
                     </div>
                     <div className="absolute px-4 bottom-[-40px] left-0 right-0 flex items-center justify-between">
