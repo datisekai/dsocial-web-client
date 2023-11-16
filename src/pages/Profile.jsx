@@ -26,7 +26,7 @@ const Profile = () => {
         isFetchingNextPage: isLoadingAllPosts,
         hasNextPage: hasNextpageAllPosts,
         fetchNextPage: fetchNextPageAllPosts,
-    } = useInfiniteLoad(PostServices.getPostByUserId, 'posts', null);
+    } = useInfiniteLoad(PostServices.getPostByUserId, 'postsProfile', null);
 
     return (
         <div>
@@ -89,7 +89,7 @@ const Profile = () => {
                     >
                         {dataAllPosts.length > 0 ? (
                             dataAllPosts.map((item, index) => {
-                                return <CardPost key={index} post={item} />;
+                                return <CardPost key={index} post={item} nameQuery={'postsProfile'} />;
                             })
                         ) : (
                             <div>Kông có bài viết nào</div>

@@ -17,7 +17,7 @@ import CardComment from './CardComment';
 import useUser from '../../hooks/useUser';
 import UpdatePostModal from '../Modal/UpdatePostModal';
 
-const CardPost = ({ post }) => {
+const CardPost = ({ post, nameQuery }) => {
     const [isShowFullImage, setIsShowFullImage] = useState(false);
     const [isShowFullComment, setIsShowFullComment] = useState(false);
     const inputRef = React.useRef(null);
@@ -56,7 +56,7 @@ const CardPost = ({ post }) => {
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createComment,
         onSuccess: (data) => {
-            const currenPost = queryClient.getQueryData(['posts']);
+            const currenPost = queryClient.getQueryData([nameQuery]);
 
             if (currenPost) {
                 const newPost = {
@@ -73,7 +73,7 @@ const CardPost = ({ post }) => {
                     }),
                     pagination: currenPost.pagination,
                 };
-                queryClient.setQueryData(['posts'], newPost);
+                queryClient.setQueryData([nameQuery], newPost);
             }
             setTextMessage('');
             Swal.fire('Thành công!', data.message, 'success');
@@ -89,7 +89,7 @@ const CardPost = ({ post }) => {
     const { mutate: mutateReaction, isPending: isPendingReaction } = useMutation({
         mutationFn: PostServices.createReaction,
         onSuccess: (data) => {
-            const currenPost = queryClient.getQueryData(['posts']);
+            const currenPost = queryClient.getQueryData([nameQuery]);
 
             if (currenPost) {
                 const newPost = {
@@ -106,7 +106,7 @@ const CardPost = ({ post }) => {
                     }),
                     pagination: currenPost.pagination,
                 };
-                queryClient.setQueryData(['posts'], newPost);
+                queryClient.setQueryData([nameQuery], newPost);
             }
             Swal.fire('Thành công!', data.message, 'success');
         },
@@ -120,7 +120,7 @@ const CardPost = ({ post }) => {
     const { mutate: mutateReactionDel, isPending: isPendingReactionDel } = useMutation({
         mutationFn: PostServices.deleteReaction,
         onSuccess: (data) => {
-            const currenPost = queryClient.getQueryData(['posts']);
+            const currenPost = queryClient.getQueryData([nameQuery]);
 
             if (currenPost) {
                 const newPost = {
@@ -137,7 +137,7 @@ const CardPost = ({ post }) => {
                     }),
                     pagination: currenPost.pagination,
                 };
-                queryClient.setQueryData(['posts'], newPost);
+                queryClient.setQueryData([nameQuery], newPost);
             }
             Swal.fire('Thành công!', data.message, 'success');
         },
@@ -152,7 +152,7 @@ const CardPost = ({ post }) => {
     const { mutate: mutatePostDel, isPending: isPendingPostDel } = useMutation({
         mutationFn: PostServices.deletePost,
         onSuccess: (data) => {
-            const currenPost = queryClient.getQueryData(['posts']);
+            const currenPost = queryClient.getQueryData([nameQuery]);
 
             if (currenPost) {
                 const newPost = {
@@ -162,7 +162,7 @@ const CardPost = ({ post }) => {
                     }),
                     pagination: currenPost.pagination,
                 };
-                queryClient.setQueryData(['posts'], newPost);
+                queryClient.setQueryData([nameQuery], newPost);
             }
 
             Swal.fire('Thành công!', data.message, 'success');

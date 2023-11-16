@@ -1,5 +1,10 @@
 import { axiosClient } from '../utils/axiosClient';
 const FriendServices = {
+    getFriend: async (userId) => {
+        if (!userId) return;
+        const result = await axiosClient.get(`/friend/${userId}`);
+        return result.data;
+    },
     getFriendByUserId: async ({ pageParam, id }) => {
         if (!id) return;
         const result = await axiosClient.get(`/friend/${id}?page=${pageParam}`);

@@ -31,7 +31,7 @@ const Home = () => {
         isFetchingNextPage: isLoadingAllPosts,
         hasNextPage: hasNextpageAllPosts,
         fetchNextPage: fetchNextPageAllPosts,
-    } = useInfiniteLoad(PostServices.getAllPost, 'posts');
+    } = useInfiniteLoad(PostServices.getAllPost, 'postsHome');
 
     const handleEmojiClick = (emojiData, event) => {
         setTextMessage((preText) => preText + emojiData.emoji);
@@ -41,7 +41,7 @@ const Home = () => {
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createPost,
         onSuccess: (data) => {
-            const currenPostHome = queryClient.getQueryData(['posts']);
+            const currenPostHome = queryClient.getQueryData(['postsHome']);
             if (currenPostHome) {
                 console.log(data.data);
                 const newPostHome = {
@@ -49,7 +49,7 @@ const Home = () => {
                     data: [data.data, ...currenPostHome.data],
                     pagination: currenPostHome.pagination,
                 };
-                queryClient.setQueryData(['posts'], newPostHome);
+                queryClient.setQueryData(['postsHome'], newPostHome);
                 console.log(currenPostHome.data);
             }
             setTextMessage('');
@@ -193,7 +193,7 @@ const Home = () => {
                 }
             >
                 {dataAllPosts.map((item, index) => (
-                    <CardPost key={index} post={item} />
+                    <CardPost key={index} post={item} nameQuery={'postsHome'} />
                 ))}
             </InfiniteScroll>
         </div>

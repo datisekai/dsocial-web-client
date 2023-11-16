@@ -65,20 +65,25 @@ const DetailGroup = () => {
         isFetchingNextPage: isLoadingAllPosts,
         hasNextPage: hasNextpageAllPosts,
         fetchNextPage: fetchNextPageAllPosts,
-    } = useInfiniteLoad(PostServices.getPostDetailGroup, 'posts', id);
+    } = useInfiniteLoad(PostServices.getPostDetailGroup, 'postsDetailGroup', id);
 
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createPost,
         onSuccess: (data) => {
-            const currenPostHome = queryClient.getQueryData(['posts']);
+            const currenPostHome = queryClient.getQueryData(['postsDetailGroup']);
             if (currenPostHome) {
                 console.log(data.data);
                 const newPostHome = {
-                    success: currenPostHome.success,
-                    data: [data.data, ...currenPostHome.data],
-                    pagination: currenPostHome.pagination,
+                    pageParams: currenPostHome.pageParams,
+                    pages: [
+                        {
+                            success: currenPostHome.pages[0].success,
+                            data: [data.data, ...currenPostHome.pages[0].data],
+                            pagination: currenPostHome.pages[0].pagination,
+                        },
+                    ],
                 };
-                queryClient.setQueryData(['posts'], newPostHome);
+                queryClient.setQueryData(['postsDetailGroup'], newPostHome);
                 console.log(currenPostHome.data);
             }
             setTextMessage('');
@@ -385,7 +390,7 @@ const DetailGroup = () => {
                         }
                     >
                         {dataAllPosts.map((item, index) => (
-                            <CardPost key={index} post={item} />
+                            <CardPost key={index} post={item} nameQuery={'postsDetailGroup'} />
                         ))}
                     </InfiniteScroll>
                 </div>

@@ -28,7 +28,7 @@ const UserProfile = () => {
     const { data: dataFriend, isLoading: isLoadingFriend } = useQuery({
         queryKey: ['friends', user.id],
         queryFn: () => {
-            return FriendServices.getFriendByUserId(user.id);
+            return FriendServices.getFriend(user.id);
         },
     });
 
@@ -44,7 +44,7 @@ const UserProfile = () => {
         isFetchingNextPage: isLoadingAllPosts,
         hasNextPage: hasNextpageAllPosts,
         fetchNextPage: fetchNextPageAllPosts,
-    } = useInfiniteLoad(PostServices.getPostByUserId, 'posts', userId);
+    } = useInfiniteLoad(PostServices.getPostByUserId, 'postsUserProfile', userId);
 
     const { mutate, isPending } = useMutation({
         mutationFn: FriendServices.addFriend,
@@ -177,7 +177,7 @@ const UserProfile = () => {
                     >
                         {dataAllPosts.length > 0 ? (
                             dataAllPosts.map((item, index) => {
-                                return <CardPost key={index} post={item} />;
+                                return <CardPost key={index} post={item} nameQuery={'postsUserProfile'} />;
                             })
                         ) : (
                             <div>Kông có bài viết nào</div>
