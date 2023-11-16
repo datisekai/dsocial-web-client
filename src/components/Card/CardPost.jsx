@@ -221,7 +221,7 @@ const CardPost = ({ post }) => {
                     ) : (
                         <div className="relative">
                             <Link to={`/group/${post.group.id}`}>
-                                <img className="w-12" src={getImage(post.group.avatar)} />
+                                <img className="w-10 h-10 rounded-full" src={getImage(post.group.avatar)} />
                             </Link>
                             <Link to={user.id == post.user_post.id ? '/profile' : `/profile/${user.id}`}>
                                 <div className="absolute right-[-4px] bottom-[-4px] border border-primary rounded-full">

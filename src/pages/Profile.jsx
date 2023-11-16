@@ -9,6 +9,8 @@ import ProfileServices from '../services/ProfileService';
 import getImage from '../utils/getImage';
 import getDate from '../utils/getDate';
 import PostServices from '../services/PostService';
+import useInfiniteLoad from '../hooks/useInfiniteLoad';
+import InfiniteScroll from 'react-infinite-scroll-component';
 const Profile = () => {
     const { user } = useSelector((state) => state.user);
 
@@ -19,13 +21,13 @@ const Profile = () => {
         },
     });
 
-    const { data: dataPost, isLoading: isLoadingPost } = useQuery({
-        queryKey: ['posts'],
-        queryFn: () => {
-            return PostServices.getPostByUserId(user.id);
-        },
-    });
-    console.log(dataPost, isLoadingPost);
+    const {
+        data: dataAllPosts,
+        isFetchingNextPage: isLoadingAllPosts,
+        hasNextPage: hasNextpageAllPosts,
+        fetchNextPage: fetchNextPageAllPosts,
+    } = useInfiniteLoad(PostServices.getPostByUserId, 'posts', null);
+
     return (
         <div>
             {!isLoadingProfile && (
@@ -75,13 +77,24 @@ const Profile = () => {
 
                 <div className="bg-[#f5f5f5] p-4 space-y-2 mt-4">
                     <h2 className="font-bold">Bài viết</h2>
-                    {!isLoadingPost && dataPost?.data.length ? (
-                        dataPost?.data.map((item, index) => {
-                            return <CardPost key={index} post={item} />;
-                        })
-                    ) : (
-                        <div>Kông có bài viết nào</div>
-                    )}
+                    <InfiniteScroll
+                        dataLength={dataAllPosts.length}
+                        next={fetchNextPageAllPosts}
+                        hasMore={hasNextpageAllPosts}
+                        loader={
+                            <div className="my-2 flex justify-center">
+                                <span className="loading loading-dots loading-md"></span>
+                            </div>
+                        }
+                    >
+                        {dataAllPosts.length > 0 ? (
+                            dataAllPosts.map((item, index) => {
+                                return <CardPost key={index} post={item} />;
+                            })
+                        ) : (
+                            <div>Kông có bài viết nào</div>
+                        )}
+                    </InfiniteScroll>
                 </div>
             </div>
         </div>

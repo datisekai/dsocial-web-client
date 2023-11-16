@@ -1,17 +1,17 @@
 import { axiosClient } from '../utils/axiosClient';
 const PostServices = {
-    getAllPost: async () => {
-        const result = await axiosClient.get(`/post`);
+    getAllPost: async ({ pageParam }) => {
+        const result = await axiosClient.get(`/post?page=${pageParam}`);
         return result.data;
     },
-    getPostByUserId: async (userId) => {
-        if (!userId) return;
-        const result = await axiosClient.get(`/post/user/${userId}`);
+    getPostByUserId: async ({ pageParam, id }) => {
+        if (!id) return;
+        const result = await axiosClient.get(`/post/user/${id}?page=${pageParam}`);
         return result.data;
     },
-    getPostDetailGroup: async (groupId) => {
-        if (!groupId) return;
-        const result = await axiosClient.get(`/post/group/${groupId}`);
+    getPostDetailGroup: async ({ pageParam, id }) => {
+        if (!id) return;
+        const result = await axiosClient.get(`/post/group/${id}?page=${pageParam}`);
         return result.data;
     },
     createComment: async (data) => {

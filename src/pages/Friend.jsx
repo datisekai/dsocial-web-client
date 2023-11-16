@@ -6,6 +6,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import Swal from 'sweetalert2';
 import getImage from '../utils/getImage';
+import useInfiniteLoad from '../hooks/useInfiniteLoad';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const tabs = [
     {
@@ -23,19 +25,32 @@ const Friend = () => {
 
     const { user } = useSelector((state) => state.user);
 
-    const { data: dataFriend, isLoading: isLoadingFriend } = useQuery({
-        queryKey: ['friends', user.id],
-        queryFn: () => {
-            return FriendServices.getFriendByUserId(user.id);
-        },
-    });
+    // const { data: dataFriend, isLoading: isLoadingFriend } = useQuery({
+    //     queryKey: ['friends', user.id],
+    //     queryFn: () => {
+    //         return FriendServices.getFriendByUserId(user.id);
+    //     },
+    // });
+    const {
+        data: dataFriend,
+        isFetchingNextPage: isLoadingFriend,
+        hasNextPage: hasNextpageFriend,
+        fetchNextPage: fetchNextPageFriend,
+    } = useInfiniteLoad(FriendServices.getFriendByUserId, 'friends', null);
 
-    const { data: dataFriendRequest, isLoading: isLoadingFriendRequest } = useQuery({
-        queryKey: ['friendRequests', user.id],
-        queryFn: () => {
-            return FriendServices.getFriendRequestByUserId();
-        },
-    });
+    // const { data: dataFriendRequest, isLoading: isLoadingFriendRequest } = useQuery({
+    //     queryKey: ['friendRequests', user.id],
+    //     queryFn: () => {
+    //         return FriendServices.getFriendRequestByUserId();
+    //     },
+    // });
+
+    const {
+        data: dataFriendRequest,
+        isFetchingNextPage: isLoadingFriendRequest,
+        hasNextPage: hasNextpageFriendRequest,
+        fetchNextPage: fetchNextPageFriendRequest,
+    } = useInfiniteLoad(FriendServices.getFriendRequestByUserId, 'friendRequests', null);
 
     const { mutate: mutateAcceptFriend, isPending: isPendingAcceptF } = useMutation({
         mutationFn: FriendServices.acceptFriend,
@@ -144,10 +159,69 @@ const Friend = () => {
                 {query.get('action') === 'request' ? (
                     <>
                         <h1 className="text-primary font-bold">Lời mời kết bạn</h1>
-                        <div className="mt-4 space-y-2">
-                            {!isLoadingFriendRequest &&
-                                dataFriendRequest?.data.map((item, index) => (
-                                    <div key={index} className="flex items-center justify-between">
+                        <InfiniteScroll
+                            dataLength={dataFriendRequest.length}
+                            next={fetchNextPageFriendRequest}
+                            hasMore={hasNextpageFriendRequest}
+                            className="mt-4 space-y-2"
+                            loader={
+                                <div className="my-2 flex justify-center">
+                                    <span className="loading loading-dots loading-md"></span>
+                                </div>
+                            }
+                        >
+                            {dataFriendRequest.map((item, index) => (
+                                <div key={index} className="flex items-center justify-between">
+                                    <Link to={`/profile/${item.id}`} className="link link-hover">
+                                        <div className="flex items-center gap-2">
+                                            <img
+                                                className="rounded-full w-[70px] h-[70px]"
+                                                src={`${getImage(item.avatar)}`}
+                                                alt=""
+                                            />
+
+                                            <h2 className="font-bold">{item.name}</h2>
+                                        </div>
+                                    </Link>
+                                    <div className="flex gap-2 mt-2 md:mt-0 flex-col md:flex-row">
+                                        <button
+                                            disabled={isPendingAcceptF}
+                                            className="btn btn-primary btn-sm md:btn-md"
+                                            onClick={() => handleAcceptFriend(item)}
+                                        >
+                                            {isPendingAcceptF && <span className="loading loading-spinner"></span>}
+                                            Chấp nhận
+                                        </button>
+                                        <button
+                                            disabled={isPendingDelFResq}
+                                            className="btn btn-sm md:btn-md"
+                                            onClick={() => handleDelFriendReq(item)}
+                                        >
+                                            {isPendingDelFResq && <span className="loading loading-spinner"></span>}
+                                            Xóa
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </InfiniteScroll>
+                    </>
+                ) : (
+                    <>
+                        <h1 className="text-primary font-bold">Bạn bè</h1>
+                        <InfiniteScroll
+                            dataLength={dataFriend.length}
+                            next={fetchNextPageFriend}
+                            hasMore={hasNextpageFriend}
+                            className="mt-4 space-y-2"
+                            loader={
+                                <div className="my-2 flex justify-center">
+                                    <span className="loading loading-dots loading-md"></span>
+                                </div>
+                            }
+                        >
+                            {dataFriend.map((item, index) => {
+                                return (
+                                    <div className="flex items-center justify-between " key={index}>
                                         <Link to={`/profile/${item.id}`} className="link link-hover">
                                             <div className="flex items-center gap-2">
                                                 <img
@@ -159,59 +233,18 @@ const Friend = () => {
                                                 <h2 className="font-bold">{item.name}</h2>
                                             </div>
                                         </Link>
-                                        <div className="flex gap-2 mt-2 md:mt-0 flex-col md:flex-row">
-                                            <button
-                                                disabled={isPendingAcceptF}
-                                                className="btn btn-primary btn-sm md:btn-md"
-                                                onClick={() => handleAcceptFriend(item)}
-                                            >
-                                                {isPendingAcceptF && <span className="loading loading-spinner"></span>}
-                                                Chấp nhận
-                                            </button>
-                                            <button
-                                                disabled={isPendingDelFResq}
-                                                className="btn btn-sm md:btn-md"
-                                                onClick={() => handleDelFriendReq(item)}
-                                            >
-                                                {isPendingDelFResq && <span className="loading loading-spinner"></span>}
-                                                Xóa
-                                            </button>
-                                        </div>
+                                        <button
+                                            className="btn btn-sm md:btn-md"
+                                            onClick={() => handleDelFriend(item)}
+                                            disabled={isPendingDelF}
+                                        >
+                                            {isPendingDelF && <span className="loading loading-spinner"></span>}
+                                            Hủy bạn bè
+                                        </button>
                                     </div>
-                                ))}
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        <h1 className="text-primary font-bold">Bạn bè</h1>
-                        <div className="mt-4 space-y-2">
-                            {!isLoadingFriend &&
-                                dataFriend?.data.map((item, index) => {
-                                    return (
-                                        <div className="flex items-center justify-between " key={index}>
-                                            <Link to={`/profile/${item.id}`} className="link link-hover">
-                                                <div className="flex items-center gap-2">
-                                                    <img
-                                                        className="rounded-full w-[70px] h-[70px]"
-                                                        src={`${getImage(item.avatar)}`}
-                                                        alt=""
-                                                    />
-
-                                                    <h2 className="font-bold">{item.name}</h2>
-                                                </div>
-                                            </Link>
-                                            <button
-                                                className="btn btn-sm md:btn-md"
-                                                onClick={() => handleDelFriend(item)}
-                                                disabled={isPendingDelF}
-                                            >
-                                                {isPendingDelF && <span className="loading loading-spinner"></span>}
-                                                Hủy bạn bè
-                                            </button>
-                                        </div>
-                                    );
-                                })}
-                        </div>
+                                );
+                            })}
+                        </InfiniteScroll>
                     </>
                 )}
             </div>

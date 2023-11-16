@@ -11,6 +11,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import PostServices from '../services/PostService';
 import { uploadsServer } from '../utils/axiosClient';
 import Swal from 'sweetalert2';
+import useInfiniteLoad from '../hooks/useInfiniteLoad';
+import InfiniteScroll from 'react-infinite-scroll-component';
 const Home = () => {
     const { user } = useSelector((state) => state.user);
     const inputRef = React.useRef(null);
@@ -24,13 +26,12 @@ const Home = () => {
             return { type: item.type.split('/')[0], file: URL.createObjectURL(item) };
         });
     }, [filePost]);
-
-    const { data, isLoading } = useQuery({
-        queryKey: ['posts'],
-        queryFn: () => {
-            return PostServices.getAllPost();
-        },
-    });
+    const {
+        data: dataAllPosts,
+        isFetchingNextPage: isLoadingAllPosts,
+        hasNextPage: hasNextpageAllPosts,
+        fetchNextPage: fetchNextPageAllPosts,
+    } = useInfiniteLoad(PostServices.getAllPost, 'posts');
 
     const handleEmojiClick = (emojiData, event) => {
         setTextMessage((preText) => preText + emojiData.emoji);
@@ -180,9 +181,21 @@ const Home = () => {
                 </div>
             </div>
 
-            <div className="mt-8 space-y-2">
-                {!isLoading && data?.data.map((item, index) => <CardPost key={index} post={item} />)}
-            </div>
+            <InfiniteScroll
+                dataLength={dataAllPosts.length}
+                next={fetchNextPageAllPosts}
+                hasMore={hasNextpageAllPosts}
+                className="mt-8 space-y-2"
+                loader={
+                    <div className="my-2 flex justify-center">
+                        <span className="loading loading-dots loading-md"></span>
+                    </div>
+                }
+            >
+                {dataAllPosts.map((item, index) => (
+                    <CardPost key={index} post={item} />
+                ))}
+            </InfiniteScroll>
         </div>
     );
 };
