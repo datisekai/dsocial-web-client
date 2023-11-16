@@ -19,6 +19,7 @@ import UpdatePostModal from '../Modal/UpdatePostModal';
 
 const CardPost = ({ post }) => {
     const [isShowFullImage, setIsShowFullImage] = useState(false);
+    const [isShowFullComment, setIsShowFullComment] = useState(false);
     const inputRef = React.useRef(null);
 
     const [showEmoji, setShowEmoji] = React.useState(false);
@@ -190,7 +191,6 @@ const CardPost = ({ post }) => {
     const handleDeleteReaction = () => {
         mutateReactionDel(iconId);
     };
-    const [showComment, setShowComment] = useState(false);
 
     const handleDeletePost = () => {
         Swal.fire({
@@ -376,25 +376,18 @@ const CardPost = ({ post }) => {
                 <h3>Bình luận</h3>
                 <div className="space-y-2 mt-4">
                     {parentComments.length == 0 && <p>Không có bình luận</p>}
-                    {parentComments.length <= 5 ? (
-                        parentComments.map((item) => {
-                            return <CardComment comment={item} key={item.id} post={post} />;
-                        })
+                    {(isShowFullComment ? parentComments : [...parentComments].splice(0, 5)).map((item, index) => (
+                        <CardComment comment={item} key={item.id} post={post} />
+                    ))}
+                    {parentComments.length > 5 ? (
+                        <button
+                            onClick={() => setIsShowFullComment(!isShowFullComment)}
+                            className="btn btn-sm md:btn-md btn-ghost mt-2"
+                        >
+                            {!isShowFullComment ? 'Xem thêm' : 'Thu gọn'}
+                        </button>
                     ) : (
-                        <>
-                            {parentComments.slice(0, 5).map((item) => {
-                                return <CardComment comment={item} key={item.id} post={post} />;
-                            })}
-                            {!showComment ? (
-                                <div className="link link-hover" onClick={() => setShowComment(true)}>
-                                    Xem tất cả bình luận
-                                </div>
-                            ) : (
-                                parentComments.slice(5, parentComments.length).map((item) => {
-                                    return <CardComment comment={item} key={item.id} post={post} />;
-                                })
-                            )}
-                        </>
+                        ''
                     )}
                 </div>
             </div>
