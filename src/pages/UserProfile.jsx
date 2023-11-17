@@ -28,16 +28,32 @@ const UserProfile = () => {
     const { data: dataFriend, isLoading: isLoadingFriend } = useQuery({
         queryKey: ['friends', user.id],
         queryFn: () => {
-            return FriendServices.getFriend(user.id);
+            return FriendServices.getAllFriendByUserId(user.id);
         },
     });
 
     const { data: dataFriendRequest, isLoading: isLoadingFriendRequest } = useQuery({
         queryKey: ['friendRequests', user.id],
         queryFn: () => {
-            return FriendServices.getFriendRequestByUserId();
+            return FriendServices.getAllFriendRequestByUserId();
         },
     });
+
+    const { data: dataMyFriendRequest, isLoading: isLoadingMyFriendRequest } = useQuery({
+        queryKey: ['myfriendRequests', user.id],
+        queryFn: () => {
+            return FriendServices.getAllMyRequestFriend();
+        },
+    });
+    const isMyFriend = useMemo(() => dataFriend?.data.some((item) => +item.id === +userId), [dataFriend, userId]);
+    const isFriendRequest = useMemo(
+        () => dataFriendRequest?.data.some((item) => +item.id === +userId),
+        [dataFriendRequest, userId],
+    );
+    const isMyFriendRequest = useMemo(
+        () => dataMyFriendRequest?.data.some((item) => +item.id === +userId),
+        [dataMyFriendRequest, userId],
+    );
 
     const {
         data: dataAllPosts,
@@ -49,6 +65,15 @@ const UserProfile = () => {
     const { mutate, isPending } = useMutation({
         mutationFn: FriendServices.addFriend,
         onSuccess: (data) => {
+            const currentMyFriendRequest = queryClient.getQueryData(['myfriendRequests', user.id]);
+            if (currentMyFriendRequest) {
+                const newDataMyFriendRequest = {
+                    success: currentMyFriendRequest.success,
+                    data: [data.data, ...currentMyFriendRequest.data],
+                    pagination: currentMyFriendRequest.pagination,
+                };
+                queryClient.setQueryData(['myfriendRequests', user.id], newDataMyFriendRequest);
+            }
             Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
@@ -58,13 +83,6 @@ const UserProfile = () => {
             Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
         },
     });
-
-    // const isMyFriend = useMemo(() => dataFriend?.data.some((item) => +item.id === +userId), [dataFriend, userId]);
-    // const isFriendRequest = useMemo(
-    //     () => dataFriendRequest?.data.some((item) => +item.id === +userId),
-    //     [dataFriendRequest, userId],
-    // );
-    // const isMyRequest = useMemo();
 
     const { mutate: mutateDelFriend, isPending: isPendingDelF } = useMutation({
         mutationFn: FriendServices.deleteFriend,
@@ -87,6 +105,68 @@ const UserProfile = () => {
             Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
         },
     });
+    const { mutate: mutateDelFriendReq, isPending: isPendingDelFResq } = useMutation({
+        mutationFn: FriendServices.deleteFriendRequest,
+        onSuccess: (data) => {
+            const currentMyFriendRequest = queryClient.getQueryData(['myfriendRequests', user.id]);
+            const currentFriendResq = queryClient.getQueryData(['friendRequests', user.id]);
+            if (currentMyFriendRequest) {
+                const newMyFriendRequest = {
+                    success: currentMyFriendRequest.success,
+                    data: currentMyFriendRequest.data.filter((item) => item.id !== data.data.id),
+                    pagination: currentMyFriendRequest.pagination,
+                };
+                queryClient.setQueryData(['myfriendRequests', user.id], newMyFriendRequest);
+            }
+            if (currentFriendResq) {
+                const newDataFriendRequest = {
+                    success: currentFriendResq.success,
+                    data: currentFriendResq.data.filter((item) => item.id !== data.data.id),
+                    pagination: currentFriendResq.pagination,
+                };
+                queryClient.setQueryData(['friendRequests', user.id], newDataFriendRequest);
+            }
+            Swal.fire('Thành công!', data.message, 'success');
+        },
+        onError: (error) => {
+            if (error?.message) {
+                return Swal.fire('Thất bại!', error.message, 'error');
+            }
+            Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
+        },
+    });
+    const { mutate: mutateAcceptFriend, isPending: isPendingAcceptF } = useMutation({
+        mutationFn: FriendServices.acceptFriend,
+        onSuccess: (data) => {
+            const currentFriend = queryClient.getQueryData(['friends', user.id]);
+            const currentFriendResq = queryClient.getQueryData(['friendRequests', user.id]);
+            if (currentFriend) {
+                const newDataFriend = {
+                    success: currentFriend.success,
+                    data: [data.data, ...currentFriend.data],
+                    pagination: currentFriend.pagination,
+                };
+
+                queryClient.setQueryData(['friends', user.id], newDataFriend);
+                if (currentFriendResq) {
+                    const newDataFriendRequest = {
+                        success: currentFriendResq.success,
+                        data: currentFriendResq.data.filter((item) => item.id !== data.data.id),
+                        pagination: currentFriendResq.pagination,
+                    };
+                    queryClient.setQueryData(['friendRequests', user.id], newDataFriendRequest);
+                }
+            }
+            console.log(data);
+            Swal.fire('Thành công!', data.message, 'success');
+        },
+        onError: (error) => {
+            if (error?.message) {
+                return Swal.fire('Thất bại!', error.message, 'error');
+            }
+            Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
+        },
+    });
 
     const handleDelFriend = (values) => {
         mutateDelFriend(values);
@@ -94,29 +174,11 @@ const UserProfile = () => {
     const handleSubmit = (values) => {
         mutate({ friendId: values });
     };
-
-    const renderButton = () => {
-        // if (!isLoadingFriend && isMyFriend)
-        //     return (
-        //         <button
-        //             className="btn btn-sm md:btn-md btn-primary"
-        //             onClick={() => handleDelFriend(userId)}
-        //             disabled={isPendingDelF}
-        //         >
-        //             {isPendingDelF && <span className="loading loading-spinner"></span>}Hủy bạn bè
-        //         </button>
-        //     );
-        // if (!isLoadingFriendRequest && isFriendRequest && !isLoadingFriend && !isMyFriend) {
-        //     return (
-        //         <button
-        //             className="btn btn-sm md:btn-md btn-primary"
-        //             onClick={() => handleSubmit(userId)}
-        //             disabled={isPending}
-        //         >
-        //             {isPending && <span className="loading loading-spinner"></span>}Kết bạn
-        //         </button>
-        //     );
-        // }
+    const handleDelFriendRequest = (values) => {
+        mutateDelFriendReq(values);
+    };
+    const handleAcceptFriend = (values) => {
+        mutateAcceptFriend(values);
     };
 
     return (
@@ -139,7 +201,48 @@ const UserProfile = () => {
                                 <p className="text-[#828486]">{dataProfile.data.other_name}</p>
                             </div>
                         </div>
-                        {/* {renderButton} */}
+                        {!isLoadingFriend && isMyFriend ? (
+                            <button
+                                className="btn btn-sm md:btn-md btn-primary"
+                                onClick={() => handleDelFriend(userId)}
+                                disabled={isPendingDelF}
+                            >
+                                {isPendingDelF && <span className="loading loading-spinner"></span>}Hủy bạn bè
+                            </button>
+                        ) : !isLoadingMyFriendRequest && isMyFriendRequest ? (
+                            <button
+                                className="btn btn-sm md:btn-md btn-primary"
+                                onClick={() => handleDelFriendRequest(userId)}
+                                disabled={isPendingDelFResq}
+                            >
+                                {isPendingDelFResq && <span className="loading loading-spinner"></span>}Hủy lời mời
+                            </button>
+                        ) : !isLoadingFriendRequest && isFriendRequest ? (
+                            <div>
+                                <button
+                                    className="btn btn-sm md:btn-md btn-primary mr-2"
+                                    onClick={() => handleAcceptFriend(userId)}
+                                    disabled={isPendingAcceptF}
+                                >
+                                    {isPendingAcceptF && <span className="loading loading-spinner"></span>}Chấp nhận
+                                </button>
+                                <button
+                                    className="btn btn-sm md:btn-md"
+                                    onClick={() => handleDelFriendRequest(userId)}
+                                    disabled={isPendingDelFResq}
+                                >
+                                    {isPendingDelFResq && <span className="loading loading-spinner"></span>}Xóa
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                className="btn btn-sm md:btn-md btn-primary"
+                                onClick={() => handleSubmit(userId)}
+                                disabled={isPending}
+                            >
+                                {isPending && <span className="loading loading-spinner"></span>}Kết bạn
+                            </button>
+                        )}
                     </div>
                 </div>
             )}

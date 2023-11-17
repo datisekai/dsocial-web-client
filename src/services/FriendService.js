@@ -9,6 +9,19 @@ const FriendServices = {
         const result = await axiosClient.get(`/friend/requests?page=${pageParam}`);
         return result.data;
     },
+    getAllMyRequestFriend: async () => {
+        const result = await axiosClient.get(`/friend/my-requests`);
+        return result.data;
+    },
+    getAllFriendRequestByUserId: async () => {
+        const result = await axiosClient.get(`/friend/requests`);
+        return result.data;
+    },
+    getAllFriendByUserId: async (userId) => {
+        if (!userId) return;
+        const result = await axiosClient.get(`/friend/${userId}`);
+        return result.data;
+    },
     acceptFriend: async (userId) => {
         if (!userId) return;
         const result = await axiosClient.put(`/friend/${userId}`);

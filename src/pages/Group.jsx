@@ -25,6 +25,7 @@ const tabs = [
 const Group = () => {
     const query = useQueryParams();
     const action = query.get('action') || '';
+    const [text, setText] = React.useState('');
     // const { data: dataAllGroups, isLoading: isLoadingAllGroups } = useQuery({
     //     queryKey: ['allgroups'],
     //     queryFn: () => {
@@ -72,16 +73,12 @@ const Group = () => {
                 ))}
             </div>
 
-            <div className="mt-4">
-                <input type="text" placeholder="Tìm kiếm nhóm" className="input input-bordered w-full max-w-xs" />
-            </div>
-
             {action == 'all' && (
                 <InfiniteScroll
                     dataLength={dataAllGroups.length}
                     next={fetchNextPageAllGroups}
                     hasMore={hasNextpageAllGroups}
-                    className="mt-4 space-y-2"
+                    className="mt-8 space-y-2"
                     loader={
                         <div className="my-2 flex justify-center">
                             <span className="loading loading-dots loading-md"></span>
@@ -99,7 +96,7 @@ const Group = () => {
                     dataLength={dataJoinGroups.length}
                     next={fetchNextPageJoinGroups}
                     hasMore={hasNextpageJoinGroups}
-                    className="mt-4 space-y-2"
+                    className="mt-8 space-y-2"
                     loader={
                         <div className="my-2 flex justify-center">
                             <span className="loading loading-dots loading-md"></span>
@@ -117,7 +114,7 @@ const Group = () => {
                     dataLength={dataOwnGroups.length}
                     next={fetchNextPageOwnGroups}
                     hasMore={hasNextpageOwnGroups}
-                    className="mt-4 space-y-2"
+                    className="mt-8 space-y-2"
                     loader={
                         <div className="my-2 flex justify-center">
                             <span className="loading loading-dots loading-md"></span>
