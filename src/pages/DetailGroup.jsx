@@ -72,7 +72,6 @@ const DetailGroup = () => {
         onSuccess: (data) => {
             const currenPostHome = queryClient.getQueryData(['postsDetailGroup']);
             if (currenPostHome) {
-                console.log(data.data);
                 const newPostHome = {
                     pageParams: currenPostHome.pageParams,
                     pages: [

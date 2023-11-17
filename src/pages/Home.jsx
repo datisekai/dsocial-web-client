@@ -45,9 +45,14 @@ const Home = () => {
             if (currenPostHome) {
                 console.log(data.data);
                 const newPostHome = {
-                    success: currenPostHome.success,
-                    data: [data.data, ...currenPostHome.data],
-                    pagination: currenPostHome.pagination,
+                    pageParams: currenPostHome.pageParams,
+                    pages: [
+                        {
+                            success: currenPostHome.pages[0].success,
+                            data: [data.data, ...currenPostHome.pages[0].data],
+                            pagination: currenPostHome.pages[0].pagination,
+                        },
+                    ],
                 };
                 queryClient.setQueryData(['postsHome'], newPostHome);
                 console.log(currenPostHome.data);

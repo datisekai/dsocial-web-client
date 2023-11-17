@@ -1,10 +1,5 @@
 import { axiosClient } from '../utils/axiosClient';
 const FriendServices = {
-    getFriend: async (userId) => {
-        if (!userId) return;
-        const result = await axiosClient.get(`/friend/${userId}`);
-        return result.data;
-    },
     getFriendByUserId: async ({ pageParam, id }) => {
         if (!id) return;
         const result = await axiosClient.get(`/friend/${id}?page=${pageParam}`);
@@ -17,22 +12,22 @@ const FriendServices = {
     acceptFriend: async (userId) => {
         if (!userId) return;
         const result = await axiosClient.put(`/friend/${userId}`);
-        return result;
+        return result.data;
     },
     deleteFriendRequest: async (userId) => {
         if (!userId) return;
         const result = await axiosClient.delete(`/friend/request/${userId}`);
-        return result;
+        return result.data;
     },
     deleteFriend: async (userId) => {
         if (!userId) return;
         const result = await axiosClient.delete(`/friend/${userId}`);
-        return result;
+        return result.data;
     },
     addFriend: async (friendId) => {
         if (!friendId) return;
         const result = await axiosClient.post(`/friend`, friendId);
-        return result;
+        return result.data;
     },
 };
 

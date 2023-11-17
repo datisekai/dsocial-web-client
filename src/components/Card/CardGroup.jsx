@@ -13,30 +13,40 @@ const CardGroup = ({ group, isJoin }) => {
         mutationFn: GroupServices.joinGroup,
         onSuccess: (data) => {
             const newCurrentGroups = { ...currentGroup, is_joined: data.data.is_joined };
-            const currentAllGroupsJoined = queryClient.getQueryData(['allgroupsjoined']);
-            const currentAllGroups = queryClient.getQueryData(['allgroups']);
+            const currentAllGroupsJoined = queryClient.getQueryData(['joinGroup']);
+            const currentAllGroups = queryClient.getQueryData(['allGroup']);
             if (currentAllGroupsJoined) {
                 const newDataAllGroupsJoined = {
-                    success: currentAllGroupsJoined.success,
-                    data: [newCurrentGroups, ...currentAllGroupsJoined.data],
-                    pagination: currentAllGroupsJoined.pagination,
+                    pageParams: currentAllGroupsJoined.pageParams,
+                    pages: [
+                        {
+                            success: currentAllGroupsJoined.pages[0].success,
+                            data: [data.data, ...currentAllGroupsJoined.pages[0].data],
+                            pagination: currentAllGroupsJoined.pages[0].pagination,
+                        },
+                    ],
                 };
-                queryClient.setQueryData(['allgroupsjoined'], newDataAllGroupsJoined);
+                queryClient.setQueryData(['joinGroup'], newDataAllGroupsJoined);
                 if (currentAllGroups) {
                     const newDataAllGroups = {
-                        success: currentAllGroups.success,
-                        data: currentAllGroups.data.map((item) => {
-                            if (item.id === newCurrentGroups.id) {
-                                return {
-                                    ...item,
-                                    is_joined: newCurrentGroups.is_joined,
-                                };
-                            }
-                            return item;
-                        }),
-                        pagination: currentAllGroups.pagination,
+                        pageParams: currentAllGroups.pageParams,
+                        pages: [
+                            {
+                                success: currentAllGroups.pages[0].success,
+                                data: currentAllGroups.pages[0].data.map((item) => {
+                                    if (item.id === newCurrentGroups.id) {
+                                        return {
+                                            ...item,
+                                            is_joined: newCurrentGroups.is_joined,
+                                        };
+                                    }
+                                    return item;
+                                }),
+                                pagination: currentAllGroups.pages[0].pagination,
+                            },
+                        ],
                     };
-                    queryClient.setQueryData(['allgroups'], newDataAllGroups);
+                    queryClient.setQueryData(['allGroup'], newDataAllGroups);
                 }
             }
 

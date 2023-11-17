@@ -8,6 +8,7 @@ import { GoPencil } from 'react-icons/go';
 import { uploadServer } from '../utils/axiosClient';
 import Swal from 'sweetalert2';
 import GroupServices from '../services/GroupService';
+import { Navigate, useNavigate } from 'react-router-dom';
 const validateSchema = Yup.object({
     name: Yup.string().required('Vui lòng nhập tên.').max(50, 'Tên không quá 50 kí tự.'),
 });
@@ -15,6 +16,7 @@ const CreateGroup = () => {
     const { user } = useSelector((state) => state.user);
     const [cover_image, setCover_Image] = useState(null);
     const [avatarImage, setAvatarImage] = useState(null);
+    const navigate = useNavigate();
 
     const previewImage = useMemo(() => {
         if (!cover_image) {
@@ -35,6 +37,7 @@ const CreateGroup = () => {
     const { mutate, isPending } = useMutation({
         mutationFn: GroupServices.createGroup,
         onSuccess: (data) => {
+            navigate(`/group/${id}`);
             // Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {

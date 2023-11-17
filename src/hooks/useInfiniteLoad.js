@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-const useInfiniteLoad = (getData, queryKey, propsId) => {
+const useInfiniteLoad = (getData, queryKey, propsId, keySearch) => {
     const { user } = useSelector((state) => state.user);
     const {
         fetchNextPage,
@@ -13,8 +13,12 @@ const useInfiniteLoad = (getData, queryKey, propsId) => {
         data,
         isFetching,
     } = useInfiniteQuery({
-        queryKey: [queryKey],
-        queryFn: ({ pageParam = 1, id = propsId === null ? user.id : propsId }) => getData({ pageParam, id }),
+        queryKey: [queryKey, keySearch],
+        queryFn: ({
+            pageParam = 1,
+            id = propsId === null ? user.id : propsId,
+            q = keySearch === null ? '' : keySearch,
+        }) => getData({ pageParam, id, q }),
         getNextPageParam: (lastPage, allPages) => {
             const nextPage = lastPage.pagination.next_page || null;
             if (nextPage) return +nextPage;

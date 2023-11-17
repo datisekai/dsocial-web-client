@@ -60,18 +60,23 @@ const CardPost = ({ post, nameQuery }) => {
 
             if (currenPost) {
                 const newPost = {
-                    success: currenPost.success,
-                    data: currenPost.data.map((item) => {
-                        if (item.id === data.data.post_id) {
-                            return {
-                                ...item,
-                                count_comment: item.count_comment + 1,
-                                comments: [data.data, ...item.comments],
-                            };
-                        }
-                        return item;
-                    }),
-                    pagination: currenPost.pagination,
+                    pageParams: currenPost.pageParams,
+                    pages: [
+                        {
+                            success: currenPost.pages[0].success,
+                            data: currenPost.pages[0].data.map((item) => {
+                                if (item.id === data.data.post_id) {
+                                    return {
+                                        ...item,
+                                        count_comment: item.count_comment + 1,
+                                        comments: [data.data, ...item.comments],
+                                    };
+                                }
+                                return item;
+                            }),
+                            pagination: currenPost.pages[0].pagination,
+                        },
+                    ],
                 };
                 queryClient.setQueryData([nameQuery], newPost);
             }
@@ -93,18 +98,23 @@ const CardPost = ({ post, nameQuery }) => {
 
             if (currenPost) {
                 const newPost = {
-                    success: currenPost.success,
-                    data: currenPost.data.map((item) => {
-                        if (item.id === data.data.post_id) {
-                            return {
-                                ...item,
-                                count_reaction: item.count_reaction + 1,
-                                reactions: [...item.reactions, data.data],
-                            };
-                        }
-                        return item;
-                    }),
-                    pagination: currenPost.pagination,
+                    pageParams: currenPost.pageParams,
+                    pages: [
+                        {
+                            success: currenPost.pages[0].success,
+                            data: currenPost.pages[0].data.map((item) => {
+                                if (item.id === data.data.post_id) {
+                                    return {
+                                        ...item,
+                                        count_reaction: item.count_reaction + 1,
+                                        reactions: [...item.reactions, data.data],
+                                    };
+                                }
+                                return item;
+                            }),
+                            pagination: currenPost.pages[0].pagination,
+                        },
+                    ],
                 };
                 queryClient.setQueryData([nameQuery], newPost);
             }
@@ -124,18 +134,23 @@ const CardPost = ({ post, nameQuery }) => {
 
             if (currenPost) {
                 const newPost = {
-                    success: currenPost.success,
-                    data: currenPost.data.map((item) => {
-                        if (item.id === data.data.post_id) {
-                            return {
-                                ...item,
-                                count_reaction: item.count_reaction - 1,
-                                reactions: item.reactions.filter((item) => item.id !== data.data.id),
-                            };
-                        }
-                        return item;
-                    }),
-                    pagination: currenPost.pagination,
+                    pageParams: currentAllGroupsJoined.pageParams,
+                    pages: [
+                        {
+                            success: currentAllGroupsJoined.pages[0].success,
+                            data: currenPost.pages[0].data.map((item) => {
+                                if (item.id === data.data.post_id) {
+                                    return {
+                                        ...item,
+                                        count_reaction: item.count_reaction - 1,
+                                        reactions: item.reactions.filter((item) => item.id !== data.data.id),
+                                    };
+                                }
+                                return item;
+                            }),
+                            pagination: currentAllGroupsJoined.pages[0].pagination,
+                        },
+                    ],
                 };
                 queryClient.setQueryData([nameQuery], newPost);
             }
@@ -156,11 +171,16 @@ const CardPost = ({ post, nameQuery }) => {
 
             if (currenPost) {
                 const newPost = {
-                    success: currenPost.success,
-                    data: currenPost.data.filter((item) => {
-                        return item.id !== data.data.id;
-                    }),
-                    pagination: currenPost.pagination,
+                    pageParams: currenPost.pageParams,
+                    pages: [
+                        {
+                            success: currenPost.pages[0].success,
+                            data: currenPost.pages[0].data.filter((item) => {
+                                return item.id !== data.data.id;
+                            }),
+                            pagination: currenPost.pages[0].pagination,
+                        },
+                    ],
                 };
                 queryClient.setQueryData([nameQuery], newPost);
             }
