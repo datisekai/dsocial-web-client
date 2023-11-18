@@ -45,7 +45,6 @@ const Search = () => {
         fetchNextPage: fetchNextPagedataPost,
     } = useInfiniteLoad(SearchServices.searchPosts, 'postSearch', null, query.get('query'));
 
-    console.log(dataPost);
     return (
         <div className="px-4 py-2">
             <h1>Kết quả tìm kiếm của "{query.get('query')}"</h1>
@@ -61,7 +60,7 @@ const Search = () => {
                 ))}
             </div>
 
-            {action == 'people' && (
+            {action == 'people' && !isLoadingPeople && (
                 <InfiniteScroll
                     dataLength={dataPeople.length}
                     next={fetchNextPagePeople}
@@ -85,7 +84,7 @@ const Search = () => {
                 </InfiniteScroll>
             )}
 
-            {action == 'post' && (
+            {action == 'post' && !isLoadingdataPost && (
                 <InfiniteScroll
                     dataLength={dataPost.length}
                     next={fetchNextPagedataPost}
@@ -109,7 +108,7 @@ const Search = () => {
                 </InfiniteScroll>
             )}
 
-            {action == 'group' && (
+            {action == 'group' && !isLoadingdataGroup && (
                 <InfiniteScroll
                     dataLength={dataGroup.length}
                     next={fetchNextPagedataGroup}

@@ -26,12 +26,6 @@ const Group = () => {
     const query = useQueryParams();
     const action = query.get('action') || '';
     const [text, setText] = React.useState('');
-    // const { data: dataAllGroups, isLoading: isLoadingAllGroups } = useQuery({
-    //     queryKey: ['allgroups'],
-    //     queryFn: () => {
-    //         return GroupServices.getAllGroups();
-    //     },
-    // });
 
     const {
         data: dataAllGroups,
@@ -85,9 +79,18 @@ const Group = () => {
                         </div>
                     }
                 >
-                    {dataAllGroups.map((group, index) => (
-                        <CardGroup key={index} group={group} isJoin={group.is_joined} />
-                    ))}
+                    {dataAllGroups.length === 0 ? (
+                        <div>Không có nhóm nào để hiển thị</div>
+                    ) : (
+                        dataAllGroups.map((group, index) => (
+                            <CardGroup
+                                key={index}
+                                group={group}
+                                isJoin={group.is_joined}
+                                nameQuery={['allGroup', undefined]}
+                            />
+                        ))
+                    )}
                 </InfiniteScroll>
             )}
 
@@ -103,9 +106,18 @@ const Group = () => {
                         </div>
                     }
                 >
-                    {dataJoinGroups.map((group, index) => (
-                        <CardGroup key={index} group={group} isJoin={group.is_joined} />
-                    ))}
+                    {dataJoinGroups.length === 0 ? (
+                        <div>Không có nhóm nào để hiển thị</div>
+                    ) : (
+                        dataJoinGroups.map((group, index) => (
+                            <CardGroup
+                                key={index}
+                                group={group}
+                                isJoin={group.is_joined}
+                                nameQuery={['joinGroup', undefined]}
+                            />
+                        ))
+                    )}
                 </InfiniteScroll>
             )}
 
@@ -121,9 +133,18 @@ const Group = () => {
                         </div>
                     }
                 >
-                    {dataOwnGroups.map((group, index) => (
-                        <CardGroup key={index} group={group} isJoin={group.is_joined} />
-                    ))}
+                    {dataOwnGroups.length === 0 ? (
+                        <div>Không có nhóm nào để hiển thị</div>
+                    ) : (
+                        dataOwnGroups.map((group, index) => (
+                            <CardGroup
+                                key={index}
+                                group={group}
+                                isJoin={group.is_joined}
+                                nameQuery={['ownGroup', undefined]}
+                            />
+                        ))
+                    )}
                 </InfiniteScroll>
             )}
         </div>

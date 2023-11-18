@@ -54,12 +54,6 @@ const DetailGroup = () => {
         },
     });
 
-    // const { data: dataPostDetailGroup, isLoading: isLoadingPostDetailGroup } = useQuery({
-    //     queryKey: ['posts'],
-    //     queryFn: () => {
-    //         return PostServices.getPostDetailGroup(id);
-    //     },
-    // });
     const {
         data: dataAllPosts,
         isFetchingNextPage: isLoadingAllPosts,
@@ -67,27 +61,36 @@ const DetailGroup = () => {
         fetchNextPage: fetchNextPageAllPosts,
     } = useInfiniteLoad(PostServices.getPostDetailGroup, 'postsDetailGroup', id);
 
+    const {
+        data: dataAllUsers,
+        isFetchingNextPage: isLoadingAllUsers,
+        hasNextPage: hasNextpageAllUsers,
+        fetchNextPage: fetchNextPageAllUsers,
+    } = useInfiniteLoad(GroupServices.getAllUserJoined, 'usersDetailGroup', id);
+
+    console.log([dataDetailGroup, ...dataAllUsers]);
+
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createPost,
         onSuccess: (data) => {
-            const currenPostHome = queryClient.getQueryData(['postsDetailGroup']);
+            const currenPostHome = queryClient.getQueryData(['postsDetailGroup', undefined]);
             if (currenPostHome) {
                 const newPostHome = {
                     pageParams: currenPostHome.pageParams,
                     pages: [
                         {
                             success: currenPostHome.pages[0].success,
-                            data: [data.data, ...currenPostHome.pages[0].data],
+                            data: [{ ...data.data, created_at: Date.now() }, ...currenPostHome.pages[0].data],
                             pagination: currenPostHome.pages[0].pagination,
                         },
                     ],
                 };
-                queryClient.setQueryData(['postsDetailGroup'], newPostHome);
+                queryClient.setQueryData(['postsDetailGroup', undefined], newPostHome);
                 console.log(currenPostHome.data);
             }
             setTextMessage('');
             setFilePost([]);
-            Swal.fire('Thành công!', data.message, 'success');
+            // Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -171,7 +174,8 @@ const DetailGroup = () => {
     const action = query.get('action') || '';
 
     const handleSubmitKickUser = (values) => {
-        mutateKickUser({ groupId: id, userId: values.id + '' });
+        console.log(values);
+        mutateKickUser({ groupId: id, userId: values });
     };
     const handleSubmiitOutGroup = () => {
         mutateOutGroup({ groupId: id });
@@ -213,9 +217,7 @@ const DetailGroup = () => {
                         <div className="flex items-center justify-between">
                             <div>
                                 <h1 className="font-bold text-white">{dataDetailGroup?.data.name}</h1>
-                                <p className="text-white">
-                                    {kFormatter(dataDetailGroup?.data.users_joined.length)} thành viên
-                                </p>
+                                <p className="text-white">{kFormatter(dataDetailGroup?.data.countJoined)} thành viên</p>
                             </div>
                             {dataDetailGroup?.data.user_own.id == user.id ? (
                                 <Link to={`/group/${id}/edit`}>
@@ -389,16 +391,27 @@ const DetailGroup = () => {
                         }
                     >
                         {dataAllPosts.map((item, index) => (
-                            <CardPost key={index} post={item} nameQuery={'postsDetailGroup'} />
+                            <CardPost key={index} post={item} nameQuery={['postsDetailGroup', undefined]} />
                         ))}
                     </InfiniteScroll>
                 </div>
             )}
 
             {action == 'members' && (
-                <div className="px-4 mt-4">
-                    {!isLoadingDetailGroup &&
-                        dataDetailGroup?.data.users_joined.map((item, index) => (
+                <InfiniteScroll
+                    dataLength={dataAllUsers.length}
+                    next={fetchNextPageAllUsers}
+                    hasMore={hasNextpageAllUsers}
+                    className="px-4 mt-4"
+                    loader={
+                        <div className="my-2 flex justify-center">
+                            <span className="loading loading-dots loading-md"></span>
+                        </div>
+                    }
+                >
+                    {!isLoadingAllUsers &&
+                        !isLoadingDetailGroup &&
+                        [dataDetailGroup?.data.user_own, ...dataAllUsers]?.map((item, index) => (
                             <div key={index} className="flex items-center justify-between border-b py-2">
                                 <div className="flex items-center gap-2">
                                     <img
@@ -426,7 +439,7 @@ const DetailGroup = () => {
                                     <button
                                         className="btn btn-ghost btn-sm md:btn-md"
                                         disabled={isPendingKickUser}
-                                        onClick={handleSubmitKickUser}
+                                        onClick={() => handleSubmitKickUser(item.id)}
                                     >
                                         {isPendingKickUser && <span className="loading loading-spinner"></span>}
                                         Xóa
@@ -436,7 +449,7 @@ const DetailGroup = () => {
                                 )}
                             </div>
                         ))}
-                </div>
+                </InfiniteScroll>
             )}
         </div>
     );

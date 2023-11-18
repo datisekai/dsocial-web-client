@@ -11,7 +11,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PostServices from '../../services/PostService';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-const CardComment = ({ comment, post }) => {
+const CardComment = ({ comment, post, nameQuery }) => {
     const inputRef = React.useRef(null);
 
     const [isShowComment, setIsShowComment] = useState(false);
@@ -32,7 +32,7 @@ const CardComment = ({ comment, post }) => {
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createComment,
         onSuccess: (data) => {
-            const currenPost = queryClient.getQueryData(['posts']);
+            const currenPost = queryClient.getQueryData(nameQuery);
 
             if (currenPost) {
                 const newPost = {
@@ -54,10 +54,9 @@ const CardComment = ({ comment, post }) => {
                         },
                     ],
                 };
-                queryClient.setQueryData(['posts'], newPost);
+                queryClient.setQueryData(nameQuery, newPost);
             }
             setTextMessage('');
-            Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -70,8 +69,10 @@ const CardComment = ({ comment, post }) => {
         const postId = comment.post_id;
         const parentId = comment.id;
         const content = textMessage.replace(/\n/g, '<br/>');
-        const payload = { postId, parentId, content };
-        mutate(payload);
+        if (content) {
+            const payload = { postId, parentId, content };
+            mutate(payload);
+        }
     };
     return (
         <div className="flex gap-2 py-2">
@@ -157,7 +158,12 @@ const CardComment = ({ comment, post }) => {
                 <div className="ml-4">
                     {showReply.includes(comment.id) &&
                         getChildrenComment(comment.id).map((repComment) => (
-                            <CardReplyComment comment={repComment} key={repComment.id} commentId={comment.id} />
+                            <CardReplyComment
+                                comment={repComment}
+                                key={repComment.id}
+                                commentId={comment.id}
+                                nameQuery={nameQuery}
+                            />
                         ))}
                 </div>
             </div>

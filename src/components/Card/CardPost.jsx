@@ -8,7 +8,6 @@ import EmojiPicker from 'emoji-picker-react';
 import { BiCommentDetail, BiDotsVerticalRounded } from 'react-icons/bi';
 import { PiSmileyWinkLight } from 'react-icons/pi';
 import { useSelector } from 'react-redux';
-import CardReplyComment from './CardReplyComment';
 import Swal from 'sweetalert2';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PostServices from '../../services/PostService';
@@ -56,7 +55,7 @@ const CardPost = ({ post, nameQuery }) => {
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createComment,
         onSuccess: (data) => {
-            const currenPost = queryClient.getQueryData([nameQuery]);
+            const currenPost = queryClient.getQueryData(nameQuery);
 
             if (currenPost) {
                 const newPost = {
@@ -78,10 +77,9 @@ const CardPost = ({ post, nameQuery }) => {
                         },
                     ],
                 };
-                queryClient.setQueryData([nameQuery], newPost);
+                queryClient.setQueryData(nameQuery, newPost);
             }
             setTextMessage('');
-            Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -94,7 +92,7 @@ const CardPost = ({ post, nameQuery }) => {
     const { mutate: mutateReaction, isPending: isPendingReaction } = useMutation({
         mutationFn: PostServices.createReaction,
         onSuccess: (data) => {
-            const currenPost = queryClient.getQueryData([nameQuery]);
+            const currenPost = queryClient.getQueryData(nameQuery);
 
             if (currenPost) {
                 const newPost = {
@@ -116,9 +114,8 @@ const CardPost = ({ post, nameQuery }) => {
                         },
                     ],
                 };
-                queryClient.setQueryData([nameQuery], newPost);
+                queryClient.setQueryData(nameQuery, newPost);
             }
-            Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -130,14 +127,14 @@ const CardPost = ({ post, nameQuery }) => {
     const { mutate: mutateReactionDel, isPending: isPendingReactionDel } = useMutation({
         mutationFn: PostServices.deleteReaction,
         onSuccess: (data) => {
-            const currenPost = queryClient.getQueryData([nameQuery]);
+            const currenPost = queryClient.getQueryData(nameQuery);
 
             if (currenPost) {
                 const newPost = {
-                    pageParams: currentAllGroupsJoined.pageParams,
+                    pageParams: currenPost.pageParams,
                     pages: [
                         {
-                            success: currentAllGroupsJoined.pages[0].success,
+                            success: currenPost.pages[0].success,
                             data: currenPost.pages[0].data.map((item) => {
                                 if (item.id === data.data.post_id) {
                                     return {
@@ -148,13 +145,12 @@ const CardPost = ({ post, nameQuery }) => {
                                 }
                                 return item;
                             }),
-                            pagination: currentAllGroupsJoined.pages[0].pagination,
+                            pagination: currenPost.pages[0].pagination,
                         },
                     ],
                 };
-                queryClient.setQueryData([nameQuery], newPost);
+                queryClient.setQueryData(nameQuery, newPost);
             }
-            Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -167,7 +163,7 @@ const CardPost = ({ post, nameQuery }) => {
     const { mutate: mutatePostDel, isPending: isPendingPostDel } = useMutation({
         mutationFn: PostServices.deletePost,
         onSuccess: (data) => {
-            const currenPost = queryClient.getQueryData([nameQuery]);
+            const currenPost = queryClient.getQueryData(nameQuery);
 
             if (currenPost) {
                 const newPost = {
@@ -182,7 +178,7 @@ const CardPost = ({ post, nameQuery }) => {
                         },
                     ],
                 };
-                queryClient.setQueryData([nameQuery], newPost);
+                queryClient.setQueryData(nameQuery, newPost);
             }
 
             Swal.fire('Thành công!', data.message, 'success');
@@ -198,8 +194,10 @@ const CardPost = ({ post, nameQuery }) => {
         const postId = post.id;
         const parentId = 0;
         const content = textMessage.replace(/\n/g, '<br/>');
-        const payload = { postId, parentId, content };
-        mutate(payload);
+        if (content) {
+            const payload = { postId, parentId, content };
+            mutate(payload);
+        }
     };
 
     const handleCreateReaction = () => {
@@ -231,7 +229,7 @@ const CardPost = ({ post, nameQuery }) => {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     {!post.group.id ? (
-                        <Link to={user.id == post.user_post.id ? '/profile' : `/profile/${user.id}`}>
+                        <Link to={user.id == post.user_post.id ? '/profile' : `/profile/${post.user_post.id}`}>
                             <div className="avatar">
                                 <div className="w-12 rounded-full">
                                     <img src={getImage(post.user_post.avatar)} />
@@ -243,7 +241,7 @@ const CardPost = ({ post, nameQuery }) => {
                             <Link to={`/group/${post.group.id}`}>
                                 <img className="w-10 h-10 rounded-full" src={getImage(post.group.avatar)} />
                             </Link>
-                            <Link to={user.id == post.user_post.id ? '/profile' : `/profile/${user.id}`}>
+                            <Link to={user.id == post.user_post.id ? '/profile' : `/profile/${post.user_post.id}`}>
                                 <div className="absolute right-[-4px] bottom-[-4px] border border-primary rounded-full">
                                     <img className="w-6 h-6 rounded-full" src={getImage(post.user_post.avatar)} />
                                 </div>
@@ -259,7 +257,7 @@ const CardPost = ({ post, nameQuery }) => {
                         )}
                         <div className="text-sm space-x-2">
                             <Link
-                                to={user.id == post.user_post.id ? '/profile' : `/profile/${user.id}`}
+                                to={user.id == post.user_post.id ? '/profile' : `/profile/${post.user_post.id}`}
                                 className="link link-hover"
                             >
                                 <span>{post.user_post.name}</span>
@@ -331,14 +329,17 @@ const CardPost = ({ post, nameQuery }) => {
             </div>
 
             <div className="flex items-center gap-2 py-2 border-t">
-                <button className="btn btn-sm">
-                    {isLiked ? (
-                        <AiFillHeart size={23} onClick={handleDeleteReaction} />
-                    ) : (
-                        <AiOutlineHeart size={23} onClick={handleCreateReaction} />
-                    )}
-                    <span>{post.count_reaction}</span>
-                </button>
+                {isLiked ? (
+                    <button className="btn btn-sm" onClick={handleDeleteReaction}>
+                        <AiFillHeart size={23} />
+                        <span>{post.count_reaction}</span>
+                    </button>
+                ) : (
+                    <button className="btn btn-sm" onClick={handleCreateReaction}>
+                        <AiOutlineHeart size={23} />
+                        <span>{post.count_reaction}</span>
+                    </button>
+                )}
                 <button className="btn btn-sm" onClick={() => inputRef?.current?.focus()}>
                     <BiCommentDetail size={20} />
                     <span>{post.count_comment}</span>
@@ -397,7 +398,7 @@ const CardPost = ({ post, nameQuery }) => {
                 <div className="space-y-2 mt-4">
                     {parentComments.length == 0 && <p>Không có bình luận</p>}
                     {(isShowFullComment ? parentComments : [...parentComments].splice(0, 5)).map((item, index) => (
-                        <CardComment comment={item} key={item.id} post={post} />
+                        <CardComment comment={item} key={item.id} post={post} nameQuery={nameQuery} />
                     ))}
                     {parentComments.length > 5 ? (
                         <button
@@ -412,7 +413,12 @@ const CardPost = ({ post, nameQuery }) => {
                 </div>
             </div>
             {visibleActivePost && post && (
-                <UpdatePostModal onClose={() => setVisibleActivePost(false)} post={post} visible={visibleActivePost} />
+                <UpdatePostModal
+                    onClose={() => setVisibleActivePost(false)}
+                    post={post}
+                    visible={visibleActivePost}
+                    nameQuery={nameQuery}
+                />
             )}
         </div>
     );

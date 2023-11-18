@@ -25,25 +25,12 @@ const Friend = () => {
 
     const { user } = useSelector((state) => state.user);
 
-    // const { data: dataFriend, isLoading: isLoadingFriend } = useQuery({
-    //     queryKey: ['friends', user.id],
-    //     queryFn: () => {
-    //         return FriendServices.getFriendByUserId(user.id);
-    //     },
-    // });
     const {
         data: dataFriend,
         isFetchingNextPage: isLoadingFriend,
         hasNextPage: hasNextpageFriend,
         fetchNextPage: fetchNextPageFriend,
     } = useInfiniteLoad(FriendServices.getFriendByUserId, 'friends', null);
-
-    // const { data: dataFriendRequest, isLoading: isLoadingFriendRequest } = useQuery({
-    //     queryKey: ['friendRequests', user.id],
-    //     queryFn: () => {
-    //         return FriendServices.getFriendRequestByUserId();
-    //     },
-    // });
 
     const {
         data: dataFriendRequest,
@@ -55,8 +42,8 @@ const Friend = () => {
     const { mutate: mutateAcceptFriend, isPending: isPendingAcceptF } = useMutation({
         mutationFn: FriendServices.acceptFriend,
         onSuccess: (data) => {
-            const currentFriend = queryClient.getQueryData(['friends']);
-            const currentFriendResq = queryClient.getQueryData(['friendRequests']);
+            const currentFriend = queryClient.getQueryData(['friends', undefined]);
+            const currentFriendResq = queryClient.getQueryData(['friendRequests', undefined]);
             if (currentFriend) {
                 const newDataFriend = {
                     pageParams: currentFriend.pageParams,
@@ -69,7 +56,7 @@ const Friend = () => {
                     ],
                 };
 
-                queryClient.setQueryData(['friends'], newDataFriend);
+                queryClient.setQueryData(['friends', undefined], newDataFriend);
                 if (currentFriendResq) {
                     const newDataFriendRequest = {
                         pageParams: currentFriendResq.pageParams,
@@ -81,7 +68,7 @@ const Friend = () => {
                             },
                         ],
                     };
-                    queryClient.setQueryData(['friendRequests'], newDataFriendRequest);
+                    queryClient.setQueryData(['friendRequests', undefined], newDataFriendRequest);
                 }
             }
             console.log(data);
@@ -98,7 +85,7 @@ const Friend = () => {
     const { mutate: mutateDelFriendReq, isPending: isPendingDelFResq } = useMutation({
         mutationFn: FriendServices.deleteFriendRequest,
         onSuccess: (data) => {
-            const currentFriendResq = queryClient.getQueryData(['friendRequests']);
+            const currentFriendResq = queryClient.getQueryData(['friendRequests', undefined]);
             console.log(data.data, currentFriendResq);
             if (currentFriendResq) {
                 const newDataFriendRequest = {
@@ -111,7 +98,7 @@ const Friend = () => {
                         },
                     ],
                 };
-                queryClient.setQueryData(['friendRequests'], newDataFriendRequest);
+                queryClient.setQueryData(['friendRequests', undefined], newDataFriendRequest);
             }
             Swal.fire('Thành công!', data.message, 'success');
         },
@@ -126,7 +113,7 @@ const Friend = () => {
     const { mutate: mutateDelFriend, isPending: isPendingDelF } = useMutation({
         mutationFn: FriendServices.deleteFriend,
         onSuccess: (data) => {
-            const currentFriend = queryClient.getQueryData(['friends']);
+            const currentFriend = queryClient.getQueryData(['friends', undefined]);
             if (currentFriend) {
                 const newDataFriend = {
                     pageParams: currentFriend.pageParams,
@@ -138,7 +125,7 @@ const Friend = () => {
                         },
                     ],
                 };
-                queryClient.setQueryData(['friends'], newDataFriend);
+                queryClient.setQueryData(['friends', undefined], newDataFriend);
             }
             Swal.fire('Thành công!', data.message, 'success');
         },
@@ -193,39 +180,43 @@ const Friend = () => {
                                 </div>
                             }
                         >
-                            {dataFriendRequest.map((item, index) => (
-                                <div key={index} className="flex items-center justify-between">
-                                    <Link to={`/profile/${item.id}`} className="link link-hover">
-                                        <div className="flex items-center gap-2">
-                                            <img
-                                                className="rounded-full w-[70px] h-[70px]"
-                                                src={`${getImage(item.avatar)}`}
-                                                alt=""
-                                            />
+                            {dataFriendRequest.length === 0 ? (
+                                <div>Không có lời mời kết bạn nào</div>
+                            ) : (
+                                dataFriendRequest.map((item, index) => (
+                                    <div key={index} className="flex items-center justify-between">
+                                        <Link to={`/profile/${item.id}`} className="link link-hover">
+                                            <div className="flex items-center gap-2">
+                                                <img
+                                                    className="rounded-full w-[70px] h-[70px]"
+                                                    src={`${getImage(item.avatar)}`}
+                                                    alt=""
+                                                />
 
-                                            <h2 className="font-bold">{item.name}</h2>
+                                                <h2 className="font-bold">{item.name}</h2>
+                                            </div>
+                                        </Link>
+                                        <div className="flex gap-2 mt-2 md:mt-0 flex-col md:flex-row">
+                                            <button
+                                                disabled={isPendingAcceptF}
+                                                className="btn btn-primary btn-sm md:btn-md"
+                                                onClick={() => handleAcceptFriend(item)}
+                                            >
+                                                {isPendingAcceptF && <span className="loading loading-spinner"></span>}
+                                                Chấp nhận
+                                            </button>
+                                            <button
+                                                disabled={isPendingDelFResq}
+                                                className="btn btn-sm md:btn-md"
+                                                onClick={() => handleDelFriendReq(item)}
+                                            >
+                                                {isPendingDelFResq && <span className="loading loading-spinner"></span>}
+                                                Xóa
+                                            </button>
                                         </div>
-                                    </Link>
-                                    <div className="flex gap-2 mt-2 md:mt-0 flex-col md:flex-row">
-                                        <button
-                                            disabled={isPendingAcceptF}
-                                            className="btn btn-primary btn-sm md:btn-md"
-                                            onClick={() => handleAcceptFriend(item)}
-                                        >
-                                            {isPendingAcceptF && <span className="loading loading-spinner"></span>}
-                                            Chấp nhận
-                                        </button>
-                                        <button
-                                            disabled={isPendingDelFResq}
-                                            className="btn btn-sm md:btn-md"
-                                            onClick={() => handleDelFriendReq(item)}
-                                        >
-                                            {isPendingDelFResq && <span className="loading loading-spinner"></span>}
-                                            Xóa
-                                        </button>
                                     </div>
-                                </div>
-                            ))}
+                                ))
+                            )}
                         </InfiniteScroll>
                     </>
                 ) : (
@@ -242,31 +233,35 @@ const Friend = () => {
                                 </div>
                             }
                         >
-                            {dataFriend.map((item, index) => {
-                                return (
-                                    <div className="flex items-center justify-between " key={index}>
-                                        <Link to={`/profile/${item.id}`} className="link link-hover">
-                                            <div className="flex items-center gap-2">
-                                                <img
-                                                    className="rounded-full w-[70px] h-[70px]"
-                                                    src={`${getImage(item.avatar)}`}
-                                                    alt=""
-                                                />
+                            {dataFriend.length === 0 ? (
+                                <div>Không có bạn bè nào</div>
+                            ) : (
+                                dataFriend.map((item, index) => {
+                                    return (
+                                        <div className="flex items-center justify-between " key={index}>
+                                            <Link to={`/profile/${item.id}`} className="link link-hover">
+                                                <div className="flex items-center gap-2">
+                                                    <img
+                                                        className="rounded-full w-[70px] h-[70px]"
+                                                        src={`${getImage(item.avatar)}`}
+                                                        alt=""
+                                                    />
 
-                                                <h2 className="font-bold">{item.name}</h2>
-                                            </div>
-                                        </Link>
-                                        <button
-                                            className="btn btn-sm md:btn-md"
-                                            onClick={() => handleDelFriend(item)}
-                                            disabled={isPendingDelF}
-                                        >
-                                            {isPendingDelF && <span className="loading loading-spinner"></span>}
-                                            Hủy bạn bè
-                                        </button>
-                                    </div>
-                                );
-                            })}
+                                                    <h2 className="font-bold">{item.name}</h2>
+                                                </div>
+                                            </Link>
+                                            <button
+                                                className="btn btn-sm md:btn-md"
+                                                onClick={() => handleDelFriend(item)}
+                                                disabled={isPendingDelF}
+                                            >
+                                                {isPendingDelF && <span className="loading loading-spinner"></span>}
+                                                Hủy bạn bè
+                                            </button>
+                                        </div>
+                                    );
+                                })
+                            )}
                         </InfiniteScroll>
                     </>
                 )}

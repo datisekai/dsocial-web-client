@@ -10,7 +10,7 @@ import EmojiPicker from 'emoji-picker-react';
 import Swal from 'sweetalert2';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-const CardReplyComment = ({ comment, commentId }) => {
+const CardReplyComment = ({ comment, commentId, nameQuery }) => {
     const [showReply, setShowReply] = useState([]);
     const { user } = useSelector((state) => state.user);
     const inputRef = React.useRef(null);
@@ -34,7 +34,7 @@ const CardReplyComment = ({ comment, commentId }) => {
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createComment,
         onSuccess: (data) => {
-            const currenPost = queryClient.getQueryData(['posts']);
+            const currenPost = queryClient.getQueryData(nameQuery);
 
             if (currenPost) {
                 const newPost = {
@@ -56,10 +56,9 @@ const CardReplyComment = ({ comment, commentId }) => {
                         },
                     ],
                 };
-                queryClient.setQueryData(['posts'], newPost);
+                queryClient.setQueryData(nameQuery, newPost);
             }
             setTextMessage('');
-            Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -72,8 +71,10 @@ const CardReplyComment = ({ comment, commentId }) => {
         const postId = comment.post_id;
         const parentId = commentId;
         const content = textMessage.replace(/\n/g, '<br/>');
-        const payload = { postId, parentId, content };
-        mutate(payload);
+        if (content) {
+            const payload = { postId, parentId, content };
+            mutate(payload);
+        }
     };
 
     return (
@@ -86,7 +87,7 @@ const CardReplyComment = ({ comment, commentId }) => {
                         alt=""
                     />
                 </Link>
-                <div className="">
+                <div className="w-full">
                     <Link
                         to={user.id == comment.user_comment.id ? '/profile' : `/profile/${user.id}`}
                         className="link link-hover"

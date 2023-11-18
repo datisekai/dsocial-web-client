@@ -89,10 +89,10 @@ const Profile = () => {
                     >
                         {dataAllPosts.length > 0 ? (
                             dataAllPosts.map((item, index) => {
-                                return <CardPost key={index} post={item} nameQuery={'postsProfile'} />;
+                                return <CardPost key={index} post={item} nameQuery={['postsProfile', undefined]} />;
                             })
                         ) : (
-                            <div>Kông có bài viết nào</div>
+                            <div>Không có bài viết nào</div>
                         )}
                     </InfiniteScroll>
                 </div>

@@ -37,7 +37,7 @@ const CreateGroup = () => {
     const { mutate, isPending } = useMutation({
         mutationFn: GroupServices.createGroup,
         onSuccess: (data) => {
-            navigate(`/group/${id}`);
+            navigate(`/group/${data.data.id}`);
             // Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
@@ -59,6 +59,12 @@ const CreateGroup = () => {
         if (avatarImage) {
             const resultAvatar = await uploadServer(avatarImage);
             avatar = resultAvatar.data;
+        }
+        if (!cover_image) {
+            return Swal.fire('Thất bại!', 'Vui lòng chọn ảnh bìa', 'error');
+        }
+        if (!avatarImage) {
+            return Swal.fire('Thất bại!', 'Vui lòng chọn ảnh đại diện', 'error');
         }
 
         const payload = { ...values, coverImage, avatar };

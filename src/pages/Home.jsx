@@ -41,25 +41,25 @@ const Home = () => {
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createPost,
         onSuccess: (data) => {
-            const currenPostHome = queryClient.getQueryData(['postsHome']);
+            const currenPostHome = queryClient.getQueryData(['postsHome', undefined]);
+            console.log(data.data, currenPostHome);
             if (currenPostHome) {
-                console.log(data.data);
                 const newPostHome = {
                     pageParams: currenPostHome.pageParams,
                     pages: [
                         {
                             success: currenPostHome.pages[0].success,
-                            data: [data.data, ...currenPostHome.pages[0].data],
+                            data: [{ ...data.data, created_at: Date.now() }, ...currenPostHome.pages[0].data],
                             pagination: currenPostHome.pages[0].pagination,
                         },
                     ],
                 };
-                queryClient.setQueryData(['postsHome'], newPostHome);
-                console.log(currenPostHome.data);
+                queryClient.setQueryData(['postsHome', undefined], newPostHome);
             }
+            console.log(data.data, currenPostHome);
             setTextMessage('');
             setFilePost([]);
-            Swal.fire('Thành công!', data.message, 'success');
+            // Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -83,7 +83,7 @@ const Home = () => {
     };
     return (
         <div className=" px-4 py-2">
-            <h1 className="text-primary font-bold">Home</h1>
+            <h1 className="text-primary font-bold">Trang chủ</h1>
             <div className="mt-2">
                 <Feed />
             </div>
@@ -198,7 +198,7 @@ const Home = () => {
                 }
             >
                 {dataAllPosts.map((item, index) => (
-                    <CardPost key={index} post={item} nameQuery={'postsHome'} />
+                    <CardPost key={index} post={item} nameQuery={['postsHome', undefined]} />
                 ))}
             </InfiniteScroll>
         </div>

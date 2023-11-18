@@ -1,32 +1,34 @@
 import React, { useState } from 'react';
 import { kFormatter } from '../../utils/common';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import GroupServices from '../../services/GroupService';
 import getImage from '../../utils/getImage';
 import Swal from 'sweetalert2';
 
-const CardGroup = ({ group, isJoin }) => {
+const CardGroup = ({ group, isJoin, nameQuery }) => {
     const [currentGroup, setCurrentGroup] = useState(null);
     const queryClient = useQueryClient();
+    const navigate = useNavigate();
     const { mutate, isPending } = useMutation({
         mutationFn: GroupServices.joinGroup,
         onSuccess: (data) => {
             const newCurrentGroups = { ...currentGroup, is_joined: data.data.is_joined };
-            const currentAllGroupsJoined = queryClient.getQueryData(['joinGroup']);
-            const currentAllGroups = queryClient.getQueryData(['allGroup']);
+            const currentAllGroupsJoined = queryClient.getQueryData(['joinGroup', undefined]);
+            const currentAllGroups = queryClient.getQueryData(nameQuery);
+            console.log(currentAllGroupsJoined, data.data);
             if (currentAllGroupsJoined) {
                 const newDataAllGroupsJoined = {
                     pageParams: currentAllGroupsJoined.pageParams,
                     pages: [
                         {
                             success: currentAllGroupsJoined.pages[0].success,
-                            data: [data.data, ...currentAllGroupsJoined.pages[0].data],
+                            data: [newCurrentGroups, ...currentAllGroupsJoined.pages[0].data],
                             pagination: currentAllGroupsJoined.pages[0].pagination,
                         },
                     ],
                 };
-                queryClient.setQueryData(['joinGroup'], newDataAllGroupsJoined);
+                queryClient.setQueryData(['joinGroup', undefined], newDataAllGroupsJoined);
                 if (currentAllGroups) {
                     const newDataAllGroups = {
                         pageParams: currentAllGroups.pageParams,
@@ -46,11 +48,10 @@ const CardGroup = ({ group, isJoin }) => {
                             },
                         ],
                     };
-                    queryClient.setQueryData(['allGroup'], newDataAllGroups);
+                    queryClient.setQueryData(nameQuery, newDataAllGroups);
                 }
             }
-
-            Swal.fire('Thành công!', data.message, 'success');
+            navigate(`/group/${newCurrentGroups.id}`);
             setCurrentGroup(null);
         },
         onError: (error) => {

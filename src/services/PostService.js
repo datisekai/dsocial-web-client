@@ -2,7 +2,6 @@ import { axiosClient } from '../utils/axiosClient';
 const PostServices = {
     getAllPost: async ({ pageParam }) => {
         const result = await axiosClient.get(`/post?page=${pageParam}`);
-        console.log(result.data);
         return result.data;
     },
     getPostByUserId: async ({ pageParam, id }) => {

@@ -74,7 +74,7 @@ const UserProfile = () => {
                 };
                 queryClient.setQueryData(['myfriendRequests', user.id], newDataMyFriendRequest);
             }
-            Swal.fire('Thành công!', data.message, 'success');
+            // Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -96,7 +96,7 @@ const UserProfile = () => {
                 };
                 queryClient.setQueryData(['friends', user.id], newDataFriend);
             }
-            Swal.fire('Thành công!', data.message, 'success');
+            // Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -126,7 +126,7 @@ const UserProfile = () => {
                 };
                 queryClient.setQueryData(['friendRequests', user.id], newDataFriendRequest);
             }
-            Swal.fire('Thành công!', data.message, 'success');
+            // Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -157,8 +157,7 @@ const UserProfile = () => {
                     queryClient.setQueryData(['friendRequests', user.id], newDataFriendRequest);
                 }
             }
-            console.log(data);
-            Swal.fire('Thành công!', data.message, 'success');
+            // Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -280,10 +279,10 @@ const UserProfile = () => {
                     >
                         {dataAllPosts.length > 0 ? (
                             dataAllPosts.map((item, index) => {
-                                return <CardPost key={index} post={item} nameQuery={'postsUserProfile'} />;
+                                return <CardPost key={index} post={item} nameQuery={['postsUserProfile', undefined]} />;
                             })
                         ) : (
-                            <div>Kông có bài viết nào</div>
+                            <div>Không có bài viết nào</div>
                         )}
                     </InfiniteScroll>
                 </div>
