@@ -6,6 +6,7 @@ const routes = {
     confirmEmail: '/confirm-email',
     friend: '/friend',
     message: '/message',
+    messageDetail: '/message/:id',
     group: '/group',
     profile: '/profile',
     editProfile: '/profile/edit',

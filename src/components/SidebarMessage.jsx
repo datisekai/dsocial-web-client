@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const SidebarMessage = () => {
     return (
@@ -13,6 +14,7 @@ const SidebarMessage = () => {
             </div>
             <div className="mt-4">
                 {[1, 2, 3, 4, 5].map((item, index) => (
+                   <Link to={`/message/${item}`} key={index}>
                     <div key={index} className="flex py-2 items-center gap-2 cursor-pointer">
                         <div className="avatar online">
                             <div className="w-[50px] rounded-full">
@@ -23,7 +25,7 @@ const SidebarMessage = () => {
                             <h2 className="font-medium">Thành Đạt</h2>
                             <p>Tin nhắn gần nhất</p>
                         </div>
-                    </div>
+                    </div></Link>
                 ))}
             </div>
         </div>

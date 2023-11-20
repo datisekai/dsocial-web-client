@@ -80,18 +80,7 @@ const CardPost = ({ post }) => {
                     ? queryClient.setQueryData(['home'], newPost)
                     : queryClient.setQueryData(['postdetailgroup'], newPost);
             }
-            console.log(
-                currenPost.data.map((item) => {
-                    if (item.id === data.data.post_id) {
-                        return {
-                            ...item,
-                            count_comment: item.count_comment + 1,
-                            comments: [data.data, ...item.comments],
-                        };
-                    }
-                    return item;
-                }),
-            );
+
             setTextMessage('');
             Swal.fire('Thành công!', data.message, 'success');
         },
@@ -207,8 +196,6 @@ const CardPost = ({ post }) => {
             }
         });
     };
-
-    console.log(post);
 
     return (
         <div className="p-4 bg-base-200 rounded w-full">

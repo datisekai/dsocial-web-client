@@ -31,6 +31,7 @@ const privateRoutes = [
     { path: config.routes.home, component: Home },
     { path: config.routes.friend, component: Friend },
     { path: config.routes.message, component: Message, layout: MessageLayout },
+    { path: config.routes.messageDetail, component: Message, layout: MessageLayout },
     { path: config.routes.group, component: Group },
     { path: config.routes.profile, component: Profile },
     { path: config.routes.editProfile, component: EditProfile },

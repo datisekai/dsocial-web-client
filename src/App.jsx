@@ -4,7 +4,8 @@ import useAuth from './hooks/useAuth';
 import { PrivateLayout, PublicLayout } from './layouts';
 import { privateRoutes, publicRoutes } from './routes';
 import { Fragment } from 'react';
-import "swiper/css";
+import 'swiper/css';
+import MainLayout from './layouts/MainLayout';
 
 function App() {
     useAuth();
@@ -38,7 +39,7 @@ function App() {
 
                     {privateRoutes.map((route, index) => {
                         const Page = route.component;
-                        let Layout = PrivateLayout;
+                        let Layout = MainLayout;
 
                         if (route.layout) {
                             Layout = route.layout;
@@ -49,9 +50,11 @@ function App() {
                                 key={index}
                                 path={route.path}
                                 element={
-                                    <Layout>
-                                        <Page />
-                                    </Layout>
+                                    <PrivateLayout>
+                                        <Layout>
+                                            <Page />
+                                        </Layout>
+                                    </PrivateLayout>
                                 }
                             />
                         );
