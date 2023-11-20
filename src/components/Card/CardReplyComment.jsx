@@ -8,10 +8,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PostServices from '../../services/PostService';
 import EmojiPicker from 'emoji-picker-react';
 import Swal from 'sweetalert2';
-import { useLocation } from 'react-router-dom';
-const CardReplyComment = ({ comment, commentId }) => {
+import { Link, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+const CardReplyComment = ({ comment, commentId, nameQuery }) => {
     const [showReply, setShowReply] = useState([]);
-
+    const { user } = useSelector((state) => state.user);
     const inputRef = React.useRef(null);
     const [textMessage, setTextMessage] = React.useState('');
     const [isShowComment, setIsShowComment] = useState(false);
@@ -33,32 +34,31 @@ const CardReplyComment = ({ comment, commentId }) => {
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createComment,
         onSuccess: (data) => {
-            const currenPost =
-                query.pathname === '/'
-                    ? queryClient.getQueryData(['home'])
-                    : queryClient.getQueryData(['postdetailgroup']);
+            const currenPost = queryClient.getQueryData(nameQuery);
 
             if (currenPost) {
                 const newPost = {
-                    success: currenPost.success,
-                    data: currenPost.data.map((item) => {
-                        if (item.id === data.data.post_id) {
-                            return {
-                                ...item,
-                                count_comment: item.count_comment + 1,
-                                comments: [data.data, ...item.comments],
-                            };
-                        }
-                        return item;
-                    }),
-                    pagination: currenPost.pagination,
+                    pageParams: currenPost.pageParams,
+                    pages: [
+                        {
+                            success: currenPost.pages[0].success,
+                            data: currenPost.pages[0].data.map((item) => {
+                                if (item.id === data.data.post_id) {
+                                    return {
+                                        ...item,
+                                        count_comment: item.count_comment + 1,
+                                        comments: [data.data, ...item.comments],
+                                    };
+                                }
+                                return item;
+                            }),
+                            pagination: currenPost.pages[0].pagination,
+                        },
+                    ],
                 };
-                query.pathname === '/'
-                    ? queryClient.setQueryData(['home'], newPost)
-                    : queryClient.setQueryData(['postdetailgroup'], newPost);
+                queryClient.setQueryData(nameQuery, newPost);
             }
             setTextMessage('');
-            Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -71,17 +71,29 @@ const CardReplyComment = ({ comment, commentId }) => {
         const postId = comment.post_id;
         const parentId = commentId;
         const content = textMessage.replace(/\n/g, '<br/>');
-        const payload = { postId, parentId, content };
-        mutate(payload);
+        if (content) {
+            const payload = { postId, parentId, content };
+            mutate(payload);
+        }
     };
 
     return (
         <div>
-            {' '}
             <div className="flex gap-2 py-2">
-                <img src={getImage(comment.user_comment.avatar)} className="w-[40px] h-[40px] rounded-full" alt="" />
-                <div className="">
-                    <h4 className="font-medium">{comment.user_comment.name || comment.user_comment.other_name}</h4>
+                <Link to={user.id == comment.user_comment.id ? '/profile' : `/profile/${user.id}`}>
+                    <img
+                        src={getImage(comment.user_comment.avatar)}
+                        className="w-[40px] h-[40px] rounded-full"
+                        alt=""
+                    />
+                </Link>
+                <div className="w-full">
+                    <Link
+                        to={user.id == comment.user_comment.id ? '/profile' : `/profile/${user.id}`}
+                        className="link link-hover"
+                    >
+                        <h4 className="font-medium">{comment.user_comment.name || comment.user_comment.other_name}</h4>
+                    </Link>
                     <p dangerouslySetInnerHTML={{ __html: comment.content }}></p>
                     <div className="text-xs flex items-center gap-1 mt-1">
                         <span className="mr-4">{calculateCreatedTime(comment.created_at)}</span>

@@ -11,6 +11,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import PostServices from '../services/PostService';
 import { uploadsServer } from '../utils/axiosClient';
 import Swal from 'sweetalert2';
+import useInfiniteLoad from '../hooks/useInfiniteLoad';
+import InfiniteScroll from 'react-infinite-scroll-component';
 const Home = () => {
     const { user } = useSelector((state) => state.user);
     const inputRef = React.useRef(null);
@@ -24,13 +26,12 @@ const Home = () => {
             return { type: item.type.split('/')[0], file: URL.createObjectURL(item) };
         });
     }, [filePost]);
-
-    const { data, isLoading } = useQuery({
-        queryKey: ['home'],
-        queryFn: () => {
-            return PostServices.getAllPost();
-        },
-    });
+    const {
+        data: dataAllPosts,
+        isFetchingNextPage: isLoadingAllPosts,
+        hasNextPage: hasNextpageAllPosts,
+        fetchNextPage: fetchNextPageAllPosts,
+    } = useInfiniteLoad(PostServices.getAllPost, 'postsHome');
 
     const handleEmojiClick = (emojiData, event) => {
         setTextMessage((preText) => preText + emojiData.emoji);
@@ -40,20 +41,25 @@ const Home = () => {
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createPost,
         onSuccess: (data) => {
-            const currenPostHome = queryClient.getQueryData(['home']);
+            const currenPostHome = queryClient.getQueryData(['postsHome', undefined]);
+            console.log(data.data, currenPostHome);
             if (currenPostHome) {
-                console.log(data.data);
                 const newPostHome = {
-                    success: currenPostHome.success,
-                    data: [data.data, ...currenPostHome.data],
-                    pagination: currenPostHome.pagination,
+                    pageParams: currenPostHome.pageParams,
+                    pages: [
+                        {
+                            success: currenPostHome.pages[0].success,
+                            data: [{ ...data.data, created_at: Date.now() }, ...currenPostHome.pages[0].data],
+                            pagination: currenPostHome.pages[0].pagination,
+                        },
+                    ],
                 };
-                queryClient.setQueryData(['home'], newPostHome);
-                console.log(currenPostHome.data);
+                queryClient.setQueryData(['postsHome', undefined], newPostHome);
             }
+            console.log(data.data, currenPostHome);
             setTextMessage('');
             setFilePost([]);
-            Swal.fire('Thành công!', data.message, 'success');
+            // Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -77,7 +83,7 @@ const Home = () => {
     };
     return (
         <div className=" px-4 py-2">
-            <h1 className="text-primary font-bold">Home</h1>
+            <h1 className="text-primary font-bold">Trang chủ</h1>
             <div className="mt-2">
                 <Feed />
             </div>
@@ -111,7 +117,7 @@ const Home = () => {
                                     />
                                     <video
                                         controls
-                                        className="w-[130px] md:w-[180px] h-auto aspect-square md:h-[180px] object-cover"
+                                        className="w-[130px] md:w-[180px] h-auto aspect-video md:h-[180px] object-cover"
                                         src={item.file}
                                         type={item.type}
                                     />
@@ -180,9 +186,21 @@ const Home = () => {
                 </div>
             </div>
 
-            <div className="mt-8 space-y-2">
-                {!isLoading && data?.data.map((item, index) => <CardPost key={index} post={item} />)}
-            </div>
+            <InfiniteScroll
+                dataLength={dataAllPosts.length}
+                next={fetchNextPageAllPosts}
+                hasMore={hasNextpageAllPosts}
+                className="mt-8 space-y-2"
+                loader={
+                    <div className="my-2 flex justify-center">
+                        <span className="loading loading-dots loading-md"></span>
+                    </div>
+                }
+            >
+                {dataAllPosts.map((item, index) => (
+                    <CardPost key={index} post={item} nameQuery={['postsHome', undefined]} />
+                ))}
+            </InfiniteScroll>
         </div>
     );
 };

@@ -1,17 +1,17 @@
 import { axiosClient } from '../utils/axiosClient';
 const PostServices = {
-    getAllPost: async () => {
-        const result = await axiosClient.get(`/post`);
+    getAllPost: async ({ pageParam }) => {
+        const result = await axiosClient.get(`/post?page=${pageParam}`);
         return result.data;
     },
-    getPostByUserId: async (userId) => {
-        if (!userId) return;
-        const result = await axiosClient.get(`/post/user/${userId}`);
+    getPostByUserId: async ({ pageParam, id }) => {
+        if (!id) return;
+        const result = await axiosClient.get(`/post/user/${id}?page=${pageParam}`);
         return result.data;
     },
-    getPostDetailGroup: async (groupId) => {
-        if (!groupId) return;
-        const result = await axiosClient.get(`/post/group/${groupId}`);
+    getPostDetailGroup: async ({ pageParam, id }) => {
+        if (!id) return;
+        const result = await axiosClient.get(`/post/group/${id}?page=${pageParam}`);
         return result.data;
     },
     createComment: async (data) => {
@@ -32,6 +32,16 @@ const PostServices = {
     createPost: async (data) => {
         if (!data) return;
         const result = await axiosClient.post(`/post`, data);
+        return result.data;
+    },
+    updatePost: async (data) => {
+        if (!data) return;
+        const result = await axiosClient.put(`/post/${data.id}`, data);
+        return result.data;
+    },
+    deletePost: async (postId) => {
+        if (!postId) return;
+        const result = await axiosClient.delete(`/post/${postId}`);
         return result.data;
     },
 };

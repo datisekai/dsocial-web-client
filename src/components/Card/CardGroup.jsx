@@ -1,45 +1,57 @@
 import React, { useState } from 'react';
 import { kFormatter } from '../../utils/common';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import GroupServices from '../../services/GroupService';
+import getImage from '../../utils/getImage';
 import Swal from 'sweetalert2';
 
-const CardGroup = ({ group, isJoin }) => {
+const CardGroup = ({ group, isJoin, nameQuery }) => {
     const [currentGroup, setCurrentGroup] = useState(null);
     const queryClient = useQueryClient();
+    const navigate = useNavigate();
     const { mutate, isPending } = useMutation({
         mutationFn: GroupServices.joinGroup,
         onSuccess: (data) => {
             const newCurrentGroups = { ...currentGroup, is_joined: data.data.is_joined };
-            const currentAllGroupsJoined = queryClient.getQueryData(['allgroupsjoined']);
-            const currentAllGroups = queryClient.getQueryData(['allgroups']);
+            const currentAllGroupsJoined = queryClient.getQueryData(['joinGroup', undefined]);
+            const currentAllGroups = queryClient.getQueryData(nameQuery);
+            console.log(currentAllGroupsJoined, data.data);
             if (currentAllGroupsJoined) {
                 const newDataAllGroupsJoined = {
-                    success: currentAllGroupsJoined.success,
-                    data: [newCurrentGroups, ...currentAllGroupsJoined.data],
-                    pagination: currentAllGroupsJoined.pagination,
+                    pageParams: currentAllGroupsJoined.pageParams,
+                    pages: [
+                        {
+                            success: currentAllGroupsJoined.pages[0].success,
+                            data: [newCurrentGroups, ...currentAllGroupsJoined.pages[0].data],
+                            pagination: currentAllGroupsJoined.pages[0].pagination,
+                        },
+                    ],
                 };
-                queryClient.setQueryData(['allgroupsjoined'], newDataAllGroupsJoined);
+                queryClient.setQueryData(['joinGroup', undefined], newDataAllGroupsJoined);
                 if (currentAllGroups) {
                     const newDataAllGroups = {
-                        success: currentAllGroups.success,
-                        data: currentAllGroups.data.map((item) => {
-                            if (item.id === newCurrentGroups.id) {
-                                return {
-                                    ...item,
-                                    is_joined: newCurrentGroups.is_joined,
-                                };
-                            }
-                            return item;
-                        }),
-                        pagination: currentAllGroups.pagination,
+                        pageParams: currentAllGroups.pageParams,
+                        pages: [
+                            {
+                                success: currentAllGroups.pages[0].success,
+                                data: currentAllGroups.pages[0].data.map((item) => {
+                                    if (item.id === newCurrentGroups.id) {
+                                        return {
+                                            ...item,
+                                            is_joined: newCurrentGroups.is_joined,
+                                        };
+                                    }
+                                    return item;
+                                }),
+                                pagination: currentAllGroups.pages[0].pagination,
+                            },
+                        ],
                     };
-                    queryClient.setQueryData(['allgroups'], newDataAllGroups);
+                    queryClient.setQueryData(nameQuery, newDataAllGroups);
                 }
             }
-
-            Swal.fire('Thành công!', data.message, 'success');
+            navigate(`/group/${newCurrentGroups.id}`);
             setCurrentGroup(null);
         },
         onError: (error) => {
@@ -56,7 +68,7 @@ const CardGroup = ({ group, isJoin }) => {
     return (
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-                <img className="w-[60px] h-[60px] rounded-full " src="https://dummyimage.com/200x200.gif" alt="" />
+                <img className="w-[60px] h-[60px] rounded-full " src={getImage(group.avatar)} alt="" />
                 <div>
                     <h2 className="text-title">{group.name}</h2>
                     <p>{kFormatter(group.users_joined.length)} thành viên</p>

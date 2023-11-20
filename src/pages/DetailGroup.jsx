@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { kFormatter } from '../utils/common';
 import useQueryParams from '../hooks/useQueryParams';
 import Tippy from '@tippyjs/react/headless';
-import { IoMdImages } from 'react-icons/io';
+import { IoMdCloseCircle, IoMdImages } from 'react-icons/io';
 import { HiOutlineVideoCamera } from 'react-icons/hi';
 import { PiSmileyWinkLight } from 'react-icons/pi';
 import EmojiPicker from 'emoji-picker-react';
@@ -15,6 +15,9 @@ import Swal from 'sweetalert2';
 import { useSelector } from 'react-redux';
 import calculateCreatedTime from '../utils/calculateCreatedTime';
 import PostServices from '../services/PostService';
+import { uploadsServer } from '../utils/axiosClient';
+import useInfiniteLoad from '../hooks/useInfiniteLoad';
+import InfiniteScroll from 'react-infinite-scroll-component';
 const tabs = [
     {
         action: '',
@@ -33,6 +36,17 @@ const DetailGroup = () => {
     const { user } = useSelector((state) => state.user);
     const navigate = useNavigate();
 
+    const inputRef = React.useRef(null);
+
+    const [showEmoji, setShowEmoji] = React.useState(false);
+    const [textMessage, setTextMessage] = React.useState('');
+    const [filePost, setFilePost] = React.useState([]);
+    const previewImage = useMemo(() => {
+        return filePost.map((item) => {
+            return { type: item.type.split('/')[0], file: URL.createObjectURL(item) };
+        });
+    }, [filePost]);
+
     const { data: dataDetailGroup, isLoading: isLoadingDetailGroup } = useQuery({
         queryKey: ['detailgroup'],
         queryFn: () => {
@@ -40,10 +54,49 @@ const DetailGroup = () => {
         },
     });
 
-    const { data: dataPostDetailGroup, isLoading: isLoadingPostDetailGroup } = useQuery({
-        queryKey: ['postdetailgroup'],
-        queryFn: () => {
-            return PostServices.getPostDetailGroup(id);
+    const {
+        data: dataAllPosts,
+        isFetchingNextPage: isLoadingAllPosts,
+        hasNextPage: hasNextpageAllPosts,
+        fetchNextPage: fetchNextPageAllPosts,
+    } = useInfiniteLoad(PostServices.getPostDetailGroup, 'postsDetailGroup', id);
+
+    const {
+        data: dataAllUsers,
+        isFetchingNextPage: isLoadingAllUsers,
+        hasNextPage: hasNextpageAllUsers,
+        fetchNextPage: fetchNextPageAllUsers,
+    } = useInfiniteLoad(GroupServices.getAllUserJoined, 'usersDetailGroup', id);
+
+    console.log([dataDetailGroup, ...dataAllUsers]);
+
+    const { mutate, isPending } = useMutation({
+        mutationFn: PostServices.createPost,
+        onSuccess: (data) => {
+            const currenPostHome = queryClient.getQueryData(['postsDetailGroup', undefined]);
+            if (currenPostHome) {
+                const newPostHome = {
+                    pageParams: currenPostHome.pageParams,
+                    pages: [
+                        {
+                            success: currenPostHome.pages[0].success,
+                            data: [{ ...data.data, created_at: Date.now() }, ...currenPostHome.pages[0].data],
+                            pagination: currenPostHome.pages[0].pagination,
+                        },
+                    ],
+                };
+                queryClient.setQueryData(['postsDetailGroup', undefined], newPostHome);
+                console.log(currenPostHome.data);
+            }
+            setTextMessage('');
+            setFilePost([]);
+            // Swal.fire('Thành công!', data.message, 'success');
+        },
+        onError: (error) => {
+            if (error?.message) {
+                return Swal.fire('Thất bại!', error.message, 'error');
+            }
+            Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
         },
     });
 
@@ -114,25 +167,42 @@ const DetailGroup = () => {
         },
     });
 
-    const inputRef = React.useRef(null);
-
-    const [showEmoji, setShowEmoji] = React.useState(false);
-    const [textMessage, setTextMessage] = React.useState('');
-
     const handleEmojiClick = (emojiData, event) => {
-        setTextMessage(textMessage + emojiData.emoji);
+        setTextMessage((preText) => preText + emojiData.emoji);
         inputRef?.current?.focus();
     };
     const action = query.get('action') || '';
 
     const handleSubmitKickUser = (values) => {
-        mutateKickUser({ groupId: id, userId: values.id + '' });
+        console.log(values);
+        mutateKickUser({ groupId: id, userId: values });
     };
     const handleSubmiitOutGroup = () => {
         mutateOutGroup({ groupId: id });
     };
     const handleSubmiitDeleteGroup = () => {
-        mutateDeleteGroup(id);
+        Swal.fire({
+            title: 'Bạn có chắc chắn muốn xóa nhóm này?',
+            showDenyButton: true,
+            confirmButtonText: 'Chắc chắn',
+            denyButtonText: `Hủy `,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                mutateDeleteGroup(id);
+            }
+        });
+    };
+    const handleSubmitPost = async () => {
+        let files = [];
+        if (filePost.length !== 0) {
+            const resultFilePost = await uploadsServer(filePost);
+            files = resultFilePost.data;
+        }
+        const payload = { html: textMessage.replace(/\n/g, '<br/>'), image: files, groupId: id };
+        mutate(payload);
+    };
+    const handleDeleteFile = (indexDel) => {
+        setFilePost(filePost.filter((item, index) => index !== indexDel));
     };
     return (
         <div>
@@ -147,18 +217,22 @@ const DetailGroup = () => {
                         <div className="flex items-center justify-between">
                             <div>
                                 <h1 className="font-bold text-white">{dataDetailGroup?.data.name}</h1>
-                                <p className="text-white">
-                                    {kFormatter(dataDetailGroup?.data.users_joined.length)} thành viên
-                                </p>
+                                <p className="text-white">{kFormatter(dataDetailGroup?.data.countJoined)} thành viên</p>
                             </div>
-                            <button className="btn btn-sm md:btn-md">Chỉnh sửa</button>
+                            {dataDetailGroup?.data.user_own.id == user.id ? (
+                                <Link to={`/group/${id}/edit`}>
+                                    <button className="btn btn-sm md:btn-md">Chỉnh sửa</button>
+                                </Link>
+                            ) : (
+                                ''
+                            )}
                         </div>
                     </div>
                     <div className="absolute px-4 bottom-[-40px] left-0 right-0 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <img
                                 className="rounded-full w-[80px] h-[80px] border-primary border-2"
-                                src={dataDetailGroup?.data.avatar}
+                                src={getImage(dataDetailGroup?.data.avatar)}
                                 alt=""
                             />
                             <div className="">
@@ -213,9 +287,52 @@ const DetailGroup = () => {
                                 className="textarea w-full outline-none rounded"
                                 placeholder={`${user.name ? `${user.name} ơi,` : ''} bạn đang nghĩ gì thế?`}
                             ></textarea>
+                            <div className="overflow-auto h-auto flex w-full flex-wrap">
+                                {previewImage?.map((item, index) => {
+                                    return item.type === 'image' ? (
+                                        <div key={index} className="relative ml-2">
+                                            <IoMdCloseCircle
+                                                onClick={() => handleDeleteFile(index)}
+                                                className="absolute right-0 text-2xl cursor-pointer text-[#6419E6]"
+                                            />
+                                            <img
+                                                className="w-[130px] md:w-[180px] h-auto aspect-square md:h-[180px] object-cover"
+                                                src={item.file}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div key={index} className="relative">
+                                            <IoMdCloseCircle
+                                                onClick={() => handleDeleteFile(index)}
+                                                className="z-[9999] absolute right-0 text-2xl cursor-pointer text-[#6419E6]"
+                                            />
+                                            <video
+                                                controls
+                                                className="w-[130px] md:w-[180px] h-auto aspect-video md:h-[180px] object-cover"
+                                                src={item.file}
+                                                type={item.type}
+                                            />
+                                        </div>
+                                    );
+                                })}
+                            </div>
 
-                            <input type="file" className="hidden" id="fileImage" accept="image/*" />
-                            <input type="file" className="hidden" id="fileVideo" accept="video/*" />
+                            <input
+                                multiple
+                                type="file"
+                                className="hidden"
+                                id="fileImage"
+                                accept="image/*"
+                                onChange={(e) => e.target.files[0] && setFilePost([...filePost, ...e.target.files])}
+                            />
+                            <input
+                                multiple
+                                type="file"
+                                className="hidden"
+                                id="fileVideo"
+                                accept="video/mp4, video/mov"
+                                onChange={(e) => e.target.files[0] && setFilePost([...filePost, ...e.target.files])}
+                            />
                             <div className="flex items-center">
                                 <label htmlFor="fileImage" className="tooltip" data-tip="Hình ảnh">
                                     <div className="btn btn-sm btn-ghost">
@@ -256,26 +373,50 @@ const DetailGroup = () => {
                             </div>
                         </div>
                         <div className="flex justify-end mt-4">
-                            <button className="btn btn-primary text-base-100">Đăng</button>
+                            <button className="btn btn-primary text-base-100" onClick={handleSubmitPost}>
+                                Đăng
+                            </button>
                         </div>
                     </div>
 
-                    <div className="mt-8 space-y-2">
-                        {!isLoadingPostDetailGroup &&
-                            dataPostDetailGroup?.data.map((item, index) => <CardPost key={index} post={item} />)}
-                    </div>
+                    <InfiniteScroll
+                        dataLength={dataAllPosts.length}
+                        next={fetchNextPageAllPosts}
+                        hasMore={hasNextpageAllPosts}
+                        className="mt-8 space-y-2"
+                        loader={
+                            <div className="my-2 flex justify-center">
+                                <span className="loading loading-dots loading-md"></span>
+                            </div>
+                        }
+                    >
+                        {dataAllPosts.map((item, index) => (
+                            <CardPost key={index} post={item} nameQuery={['postsDetailGroup', undefined]} />
+                        ))}
+                    </InfiniteScroll>
                 </div>
             )}
 
             {action == 'members' && (
-                <div className="px-4 mt-4">
-                    {!isLoadingDetailGroup &&
-                        dataDetailGroup?.data.users_joined.map((item, index) => (
+                <InfiniteScroll
+                    dataLength={dataAllUsers.length}
+                    next={fetchNextPageAllUsers}
+                    hasMore={hasNextpageAllUsers}
+                    className="px-4 mt-4"
+                    loader={
+                        <div className="my-2 flex justify-center">
+                            <span className="loading loading-dots loading-md"></span>
+                        </div>
+                    }
+                >
+                    {!isLoadingAllUsers &&
+                        !isLoadingDetailGroup &&
+                        [dataDetailGroup?.data.user_own, ...dataAllUsers]?.map((item, index) => (
                             <div key={index} className="flex items-center justify-between border-b py-2">
                                 <div className="flex items-center gap-2">
                                     <img
                                         className="w-[50px] h-[50px] rounded-full"
-                                        src="https://dummyimage.com/50x50.gif"
+                                        src={getImage(item.avatar)}
                                         alt=""
                                     />
                                     <div>
@@ -298,7 +439,7 @@ const DetailGroup = () => {
                                     <button
                                         className="btn btn-ghost btn-sm md:btn-md"
                                         disabled={isPendingKickUser}
-                                        onClick={handleSubmitKickUser}
+                                        onClick={() => handleSubmitKickUser(item.id)}
                                     >
                                         {isPendingKickUser && <span className="loading loading-spinner"></span>}
                                         Xóa
@@ -308,7 +449,7 @@ const DetailGroup = () => {
                                 )}
                             </div>
                         ))}
-                </div>
+                </InfiniteScroll>
             )}
         </div>
     );

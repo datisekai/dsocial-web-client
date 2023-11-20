@@ -1,14 +1,53 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ErrorMessage, Field, Formik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
+import PostServices from '../../services/PostService';
+import Swal from 'sweetalert2';
 
 const validateSchema = Yup.object({
     html: Yup.string().required('Bạn cần phải nhập nội dung.'),
 });
-const UpdatePostModal = ({ post, onClose, visible }) => {
-    const { isPending } = useMutation();
+const UpdatePostModal = ({ post, onClose, visible, nameQuery }) => {
     const inputRef = React.useRef(null);
+    const queryClient = useQueryClient();
+    const { mutate, isPending } = useMutation({
+        mutationFn: PostServices.updatePost,
+        onSuccess: (data) => {
+            const currenPost = queryClient.getQueryData(nameQuery);
+            if (currenPost) {
+                console.log(data.data);
+                const newPost = {
+                    pageParams: currenPost.pageParams,
+                    pages: [
+                        {
+                            success: currenPost.pages[0].success,
+                            data: currenPost.pages[0].data.map((item) => {
+                                if (item.id === data.data.id) {
+                                    return {
+                                        ...item,
+                                        html: data.data.html,
+                                    };
+                                }
+                                return item;
+                            }),
+                            pagination: currenPost.pages[0].pagination,
+                        },
+                    ],
+                };
+                queryClient.setQueryData(nameQuery, newPost);
+                console.log(currenPost.data, data.data);
+            }
+            Swal.fire('Thành công!', data.message, 'success');
+            onClose();
+        },
+        onError: (error) => {
+            if (error?.message) {
+                return Swal.fire('Thất bại!', error.message, 'error');
+            }
+            Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
+        },
+    });
 
     return (
         <>
@@ -17,9 +56,14 @@ const UpdatePostModal = ({ post, onClose, visible }) => {
                 <div className="modal-box">
                     <Formik
                         onSubmit={(values) => {
-                            console.log(values);
+                            const payload = {
+                                id: values.id,
+                                html: values.html.replace(/\n/g, '<br/>'),
+                                images: values.images,
+                            };
+                            mutate(payload);
                         }}
-                        initialValues={post}
+                        initialValues={{ ...post, html: post.html.replace('<br/>', '\n') }}
                         validationSchema={validateSchema}
                     >
                         {({ handleSubmit, values, setFieldValue }) => (
@@ -32,7 +76,7 @@ const UpdatePostModal = ({ post, onClose, visible }) => {
                                             ref={inputRef}
                                             name="html"
                                             className="textarea w-full textarea-bordered outline-none rounded"
-                                            placeholder="Bạn đang nghĩ gì thế?"
+                                            placeholder="Sửa bài viết"
                                         ></Field>
                                         <ErrorMessage name="html" component="div" className="text-error text-sm" />
                                     </div>

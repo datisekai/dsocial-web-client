@@ -8,22 +8,21 @@ import EmojiPicker from 'emoji-picker-react';
 import { BiCommentDetail, BiDotsVerticalRounded } from 'react-icons/bi';
 import { PiSmileyWinkLight } from 'react-icons/pi';
 import { useSelector } from 'react-redux';
-import CardReplyComment from './CardReplyComment';
 import Swal from 'sweetalert2';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PostServices from '../../services/PostService';
-import { useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import CardComment from './CardComment';
 import useUser from '../../hooks/useUser';
 import UpdatePostModal from '../Modal/UpdatePostModal';
 
-const CardPost = ({ post }) => {
+const CardPost = ({ post, nameQuery }) => {
     const [isShowFullImage, setIsShowFullImage] = useState(false);
+    const [isShowFullComment, setIsShowFullComment] = useState(false);
     const inputRef = React.useRef(null);
 
     const [showEmoji, setShowEmoji] = React.useState(false);
     const [textMessage, setTextMessage] = React.useState('');
-    const query = useLocation();
 
     const [visibleActivePost, setVisibleActivePost] = useState(false);
 
@@ -56,33 +55,31 @@ const CardPost = ({ post }) => {
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createComment,
         onSuccess: (data) => {
-            const currenPost =
-                query.pathname === '/'
-                    ? queryClient.getQueryData(['home'])
-                    : queryClient.getQueryData(['postdetailgroup']);
+            const currenPost = queryClient.getQueryData(nameQuery);
 
             if (currenPost) {
                 const newPost = {
-                    success: currenPost.success,
-                    data: currenPost.data.map((item) => {
-                        if (item.id === data.data.post_id) {
-                            return {
-                                ...item,
-                                count_comment: item.count_comment + 1,
-                                comments: [data.data, ...item.comments],
-                            };
-                        }
-                        return item;
-                    }),
-                    pagination: currenPost.pagination,
+                    pageParams: currenPost.pageParams,
+                    pages: [
+                        {
+                            success: currenPost.pages[0].success,
+                            data: currenPost.pages[0].data.map((item) => {
+                                if (item.id === data.data.post_id) {
+                                    return {
+                                        ...item,
+                                        count_comment: item.count_comment + 1,
+                                        comments: [data.data, ...item.comments],
+                                    };
+                                }
+                                return item;
+                            }),
+                            pagination: currenPost.pages[0].pagination,
+                        },
+                    ],
                 };
-                query.pathname === '/'
-                    ? queryClient.setQueryData(['home'], newPost)
-                    : queryClient.setQueryData(['postdetailgroup'], newPost);
+                queryClient.setQueryData(nameQuery, newPost);
             }
-
             setTextMessage('');
-            Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -95,31 +92,30 @@ const CardPost = ({ post }) => {
     const { mutate: mutateReaction, isPending: isPendingReaction } = useMutation({
         mutationFn: PostServices.createReaction,
         onSuccess: (data) => {
-            const currenPost =
-                query.pathname === '/'
-                    ? queryClient.getQueryData(['home'])
-                    : queryClient.getQueryData(['postdetailgroup']);
+            const currenPost = queryClient.getQueryData(nameQuery);
 
             if (currenPost) {
                 const newPost = {
-                    success: currenPost.success,
-                    data: currenPost.data.map((item) => {
-                        if (item.id === data.data.post_id) {
-                            return {
-                                ...item,
-                                count_reaction: item.count_reaction + 1,
-                                reactions: [...item.reactions, data.data],
-                            };
-                        }
-                        return item;
-                    }),
-                    pagination: currenPost.pagination,
+                    pageParams: currenPost.pageParams,
+                    pages: [
+                        {
+                            success: currenPost.pages[0].success,
+                            data: currenPost.pages[0].data.map((item) => {
+                                if (item.id === data.data.post_id) {
+                                    return {
+                                        ...item,
+                                        count_reaction: item.count_reaction + 1,
+                                        reactions: [...item.reactions, data.data],
+                                    };
+                                }
+                                return item;
+                            }),
+                            pagination: currenPost.pages[0].pagination,
+                        },
+                    ],
                 };
-                query.pathname === '/'
-                    ? queryClient.setQueryData(['home'], newPost)
-                    : queryClient.setQueryData(['postdetailgroup'], newPost);
+                queryClient.setQueryData(nameQuery, newPost);
             }
-            Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -131,30 +127,60 @@ const CardPost = ({ post }) => {
     const { mutate: mutateReactionDel, isPending: isPendingReactionDel } = useMutation({
         mutationFn: PostServices.deleteReaction,
         onSuccess: (data) => {
-            const currenPost =
-                query.pathname === '/'
-                    ? queryClient.getQueryData(['home'])
-                    : queryClient.getQueryData(['postdetailgroup']);
+            const currenPost = queryClient.getQueryData(nameQuery);
 
             if (currenPost) {
                 const newPost = {
-                    success: currenPost.success,
-                    data: currenPost.data.map((item) => {
-                        if (item.id === data.data.post_id) {
-                            return {
-                                ...item,
-                                count_reaction: item.count_reaction - 1,
-                                reactions: item.reactions.filter((item) => item.id !== data.data.id),
-                            };
-                        }
-                        return item;
-                    }),
-                    pagination: currenPost.pagination,
+                    pageParams: currenPost.pageParams,
+                    pages: [
+                        {
+                            success: currenPost.pages[0].success,
+                            data: currenPost.pages[0].data.map((item) => {
+                                if (item.id === data.data.post_id) {
+                                    return {
+                                        ...item,
+                                        count_reaction: item.count_reaction - 1,
+                                        reactions: item.reactions.filter((item) => item.id !== data.data.id),
+                                    };
+                                }
+                                return item;
+                            }),
+                            pagination: currenPost.pages[0].pagination,
+                        },
+                    ],
                 };
-                query.pathname === '/'
-                    ? queryClient.setQueryData(['home'], newPost)
-                    : queryClient.setQueryData(['postdetailgroup'], newPost);
+                queryClient.setQueryData(nameQuery, newPost);
             }
+        },
+        onError: (error) => {
+            if (error?.message) {
+                return Swal.fire('Thất bại!', error.message, 'error');
+            }
+            Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
+        },
+    });
+
+    const { mutate: mutatePostDel, isPending: isPendingPostDel } = useMutation({
+        mutationFn: PostServices.deletePost,
+        onSuccess: (data) => {
+            const currenPost = queryClient.getQueryData(nameQuery);
+
+            if (currenPost) {
+                const newPost = {
+                    pageParams: currenPost.pageParams,
+                    pages: [
+                        {
+                            success: currenPost.pages[0].success,
+                            data: currenPost.pages[0].data.filter((item) => {
+                                return item.id !== data.data.id;
+                            }),
+                            pagination: currenPost.pages[0].pagination,
+                        },
+                    ],
+                };
+                queryClient.setQueryData(nameQuery, newPost);
+            }
+
             Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
@@ -168,8 +194,10 @@ const CardPost = ({ post }) => {
         const postId = post.id;
         const parentId = 0;
         const content = textMessage.replace(/\n/g, '<br/>');
-        const payload = { postId, parentId, content };
-        mutate(payload);
+        if (content) {
+            const payload = { postId, parentId, content };
+            mutate(payload);
+        }
     };
 
     const handleCreateReaction = () => {
@@ -181,7 +209,6 @@ const CardPost = ({ post }) => {
     const handleDeleteReaction = () => {
         mutateReactionDel(iconId);
     };
-    const [showComment, setShowComment] = useState(false);
 
     const handleDeletePost = () => {
         Swal.fire({
@@ -191,8 +218,8 @@ const CardPost = ({ post }) => {
             denyButtonText: `Hủy `,
         }).then((result) => {
             if (result.isConfirmed) {
-                //TODO
-                //Xử lý call api xóa
+                const postId = post.id;
+                mutatePostDel(postId);
             }
         });
     };
@@ -201,25 +228,40 @@ const CardPost = ({ post }) => {
         <div className="p-4 bg-base-200 rounded w-full">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    {!post.group.id && (
-                        <div className="avatar">
-                            <div className="w-12 rounded-full">
-                                <img src={getImage(post.user_post.avatar)} />
+                    {!post.group.id ? (
+                        <Link to={user.id == post.user_post.id ? '/profile' : `/profile/${post.user_post.id}`}>
+                            <div className="avatar">
+                                <div className="w-12 rounded-full">
+                                    <img src={getImage(post.user_post.avatar)} />
+                                </div>
                             </div>
+                        </Link>
+                    ) : (
+                        <div className="relative">
+                            <Link to={`/group/${post.group.id}`}>
+                                <img className="w-10 h-10 rounded-full" src={getImage(post.group.avatar)} />
+                            </Link>
+                            <Link to={user.id == post.user_post.id ? '/profile' : `/profile/${post.user_post.id}`}>
+                                <div className="absolute right-[-4px] bottom-[-4px] border border-primary rounded-full">
+                                    <img className="w-6 h-6 rounded-full" src={getImage(post.user_post.avatar)} />
+                                </div>
+                            </Link>
                         </div>
                     )}
 
-                    <div className="relative">
-                        <img className="w-12" src={getImage(post.group.avatar)} />
-                        <div className="absolute right-[-4px] bottom-[-4px] border border-primary rounded-full">
-                            <img className="w-6 h-6 rounded-full" src={getImage(post.user_post.avatar)} />
-                        </div>
-                    </div>
-
                     <div>
-                        {post.group.id && <p className="font-medium">nhóm: {post.group.name}</p>}
+                        {post.group.id && (
+                            <Link to={`/group/${post.group.id}`} className=" link link-hover">
+                                <p className="font-medium">{post.group.name}</p>
+                            </Link>
+                        )}
                         <div className="text-sm space-x-2">
-                            <span>{post.user_post.name}</span>
+                            <Link
+                                to={user.id == post.user_post.id ? '/profile' : `/profile/${post.user_post.id}`}
+                                className="link link-hover"
+                            >
+                                <span>{post.user_post.name}</span>
+                            </Link>
                             <span>·</span>
                             <span>{calculateCreatedTime(post.created_at)}</span>
                         </div>
@@ -259,9 +301,18 @@ const CardPost = ({ post }) => {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     {(isShowFullImage ? post.images : [...post.images].splice(0, 6)).map((item, index) =>
                         getImage(item.src).includes('.mp4') || getImage(item.src).includes('.mov') ? (
-                            <video controls key={index} className="w-full h-full" src={getImage(item.src)} />
+                            <video
+                                controls
+                                key={index}
+                                className="w-full h-[250px] object-cover aspect-square"
+                                src={getImage(item.src)}
+                            />
                         ) : (
-                            <img src={getImage(item.src)} key={index} className="w-full h-full" />
+                            <img
+                                src={getImage(item.src)}
+                                key={index}
+                                className="w-full h-[250px] object-cover aspect-video"
+                            />
                         ),
                     )}
                 </div>
@@ -278,14 +329,17 @@ const CardPost = ({ post }) => {
             </div>
 
             <div className="flex items-center gap-2 py-2 border-t">
-                <button className="btn btn-sm">
-                    {isLiked ? (
-                        <AiFillHeart size={23} onClick={handleDeleteReaction} />
-                    ) : (
-                        <AiOutlineHeart size={23} onClick={handleCreateReaction} />
-                    )}
-                    <span>{post.count_reaction}</span>
-                </button>
+                {isLiked ? (
+                    <button className="btn btn-sm" onClick={handleDeleteReaction}>
+                        <AiFillHeart size={23} />
+                        <span>{post.count_reaction}</span>
+                    </button>
+                ) : (
+                    <button className="btn btn-sm" onClick={handleCreateReaction}>
+                        <AiOutlineHeart size={23} />
+                        <span>{post.count_reaction}</span>
+                    </button>
+                )}
                 <button className="btn btn-sm" onClick={() => inputRef?.current?.focus()}>
                     <BiCommentDetail size={20} />
                     <span>{post.count_comment}</span>
@@ -343,30 +397,28 @@ const CardPost = ({ post }) => {
                 <h3>Bình luận</h3>
                 <div className="space-y-2 mt-4">
                     {parentComments.length == 0 && <p>Không có bình luận</p>}
-                    {parentComments.length <= 5 ? (
-                        parentComments.map((item) => {
-                            return <CardComment comment={item} key={item.id} post={post} />;
-                        })
+                    {(isShowFullComment ? parentComments : [...parentComments].splice(0, 5)).map((item, index) => (
+                        <CardComment comment={item} key={item.id} post={post} nameQuery={nameQuery} />
+                    ))}
+                    {parentComments.length > 5 ? (
+                        <button
+                            onClick={() => setIsShowFullComment(!isShowFullComment)}
+                            className="btn btn-sm md:btn-md btn-ghost mt-2"
+                        >
+                            {!isShowFullComment ? 'Xem thêm' : 'Thu gọn'}
+                        </button>
                     ) : (
-                        <>
-                            {parentComments.slice(0, 5).map((item) => {
-                                return <CardComment comment={item} key={item.id} post={post} />;
-                            })}
-                            {!showComment ? (
-                                <div className="link link-hover" onClick={() => setShowComment(true)}>
-                                    Xem tất cả bình luận
-                                </div>
-                            ) : (
-                                parentComments.slice(5, parentComments.length).map((item) => {
-                                    return <CardComment comment={item} key={item.id} post={post} />;
-                                })
-                            )}
-                        </>
+                        ''
                     )}
                 </div>
             </div>
             {visibleActivePost && post && (
-                <UpdatePostModal onClose={() => setVisibleActivePost(false)} post={post} visible={visibleActivePost} />
+                <UpdatePostModal
+                    onClose={() => setVisibleActivePost(false)}
+                    post={post}
+                    visible={visibleActivePost}
+                    nameQuery={nameQuery}
+                />
             )}
         </div>
     );

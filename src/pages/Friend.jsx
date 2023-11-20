@@ -6,6 +6,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import Swal from 'sweetalert2';
 import getImage from '../utils/getImage';
+import useInfiniteLoad from '../hooks/useInfiniteLoad';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const tabs = [
     {
@@ -23,41 +25,53 @@ const Friend = () => {
 
     const { user } = useSelector((state) => state.user);
 
-    const { data: dataFriend, isLoading: isLoadingFriend } = useQuery({
-        queryKey: ['friends', user.id],
-        queryFn: () => {
-            return FriendServices.getFriendByUserId(user.id);
-        },
-    });
+    const {
+        data: dataFriend,
+        isFetchingNextPage: isLoadingFriend,
+        hasNextPage: hasNextpageFriend,
+        fetchNextPage: fetchNextPageFriend,
+    } = useInfiniteLoad(FriendServices.getFriendByUserId, 'friends', null);
 
-    const { data: dataFriendRequest, isLoading: isLoadingFriendRequest } = useQuery({
-        queryKey: ['friendRequests', user.id],
-        queryFn: () => {
-            return FriendServices.getFriendRequestByUserId();
-        },
-    });
+    const {
+        data: dataFriendRequest,
+        isFetchingNextPage: isLoadingFriendRequest,
+        hasNextPage: hasNextpageFriendRequest,
+        fetchNextPage: fetchNextPageFriendRequest,
+    } = useInfiniteLoad(FriendServices.getFriendRequestByUserId, 'friendRequests', null);
 
     const { mutate: mutateAcceptFriend, isPending: isPendingAcceptF } = useMutation({
         mutationFn: FriendServices.acceptFriend,
         onSuccess: (data) => {
-            const currentFriend = queryClient.getQueryData(['friends', user.id]);
-            const currentFriendResq = queryClient.getQueryData(['friendRequests', user.id]);
+            const currentFriend = queryClient.getQueryData(['friends', undefined]);
+            const currentFriendResq = queryClient.getQueryData(['friendRequests', undefined]);
             if (currentFriend) {
                 const newDataFriend = {
-                    success: currentFriend.success,
-                    data: [data.data, ...currentFriend.data],
-                    pagination: currentFriend.pagination,
+                    pageParams: currentFriend.pageParams,
+                    pages: [
+                        {
+                            success: currentFriend.pages[0].success,
+                            data: [data.data, ...currentFriend.pages[0].data],
+                            pagination: currentFriend.pages[0].pagination,
+                        },
+                    ],
                 };
-                queryClient.setQueryData(['friends', user.id], newDataFriend);
+
+                queryClient.setQueryData(['friends', undefined], newDataFriend);
                 if (currentFriendResq) {
                     const newDataFriendRequest = {
-                        success: currentFriendResq.success,
-                        data: currentFriendResq.data.filter((item) => item.id !== data.data.id),
-                        pagination: currentFriendResq.pagination,
+                        pageParams: currentFriendResq.pageParams,
+                        pages: [
+                            {
+                                success: currentFriendResq.pages[0].success,
+                                data: currentFriendResq.pages[0].data.filter((item) => item.id !== data.data.id),
+                                pagination: currentFriendResq.pages[0].pagination,
+                            },
+                        ],
                     };
-                    queryClient.setQueryData(['friendRequests', user.id], newDataFriendRequest);
+                    queryClient.setQueryData(['friendRequests', undefined], newDataFriendRequest);
                 }
             }
+            console.log(data);
             Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
@@ -71,14 +85,20 @@ const Friend = () => {
     const { mutate: mutateDelFriendReq, isPending: isPendingDelFResq } = useMutation({
         mutationFn: FriendServices.deleteFriendRequest,
         onSuccess: (data) => {
-            const currentFriendResq = queryClient.getQueryData(['friendRequests', user.id]);
+            const currentFriendResq = queryClient.getQueryData(['friendRequests', undefined]);
+            console.log(data.data, currentFriendResq);
             if (currentFriendResq) {
                 const newDataFriendRequest = {
-                    success: currentFriendResq.success,
-                    data: currentFriendResq.data.filter((item) => item.id !== data.data.id),
-                    pagination: currentFriendResq.pagination,
+                    pageParams: currentFriendResq.pageParams,
+                    pages: [
+                        {
+                            success: currentFriendResq.pages[0].success,
+                            data: currentFriendResq.pages[0].data.filter((item) => item.id !== data.data.id),
+                            pagination: currentFriendResq.pages[0].pagination,
+                        },
+                    ],
                 };
-                queryClient.setQueryData(['friendRequests', user.id], newDataFriendRequest);
+                queryClient.setQueryData(['friendRequests', undefined], newDataFriendRequest);
             }
             Swal.fire('Thành công!', data.message, 'success');
         },
@@ -93,14 +113,19 @@ const Friend = () => {
     const { mutate: mutateDelFriend, isPending: isPendingDelF } = useMutation({
         mutationFn: FriendServices.deleteFriend,
         onSuccess: (data) => {
-            const currentFriend = queryClient.getQueryData(['friends', user.id]);
+            const currentFriend = queryClient.getQueryData(['friends', undefined]);
             if (currentFriend) {
                 const newDataFriend = {
-                    success: currentFriend.success,
-                    data: currentFriend.data.filter((item) => item.id !== data.data.id),
-                    pagination: currentFriend.pagination,
+                    pageParams: currentFriend.pageParams,
+                    pages: [
+                        {
+                            success: currentFriend.pages[0].success,
+                            data: currentFriend.pages[0].data.filter((item) => item.id !== data.data.id),
+                            pagination: currentFriend.pages[0].pagination,
+                        },
+                    ],
                 };
-                queryClient.setQueryData(['friends', user.id], newDataFriend);
+                queryClient.setQueryData(['friends', undefined], newDataFriend);
             }
             Swal.fire('Thành công!', data.message, 'success');
         },
@@ -144,18 +169,33 @@ const Friend = () => {
                 {query.get('action') === 'request' ? (
                     <>
                         <h1 className="text-primary font-bold">Lời mời kết bạn</h1>
-                        <div className="mt-4 space-y-2">
-                            {!isLoadingFriendRequest &&
-                                dataFriendRequest?.data.map((item, index) => (
+                        <InfiniteScroll
+                            dataLength={dataFriendRequest.length}
+                            next={fetchNextPageFriendRequest}
+                            hasMore={hasNextpageFriendRequest}
+                            className="mt-4 space-y-2"
+                            loader={
+                                <div className="my-2 flex justify-center">
+                                    <span className="loading loading-dots loading-md"></span>
+                                </div>
+                            }
+                        >
+                            {dataFriendRequest.length === 0 ? (
+                                <div>Không có lời mời kết bạn nào</div>
+                            ) : (
+                                dataFriendRequest.map((item, index) => (
                                     <div key={index} className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <img
-                                                className="rounded-full w-[70px] h-[70px]"
-                                                src={`${getImage(item.avatar)}`}
-                                                alt=""
-                                            />
-                                            <h2 className="font-bold">{item.name}</h2>
-                                        </div>
+                                        <Link to={`/profile/${item.id}`} className="link link-hover">
+                                            <div className="flex items-center gap-2">
+                                                <img
+                                                    className="rounded-full w-[70px] h-[70px]"
+                                                    src={`${getImage(item.avatar)}`}
+                                                    alt=""
+                                                />
+
+                                                <h2 className="font-bold">{item.name}</h2>
+                                            </div>
+                                        </Link>
                                         <div className="flex gap-2 mt-2 md:mt-0 flex-col md:flex-row">
                                             <button
                                                 disabled={isPendingAcceptF}
@@ -175,25 +215,41 @@ const Friend = () => {
                                             </button>
                                         </div>
                                     </div>
-                                ))}
-                        </div>
+                                ))
+                            )}
+                        </InfiniteScroll>
                     </>
                 ) : (
                     <>
                         <h1 className="text-primary font-bold">Bạn bè</h1>
-                        <div className="mt-4 space-y-2">
-                            {!isLoadingFriend &&
-                                dataFriend?.data.map((item, index) => {
+                        <InfiniteScroll
+                            dataLength={dataFriend.length}
+                            next={fetchNextPageFriend}
+                            hasMore={hasNextpageFriend}
+                            className="mt-4 space-y-2"
+                            loader={
+                                <div className="my-2 flex justify-center">
+                                    <span className="loading loading-dots loading-md"></span>
+                                </div>
+                            }
+                        >
+                            {dataFriend.length === 0 ? (
+                                <div>Không có bạn bè nào</div>
+                            ) : (
+                                dataFriend.map((item, index) => {
                                     return (
                                         <div className="flex items-center justify-between " key={index}>
-                                            <div className="flex items-center gap-2">
-                                                <img
-                                                    className="rounded-full w-[70px] h-[70px]"
-                                                    src={`${getImage(item.avatar)}`}
-                                                    alt=""
-                                                />
-                                                <h2 className="font-bold">{item.name}</h2>
-                                            </div>
+                                            <Link to={`/profile/${item.id}`} className="link link-hover">
+                                                <div className="flex items-center gap-2">
+                                                    <img
+                                                        className="rounded-full w-[70px] h-[70px]"
+                                                        src={`${getImage(item.avatar)}`}
+                                                        alt=""
+                                                    />
+
+                                                    <h2 className="font-bold">{item.name}</h2>
+                                                </div>
+                                            </Link>
                                             <button
                                                 className="btn btn-sm md:btn-md"
                                                 onClick={() => handleDelFriend(item)}
@@ -204,8 +260,9 @@ const Friend = () => {
                                             </button>
                                         </div>
                                     );
-                                })}
-                        </div>
+                                })
+                            )}
+                        </InfiniteScroll>
                     </>
                 )}
             </div>

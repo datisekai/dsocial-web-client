@@ -1,6 +1,6 @@
 import React from 'react';
 import tabs from '../../data/tabs';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import getImage from '../../utils/getImage';
 import useUser from '../../hooks/useUser';
@@ -8,6 +8,9 @@ import { BiLogOutCircle } from 'react-icons/bi';
 const DrawerMenu = ({ visible, onClose }) => {
     const { user, handleLogout } = useUser();
 
+    const [searchText, setSearchText] = React.useState('');
+
+    const navigate = useNavigate();
     return (
         <div className="drawer">
             <input id="my-drawer" type="checkbox" className="drawer-toggle" onChange={() => {}} checked={visible} />
@@ -24,7 +27,14 @@ const DrawerMenu = ({ visible, onClose }) => {
                         <div>
                             <input
                                 type="text"
+                                value={searchText}
+                                onChange={(e) => setSearchText(e.target.value)}
                                 placeholder="Tìm kiếm trên DSocial"
+                                onKeyUp={(e) => {
+                                    if (e.code == 'Enter') {
+                                        navigate(`/search?query=${searchText}`);
+                                    }
+                                }}
                                 className="input input-bordered input-sm w-full max-w-xs"
                             />
                         </div>
