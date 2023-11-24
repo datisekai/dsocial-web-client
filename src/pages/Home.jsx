@@ -42,7 +42,6 @@ const Home = () => {
         mutationFn: PostServices.createPost,
         onSuccess: (data) => {
             const currenPostHome = queryClient.getQueryData(['postsHome', undefined]);
-            console.log(data.data, currenPostHome);
             if (currenPostHome) {
                 const newPostHome = {
                     pageParams: currenPostHome.pageParams,
@@ -56,7 +55,6 @@ const Home = () => {
                 };
                 queryClient.setQueryData(['postsHome', undefined], newPostHome);
             }
-            console.log(data.data, currenPostHome);
             setTextMessage('');
             setFilePost([]);
             // Swal.fire('Thành công!', data.message, 'success');

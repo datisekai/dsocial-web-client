@@ -42,6 +42,10 @@ const FriendServices = {
         const result = await axiosClient.post(`/friend`, friendId);
         return result.data;
     },
+    getMyFriend: async () => {
+        const result = await axiosClient.get('/friend/all');
+        return result.data;
+    },
 };
 
 export default FriendServices;

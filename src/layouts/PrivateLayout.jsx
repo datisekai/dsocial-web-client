@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useLocalStorage } from 'usehooks-ts';
-import Header from '../components/Header';
 import ScreenSpinner from '../components/ScreenSpinner';
-import SideFriend from '../components/SideFriend';
-import Sidebar from '../components/Sidebar';
-import DrawerMenu from '../components/Drawer/DrawerMenu';
-import DrawerFriend from '../components/Drawer/DrawerFriend';
+import SocketContextProvider from '../contexts/SocketContext';
 
 const PrivateLayout = ({ children }) => {
     const [token, setToken] = useLocalStorage('token', '');
     const { user } = useSelector((state) => state.user);
+    const dispatch = useDispatch();
 
     // const user = null
     const navigate = useNavigate();
@@ -20,11 +17,9 @@ const PrivateLayout = ({ children }) => {
         if (!token) {
             navigate('/login');
         }
-
-        console.log('mounted')
     }, []);
 
-    return <>{!token || !user ? <ScreenSpinner /> : <>{children}</>}</>;
+    return <>{!token || !user ? <ScreenSpinner /> : <SocketContextProvider>{children}</SocketContextProvider>}</>;
 };
 
 export default PrivateLayout;

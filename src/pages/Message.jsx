@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import { HiOutlineVideoCamera } from 'react-icons/hi';
 import { IoMdImages } from 'react-icons/io';
 import { useSelector } from 'react-redux';
@@ -7,60 +7,94 @@ import EmojiPicker from 'emoji-picker-react';
 import { PiSmileyWinkLight } from 'react-icons/pi';
 import { LuSendHorizonal } from 'react-icons/lu';
 import { useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import MessageService from '../services/MessageService';
+import useInfiniteLoad from '../hooks/useInfiniteLoad';
+import ProfileServices from '../services/ProfileService';
+import { SocketContext } from '../contexts/SocketContext';
+import getImage from '../utils/getImage';
+import CardMessage from '../components/Card/CardMessage';
+import useHandleMessage from '../hooks/useHandleMessage';
 
 const Message = () => {
     const { user } = useSelector((state) => state.user);
+    const { userActives } = useContext(SocketContext);
     const inputRef = React.useRef(null);
 
     const [showEmoji, setShowEmoji] = React.useState(false);
     const [textMessage, setTextMessage] = React.useState('');
 
-    const { id } = useParams();
-    console.log('id', id);
+    const { id = 0 } = useParams();
+    const { handleSendText, handleSendImage, handleSendVideo, isSuccess } = useHandleMessage({ receiveId: id });
+
+    useEffect(() => {
+        if (isSuccess) {
+            setTextMessage('');
+        }
+    }, [isSuccess]);
+
+    const { data: friend, isFetching: isFetchingFiend } = useQuery({
+        queryKey: ['user', id],
+        queryFn: () => ProfileServices.getProfileByUserId(id),
+    });
+
+    const { data, isFetching, fetchNextPage } = useInfiniteLoad(
+        MessageService.getMessageByReceiveId,
+        'message',
+        id,
+        id,
+    );
 
     const handleEmojiClick = (emojiData, event) => {
         setTextMessage(textMessage + emojiData.emoji);
         inputRef?.current?.focus();
     };
+
+    const isOnline = useMemo(() => {
+        if (!friend || !userActives) return false;
+
+        return userActives.some((item) => item.id === friend.data.id);
+    }, [userActives, friend]);
+
     return (
         <>
             {' '}
             {id ? (
                 <div className="relative h-full">
-                    <div className="flex items-center py-2 border-b px-4 gap-2">
-                        <div className="avatar online">
+                    <div className="flex items-center py-2 border-b px-4 gap-2 fixed bg-white z-10 right-0 left-0 md:left-[300px] top-[66px]">
+                        <div className={`avatar ${isOnline ? 'online' : ''}`}>
                             <div className="w-12 rounded-full">
-                                <img src="https://dummyimage.com/40x40.gif" />
+                                <img src={getImage(friend?.data.avatar)} />
                             </div>
                         </div>
                         <div>
-                            <h2 className="font-medium">Thành Đạt</h2>
-                            <p className="text-sm">Đang hoạt động</p>
+                            <h2 className="font-medium">{friend?.data?.name}</h2>
+                            {isOnline && <p className="text-sm">Đang hoạt động</p>}
                         </div>
                     </div>
 
-                    <div className="px-4 mt-4 overflow-y-auto pb-[168px]">
-                        {[1, 2, 3, 4, 5, 6, 7, 8].map((item, index) => (
-                            <div key={index} className={`chat ${index % 2 == 0 ? 'chat-start' : 'chat-end'}`}>
-                                <div className="chat-image avatar">
-                                    <div className="w-12 rounded-full">
-                                        <img src="https://dummyimage.com/40x40.gif" />
-                                    </div>
-                                </div>
-                                <div className="chat-header">
-                                    Obi-Wan Kenobi
-                                    <time className="text-xs opacity-50">12:45</time>
-                                </div>
-                                <div className="chat-bubble">You were the Chosen One!</div>
-                                <div className="chat-footer opacity-50">Delivered</div>
-                            </div>
+                    <div className="px-4 mt-[70px] overflow-y-auto pb-[100px]">
+                        {data.map((item, index) => (
+                            <CardMessage key={item.id} data={item} />
                         ))}
                     </div>
 
                     <div className="mt-4 bg-base-200 p-4 rounded fixed md:left-[300px] left-0 right-0 bottom-0">
                         <div className="rounded flex">
-                            <input type="file" className="hidden" id="fileImage" accept="image/*" />
-                            <input type="file" className="hidden" id="fileVideo" accept="video/*" />
+                            <input
+                                type="file"
+                                className="hidden"
+                                id="fileImage"
+                                onChange={(e) => handleSendImage(e.target.files[0])}
+                                accept="image/*"
+                            />
+                            <input
+                                type="file"
+                                className="hidden"
+                                id="fileVideo"
+                                accept="video/*"
+                                onChange={(e) => handleSendVideo(e.target.files[0])}
+                            />
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center">
                                     <label htmlFor="fileImage" className="tooltip" data-tip="Hình ảnh">
@@ -108,9 +142,14 @@ const Message = () => {
                                 onChange={(e) => setTextMessage(e.target.value)}
                                 className="outline-none w-full py-2 rounded px-4"
                                 placeholder={`${user.name ? `${user.name} ơi,` : ''} bạn đang nghĩ gì thế?`}
+                                onKeyUp={(e) => {
+                                    if (e.code == 'Enter') {
+                                        handleSendText(textMessage);
+                                    }
+                                }}
                             ></input>
-                            <div className='flex items-center'>
-                                <button className="btn btn-sm md:btn-md">
+                            <div className="flex items-center">
+                                <button onClick={() => handleSendText(textMessage)} className="btn btn-sm md:btn-md">
                                     Gửi <LuSendHorizonal />
                                 </button>
                             </div>

@@ -1,9 +1,17 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import FriendServices from '../../services/FriendService';
 
 const initialState = {
     user: null,
     token: null,
+    friends: [],
 };
+
+export const reloadMyFriend = createAsyncThunk('/my-friend', async () => {
+    const res = await FriendServices.getMyFriend();
+    return res.data;
+});
+
 export const userSlice = createSlice({
     // action creator
     name: 'user',
@@ -26,6 +34,11 @@ export const userSlice = createSlice({
             state.user = user;
             state.token = token;
         },
+    },
+    extraReducers: (builder) => {
+        builder.addCase(reloadMyFriend.fulfilled, (state, action) => {
+            state.friends = action.payload;
+        });
     },
 });
 

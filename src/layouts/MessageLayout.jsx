@@ -6,10 +6,14 @@ import DrawerMenu from '../components/Drawer/DrawerMenu';
 import DrawMessage from '../components/Drawer/DrawerMessage';
 import Header from '../components/Header';
 import SidebarMessage from '../components/SidebarMessage';
+import { useQuery } from '@tanstack/react-query';
+import MessageService from '../services/MessageService';
 
 const MessageLayout = ({ children }) => {
     const [visibleMenu, setVisibleMenu] = useState(false);
     const [visibleFriend, setVisibleFriend] = useState(false);
+
+    const {data, isLoading} = useQuery({queryKey:['list-message'], queryFn:() => MessageService.getListMessage()})
 
     return (
         <div className="min-h-screen">

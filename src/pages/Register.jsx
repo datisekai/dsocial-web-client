@@ -30,8 +30,6 @@ const Register = () => {
         },
     });
 
-    console.log(isPending)
-
     const handleSubmit = (values) => {
         mutate(values);
     };

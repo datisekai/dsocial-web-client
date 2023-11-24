@@ -1,22 +1,24 @@
-import React, { useMemo, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import React, { useMemo } from 'react';
 import { FaRegAddressCard } from 'react-icons/fa';
 import { LiaBirthdayCakeSolid } from 'react-icons/lia';
-import CardPost from '../components/Card/CardPost';
-import { Link, useParams } from 'react-router-dom';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useSelector } from 'react-redux';
-import ProfileServices from '../services/ProfileService';
-import getImage from '../utils/getImage';
-import getDate from '../utils/getDate';
-import PostServices from '../services/PostService';
-import useInfiniteLoad from '../hooks/useInfiniteLoad';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import FriendServices from '../services/FriendService';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import CardPost from '../components/Card/CardPost';
+import useInfiniteLoad from '../hooks/useInfiniteLoad';
+import { reloadMyFriend } from '../redux/slices/userSlice';
+import FriendServices from '../services/FriendService';
+import PostServices from '../services/PostService';
+import ProfileServices from '../services/ProfileService';
+import getDate from '../utils/getDate';
+import getImage from '../utils/getImage';
 const UserProfile = () => {
     const { user } = useSelector((state) => state.user);
     const { userId } = useParams();
     const queryClient = useQueryClient();
+    const dispatch = useDispatch();
 
     const { data: dataProfile, isLoading: isLoadingProfile } = useQuery({
         queryKey: ['profile', userId],
@@ -95,6 +97,7 @@ const UserProfile = () => {
                     pagination: currentFriend.pagination,
                 };
                 queryClient.setQueryData(['friends', user.id], newDataFriend);
+                dispatch(reloadMyFriend());
             }
             // Swal.fire('Thành công!', data.message, 'success');
         },
@@ -156,6 +159,8 @@ const UserProfile = () => {
                     };
                     queryClient.setQueryData(['friendRequests', user.id], newDataFriendRequest);
                 }
+
+                dispatch(reloadMyFriend());
             }
             // Swal.fire('Thành công!', data.message, 'success');
         },

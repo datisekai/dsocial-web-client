@@ -16,7 +16,6 @@ const ChangePasswordModal = ({ visible = false, onClose }) => {
     const { mutate, isPending } = useMutation({
         mutationFn: ProfileServices.changePassword,
         onSuccess: (data) => {
-            console.log(data);
             Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
@@ -38,7 +37,6 @@ const ChangePasswordModal = ({ visible = false, onClose }) => {
                 <div className="modal-box">
                     <Formik
                         onSubmit={(values) => {
-                            console.log('called');
                             handleChangePassword(values);
                         }}
                         initialValues={{ oldPassword: '', newPassword: '', confirm: '' }}

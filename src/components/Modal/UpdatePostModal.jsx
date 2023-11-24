@@ -16,7 +16,6 @@ const UpdatePostModal = ({ post, onClose, visible, nameQuery }) => {
         onSuccess: (data) => {
             const currenPost = queryClient.getQueryData(nameQuery);
             if (currenPost) {
-                console.log(data.data);
                 const newPost = {
                     pageParams: currenPost.pageParams,
                     pages: [
@@ -36,7 +35,6 @@ const UpdatePostModal = ({ post, onClose, visible, nameQuery }) => {
                     ],
                 };
                 queryClient.setQueryData(nameQuery, newPost);
-                console.log(currenPost.data, data.data);
             }
             Swal.fire('Thành công!', data.message, 'success');
             onClose();

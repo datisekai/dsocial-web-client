@@ -20,21 +20,23 @@ const useInfiniteLoad = (getData, queryKey, propsId, keySearch) => {
             q = keySearch === null ? '' : keySearch,
         }) => getData({ pageParam, id, q }),
         getNextPageParam: (lastPage, allPages) => {
-            const nextPage = lastPage.pagination.next_page || null;
+            const nextPage = lastPage?.pagination.next_page || null;
             if (nextPage) return +nextPage;
         },
         getPreviousPageParam: (firstPage, allPages) => {
-            const prevPage = firstPage.pagination.prev_page || null;
+            const prevPage = firstPage?.pagination.prev_page || null;
             if (prevPage) return +prevPage;
         },
     });
 
     const dataAllPages = useMemo(() => {
         if (!data) return [];
-        return data.pages.reduce((pre, cur) => [...pre, ...cur.data], []);
+        return data?.pages?.reduce((pre, cur) => {
+            if(cur){
+                return [...pre, ...cur.data]
+            }
+        }, []);
     }, [data]);
-    console.log(dataAllPages);
-    // console.log(groupId);
     return {
         fetchNextPage,
         hasNextPage,

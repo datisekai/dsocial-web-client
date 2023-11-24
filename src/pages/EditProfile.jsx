@@ -71,7 +71,6 @@ const EditProfile = () => {
         }
 
         const payload = { ...values, coverImage, avatar };
-        console.log('submit', payload);
         mutate(payload);
     };
 
