@@ -19,6 +19,11 @@ const PostServices = {
         const result = await axiosClient.post(`/post-comment`, data);
         return result.data;
     },
+    deleteComment: async (id) => {
+        if (!id) return;
+        const result = await axiosClient.delete(`/post-comment/${id}`);
+        return result.data;
+    },
     createReaction: async (data) => {
         if (!data) return;
         const result = await axiosClient.post(`/post-reaction`, data);
@@ -42,6 +47,16 @@ const PostServices = {
     deletePost: async (postId) => {
         if (!postId) return;
         const result = await axiosClient.delete(`/post/${postId}`);
+        return result.data;
+    },
+    deletePost: async (postId) => {
+        if (!postId) return;
+        const result = await axiosClient.delete(`/post/${postId}`);
+        return result.data;
+    },
+    deletePostGroup: async (postId) => {
+        if (!postId) return;
+        const result = await axiosClient.delete(`/post/own/${postId}`);
         return result.data;
     },
 };

@@ -68,8 +68,6 @@ const DetailGroup = () => {
         fetchNextPage: fetchNextPageAllUsers,
     } = useInfiniteLoad(GroupServices.getAllUserJoined, 'usersDetailGroup', id);
 
-    console.log([dataDetailGroup, ...dataAllUsers]);
-
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createPost,
         onSuccess: (data) => {
@@ -391,7 +389,7 @@ const DetailGroup = () => {
                         }
                     >
                         {dataAllPosts.map((item, index) => (
-                            <CardPost key={index} post={item} nameQuery={['postsDetailGroup', undefined]} />
+                            <CardPost group={dataDetailGroup.data} key={index} post={item} nameQuery={['postsDetailGroup', undefined]} />
                         ))}
                     </InfiniteScroll>
                 </div>

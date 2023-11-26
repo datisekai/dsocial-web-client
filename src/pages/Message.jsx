@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { HiOutlineVideoCamera } from 'react-icons/hi';
 import { IoMdImages } from 'react-icons/io';
 import { useSelector } from 'react-redux';
@@ -24,8 +24,12 @@ const Message = () => {
     const [showEmoji, setShowEmoji] = React.useState(false);
     const [textMessage, setTextMessage] = React.useState('');
 
+    const scrollRef = useRef(null);
+
     const { id = 0 } = useParams();
-    const { handleSendText, handleSendImage, handleSendVideo, isSuccess } = useHandleMessage({ receiveId: id });
+    const { handleSendText, handleSendImage, handleSendVideo, isSuccess, handleSeenMessage } = useHandleMessage({
+        receiveId: id,
+    });
 
     useEffect(() => {
         if (isSuccess) {
@@ -38,12 +42,28 @@ const Message = () => {
         queryFn: () => ProfileServices.getProfileByUserId(id),
     });
 
-    const { data, isFetching, fetchNextPage } = useInfiniteLoad(
-        MessageService.getMessageByReceiveId,
-        'message',
-        id,
-        id,
-    );
+    const { data } = useQuery({
+        queryKey: ['message', id],
+        queryFn: () => MessageService.getMessageByReceiveId({ id }),
+    });
+
+    // useEffect(() => {
+    //     if (id && inputRef && inputRef.current && data) {
+    //         inputRef.current.focus();
+
+    //         const lastMessage = data[data.length - 1];
+    //         if (!lastMessage.is_seen) {
+    //             handleSeenMessage(lastMessage.id);
+    //         }
+    //     }
+    // }, [id, data]);
+    useEffect(() => {
+        if (data && data.length > 0) {
+            setTimeout(() => {
+                scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+    }, [data]);
 
     const handleEmojiClick = (emojiData, event) => {
         setTextMessage(textMessage + emojiData.emoji);
@@ -58,7 +78,6 @@ const Message = () => {
 
     return (
         <>
-            {' '}
             {id ? (
                 <div className="relative h-full">
                     <div className="flex items-center py-2 border-b px-4 gap-2 fixed bg-white z-10 right-0 left-0 md:left-[300px] top-[66px]">
@@ -74,10 +93,11 @@ const Message = () => {
                     </div>
 
                     <div className="px-4 mt-[70px] overflow-y-auto pb-[100px]">
-                        {data.map((item, index) => (
+                        {data?.map((item, index) => (
                             <CardMessage key={item.id} data={item} />
                         ))}
                     </div>
+                    <div ref={scrollRef} id="scroll"></div>
 
                     <div className="mt-4 bg-base-200 p-4 rounded fixed md:left-[300px] left-0 right-0 bottom-0">
                         <div className="rounded flex">

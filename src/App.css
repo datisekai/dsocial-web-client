@@ -21,3 +21,15 @@ body {
 .text-title{
     @apply text-primary font-bold
 }
+
+.no-scrollbar::-webkit-scrollbar{
+    display: none !important;
+}
+
+.infinite-scroll-component__outerdiv::-webkit-scrollbar{
+    display: none !important;
+}
+
+.infinite-scroll-component{
+    overflow: hidden !important;
+}

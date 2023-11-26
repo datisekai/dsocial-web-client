@@ -75,7 +75,7 @@ const Search = () => {
                     {dataPeople.length > 0 ? (
                         dataPeople.map((item, index) => (
                             <div className="mt-4" key={index}>
-                                <CardFriend key={item.id} {...item} />
+                                <CardFriend key={item.id} disableOnline={true} {...item} />
                             </div>
                         ))
                     ) : (
