@@ -76,12 +76,12 @@ const CardComment = ({ comment, post, nameQuery }) => {
     };
     return (
         <div className="flex gap-2 py-2">
-            <Link to={user.id == comment.user_comment.id ? '/profile' : `/profile/${user.id}`}>
+            <Link to={user.id == comment.user_comment.id ? '/profile' : `/profile/${comment.user_comment.id}`}>
                 <img src={getImage(comment.user_comment.avatar)} className="w-[40px] h-[40px] rounded-full" alt="" />
             </Link>
             <div className="w-full">
                 <Link
-                    to={user.id == comment.user_comment.id ? '/profile' : `/profile/${user.id}`}
+                    to={user.id == comment.user_comment.id ? '/profile' : `/profile/${comment.user_comment.id}`}
                     className="link link-hover"
                 >
                     <h4 className="font-medium">{comment.user_comment.name || comment.user_comment.other_name}</h4>
