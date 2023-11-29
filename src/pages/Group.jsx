@@ -72,7 +72,8 @@ const Group = () => {
                     dataLength={dataAllGroups.length}
                     next={fetchNextPageAllGroups}
                     hasMore={hasNextpageAllGroups}
-                    className="mt-8 space-y-2"
+                    className="mt-8 space-y-2 no-scrollbar"
+                    
                     loader={
                         <div className="my-2 flex justify-center">
                             <span className="loading loading-dots loading-md"></span>

@@ -16,7 +16,7 @@ const SocketContextProvider = ({ children }) => {
         socket.current.emit('add-user-active', user);
         socket.current.on('get-user-active', (users) => {
             console.log('userActives', users);
-            setUserActives(users.filter(item => item.id !== user.id));
+            setUserActives(users.filter((item) => item.id !== user.id));
         });
     }, []);
 

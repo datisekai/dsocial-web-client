@@ -16,7 +16,7 @@ import CardComment from './CardComment';
 import useUser from '../../hooks/useUser';
 import UpdatePostModal from '../Modal/UpdatePostModal';
 
-const CardPost = ({ post, nameQuery }) => {
+const CardPost = ({ post, nameQuery, group }) => {
     const [isShowFullImage, setIsShowFullImage] = useState(false);
     const [isShowFullComment, setIsShowFullComment] = useState(false);
     const inputRef = React.useRef(null);
@@ -162,26 +162,8 @@ const CardPost = ({ post, nameQuery }) => {
 
     const { mutate: mutatePostDel, isPending: isPendingPostDel } = useMutation({
         mutationFn: PostServices.deletePost,
-        onSuccess: (data) => {
-            const currenPost = queryClient.getQueryData(nameQuery);
-
-            if (currenPost) {
-                const newPost = {
-                    pageParams: currenPost.pageParams,
-                    pages: [
-                        {
-                            success: currenPost.pages[0].success,
-                            data: currenPost.pages[0].data.filter((item) => {
-                                return item.id !== data.data.id;
-                            }),
-                            pagination: currenPost.pages[0].pagination,
-                        },
-                    ],
-                };
-                queryClient.setQueryData(nameQuery, newPost);
-            }
-
-            Swal.fire('Thành công!', data.message, 'success');
+        onSuccess: (data, variable) => {
+            updateStatePost(data, variable);
         },
         onError: (error) => {
             if (error?.message) {
@@ -190,6 +172,36 @@ const CardPost = ({ post, nameQuery }) => {
             Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
         },
     });
+
+    const { mutate: mutatePostDelGroup, isPending: isPendingPostDelGroup } = useMutation({
+        mutationFn: PostServices.deletePostGroup,
+        onSuccess: (data, variable) => {
+            updateStatePost(data, variable);
+        },
+        onError: (error) => {
+            if (error?.message) {
+                return Swal.fire('Thất bại!', error.message, 'error');
+            }
+            Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
+        },
+    });
+
+    const updateStatePost = (data, variable) => {
+        const oldData = queryClient.getQueryData(nameQuery);
+
+        const pages = oldData.pages.map((page) => {
+            const { data } = page;
+            const currentPost = data.find((item) => item.id == variable);
+            if (currentPost) {
+                return { ...page, data: data.filter((item) => item.id !== variable) };
+            }
+            return page;
+        });
+
+        queryClient.setQueryData(nameQuery, { ...oldData, pages });
+
+        Swal.fire('Thành công!', data.message, 'success');
+    };
     const handleSubmit = () => {
         const postId = post.id;
         const parentId = 0;
@@ -224,8 +236,22 @@ const CardPost = ({ post, nameQuery }) => {
         });
     };
 
+    const handleDeletePostGroup = () => {
+        Swal.fire({
+            title: 'Bạn có chắc chắn muốn xóa bài viết này?',
+            showDenyButton: true,
+            confirmButtonText: 'Chắc chắn',
+            denyButtonText: `Hủy `,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const postId = post.id;
+                mutatePostDelGroup(postId);
+            }
+        });
+    };
+
     return (
-        <div className="p-4 bg-base-200 rounded w-full">
+        <div className="p-4 bg-base-200 border-b-2 rounded w-full">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     {!post.group.id ? (
@@ -268,7 +294,7 @@ const CardPost = ({ post, nameQuery }) => {
                     </div>
                 </div>
 
-                {post.author_id == user.id && (
+                {post.author_id == user.id ? (
                     <div className="dropdown dropdown-left">
                         <label tabIndex={0}>
                             <div className="btn btn-ghost btn-sm">
@@ -293,6 +319,24 @@ const CardPost = ({ post, nameQuery }) => {
                             </li>
                         </ul>
                     </div>
+                ) : group && group.user_own.id == user.id ? (
+                    <div className="dropdown dropdown-left">
+                        <label tabIndex={0}>
+                            <div className="btn btn-ghost btn-sm">
+                                <BiDotsVerticalRounded size={25} />
+                            </div>
+                        </label>
+                        <ul
+                            tabIndex={0}
+                            className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                        >
+                            <li>
+                                <a onClick={handleDeletePostGroup}>Xóa</a>
+                            </li>
+                        </ul>
+                    </div>
+                ) : (
+                    <></>
                 )}
             </div>
             <article className="prose lg:prose-xl mt-2" dangerouslySetInnerHTML={{ __html: post.html }}></article>

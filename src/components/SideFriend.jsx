@@ -27,15 +27,7 @@ const SideFriend = () => {
 
     return (
         <div>
-            <div>
-                <input
-                    type="text"
-                    placeholder="Người liên hệ"
-                    className="input input-bordered input-sm w-full max-w-xs"
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                />
-            </div>
+          
             <div className="mt-4 flex items-center justify-between">
                 <h3 className="font-medium">Người liên hệ</h3>
                 <Link to={'/friend'}>

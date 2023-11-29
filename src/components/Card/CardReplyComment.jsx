@@ -10,7 +10,8 @@ import EmojiPicker from 'emoji-picker-react';
 import Swal from 'sweetalert2';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-const CardReplyComment = ({ comment, commentId, nameQuery }) => {
+import { BiDotsVerticalRounded } from 'react-icons/bi';
+const CardReplyComment = ({ comment, commentId, nameQuery, post }) => {
     const [showReply, setShowReply] = useState([]);
     const { user } = useSelector((state) => state.user);
     const inputRef = React.useRef(null);
@@ -18,7 +19,30 @@ const CardReplyComment = ({ comment, commentId, nameQuery }) => {
     const [isShowComment, setIsShowComment] = useState(false);
     const [showEmoji, setShowEmoji] = React.useState(false);
     const queryClient = useQueryClient();
-    const query = useLocation();
+    const location = useLocation();
+
+    console.log('local', location);
+
+    const { mutate: deleteComment } = useMutation({
+        mutationFn: PostServices.deleteComment,
+        onSuccess: (data, variable) => {
+            const oldData = queryClient.getQueryData(['postsHome', null]);
+
+            const pages = oldData.pages.map((page) => {
+                const { data } = page;
+                const currentPost = data.find((item) => item.id == post.id);
+                const currentComment = currentPost.comments.find((item) => item.id == variable);
+                if (currentComment) {
+                    const newComments = currentPost.comments.filter((item) => item.id != variable);
+                    return { ...page, data: data.map((p) => (p.id == post.id ? { ...p, comments: newComments } : p)) };
+                }
+
+                return page;
+            });
+
+            queryClient.setQueryData(['postsHome', null], { ...oldData, pages });
+        },
+    });
 
     const handleEmojiClick = (emojiData, event) => {
         setTextMessage((preText) => preText + emojiData.emoji);
@@ -80,26 +104,55 @@ const CardReplyComment = ({ comment, commentId, nameQuery }) => {
     return (
         <div>
             <div className="flex gap-2 py-2">
-                <Link to={user.id == comment.user_comment.id ? '/profile' : `/profile/${comment.user_comment.id}`}>
-                    <img
-                        src={getImage(comment.user_comment.avatar)}
-                        className="w-[40px] h-[40px] rounded-full"
-                        alt=""
-                    />
+                <Link
+                    to={user.id == comment.user_comment.id ? '/profile' : `/profile/${comment.user_comment.id}`}
+                    className="w-10 h-10 rounded-full"
+                >
+                    <img src={getImage(comment.user_comment.avatar)} className="w-10 h-10 rounded-full" alt="" />
                 </Link>
                 <div className="w-full">
-                    <Link
-                        to={user.id == comment.user_comment.id ? '/profile' : `/profile/${comment.user_comment.id}`}
-                        className="link link-hover"
-                    >
-                        <h4 className="font-medium">{comment.user_comment.name || comment.user_comment.other_name}</h4>
-                    </Link>
-                    <p dangerouslySetInnerHTML={{ __html: comment.content }}></p>
-                    <div className="text-xs flex items-center gap-1 mt-1">
-                        <span className="mr-4">{calculateCreatedTime(comment.created_at)}</span>
-                        <span className="link link-hover" onClick={() => setIsShowComment(true)}>
-                            Phản hồi
-                        </span>
+                    <div className="flex justify-between">
+                        <div>
+                            <Link
+                                to={
+                                    user.id == comment.user_comment.id
+                                        ? '/profile'
+                                        : `/profile/${comment.user_comment.id}`
+                                }
+                                className="link link-hover"
+                            >
+                                <h4 className="font-medium">
+                                    {comment.user_comment.name || comment.user_comment.other_name}
+                                </h4>
+                            </Link>
+
+                            <p dangerouslySetInnerHTML={{ __html: comment.content }}></p>
+                            <div className="text-xs flex items-center gap-1 mt-1">
+                                <span className="mr-4">{calculateCreatedTime(comment.created_at)}</span>
+                                <span className="link link-hover" onClick={() => setIsShowComment(true)}>
+                                    Phản hồi
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            {comment.author_id == user.id && (
+                                <div className="dropdown dropdown-left">
+                                    <label tabIndex={0}>
+                                        <div className="btn btn-ghost btn-sm">
+                                            <BiDotsVerticalRounded size={25} />
+                                        </div>
+                                    </label>
+                                    <ul
+                                        tabIndex={0}
+                                        className="dropdown-content z-[1] menu shadow bg-base-100 rounded-box w-24"
+                                    >
+                                        <li>
+                                            <a onClick={() => deleteComment(comment.id)}>Xóa</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
                     </div>
                     {isShowComment && (
                         <div className="mt-2 bg-base-200 rounded">
