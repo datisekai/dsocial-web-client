@@ -14,29 +14,8 @@ const UpdatePostModal = ({ post, onClose, visible, nameQuery }) => {
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.updatePost,
         onSuccess: (data) => {
-            const currenPost = queryClient.getQueryData(nameQuery);
-            if (currenPost) {
-                const newPost = {
-                    pageParams: currenPost.pageParams,
-                    pages: [
-                        {
-                            success: currenPost.pages[0].success,
-                            data: currenPost.pages[0].data.map((item) => {
-                                if (item.id === data.data.id) {
-                                    return {
-                                        ...item,
-                                        html: data.data.html,
-                                    };
-                                }
-                                return item;
-                            }),
-                            pagination: currenPost.pages[0].pagination,
-                        },
-                    ],
-                };
-                queryClient.setQueryData(nameQuery, newPost);
-            }
-            Swal.fire('Thành công!', data.message, 'success');
+            const postId = data.data.id;
+            updateStatePost(data, postId);
             onClose();
         },
         onError: (error) => {
@@ -46,6 +25,31 @@ const UpdatePostModal = ({ post, onClose, visible, nameQuery }) => {
             Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
         },
     });
+
+    const updateStatePost = (data, postId) => {
+        const dataResult = data;
+        const oldData = queryClient.getQueryData(nameQuery);
+        const pages = oldData.pages.map((page) => {
+            const { data } = page;
+            const currentPost = data.find((item) => item.id == postId);
+            if (currentPost) {
+                return {
+                    ...page,
+                    data: data.map((item) => {
+                        if (item.id === postId) {
+                            return {
+                                ...item,
+                                html: dataResult.data.html,
+                            };
+                        }
+                        return item;
+                    }),
+                };
+            }
+            return page;
+        });
+        queryClient.setQueryData(nameQuery, { ...oldData, pages });
+    };
 
     return (
         <>
