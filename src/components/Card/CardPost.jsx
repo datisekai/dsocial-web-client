@@ -56,9 +56,9 @@ const CardPost = ({ post, nameQuery, group }) => {
         mutationFn: PostServices.createComment,
         onSuccess: (data) => {
             const postId = data.data.post_id;
-            const reactionId = data.data.id;
+            const id = data.data.id;
             const type = 'create-comment';
-            updateStateReact(data, type, postId, reactionId);
+            updateState(data, type, postId, id);
             setTextMessage('');
         },
         onError: (error) => {
@@ -73,9 +73,9 @@ const CardPost = ({ post, nameQuery, group }) => {
         mutationFn: PostServices.createReaction,
         onSuccess: (data) => {
             const postId = data.data.post_id;
-            const reactionId = data.data.id;
+            const id = data.data.id;
             const type = 'create-react';
-            updateStateReact(data, type, postId, reactionId);
+            updateState(data, type, postId, id);
         },
         onError: (error) => {
             if (error?.message) {
@@ -88,9 +88,9 @@ const CardPost = ({ post, nameQuery, group }) => {
         mutationFn: PostServices.deleteReaction,
         onSuccess: (data) => {
             const postId = data.data.post_id;
-            const reactionId = data.data.id;
+            const id = data.data.id;
             const type = 'delete-react';
-            updateStateReact(data, type, postId, reactionId);
+            updateState(data, type, postId, id);
         },
         onError: (error) => {
             if (error?.message) {
@@ -126,7 +126,7 @@ const CardPost = ({ post, nameQuery, group }) => {
         },
     });
 
-    const updateStateReact = (data, type, postId, reactionId) => {
+    const updateState = (data, type, postId, reactionId) => {
         const dataResult = data;
         const oldData = queryClient.getQueryData(nameQuery);
         const pages = oldData.pages.map((page) => {

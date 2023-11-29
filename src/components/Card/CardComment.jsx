@@ -41,23 +41,10 @@ const CardComment = ({ comment, post, nameQuery }) => {
     const { mutate: deleteComment } = useMutation({
         mutationFn: PostServices.deleteComment,
         onSuccess: (data, variable) => {
-            const keyPost = geyKeyPost();
-            const oldData = queryClient.getQueryData([keyPost, null]);
-
-            const pages = oldData.pages.map((page) => {
-                const { data } = page;
-                const currentPost = data.find((item) => item.id == post.id);
-                const currentComment = currentPost.comments.find((item) => item.id == variable);
-                if (currentComment) {
-                    const newComments = currentPost.comments.filter((item) => item.id != variable);
-                    console.log('currentPost', currentPost);
-                    return { ...page, data: data.map((p) => (p.id == post.id ? { ...p, comments: newComments } : p)) };
-                }
-
-                return page;
-            });
-
-            queryClient.setQueryData([keyPost, null], { ...oldData, pages });
+            const postId = data.data.post_id;
+            const id = data.data.id;
+            const type = 'delete-comment';
+            updateStateComment(data, type, postId, id);
         },
     });
 
@@ -67,30 +54,10 @@ const CardComment = ({ comment, post, nameQuery }) => {
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createComment,
         onSuccess: (data) => {
-            const currenPost = queryClient.getQueryData(nameQuery);
-
-            if (currenPost) {
-                const newPost = {
-                    pageParams: currenPost.pageParams,
-                    pages: [
-                        {
-                            success: currenPost.pages[0].success,
-                            data: currenPost.pages[0].data.map((item) => {
-                                if (item.id === data.data.post_id) {
-                                    return {
-                                        ...item,
-                                        count_comment: item.count_comment + 1,
-                                        comments: [data.data, ...item.comments],
-                                    };
-                                }
-                                return item;
-                            }),
-                            pagination: currenPost.pages[0].pagination,
-                        },
-                    ],
-                };
-                queryClient.setQueryData(nameQuery, newPost);
-            }
+            const postId = data.data.post_id;
+            const id = data.data.id;
+            const type = 'create-comment';
+            updateStateComment(data, type, postId, id);
             setTextMessage('');
         },
         onError: (error) => {
@@ -100,6 +67,41 @@ const CardComment = ({ comment, post, nameQuery }) => {
             Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
         },
     });
+    const updateStateComment = (data, type, postId, id) => {
+        const dataResult = data;
+        const oldData = queryClient.getQueryData(nameQuery);
+        const pages = oldData.pages.map((page) => {
+            const { data } = page;
+            const currentPost = data.find((item) => item.id == postId);
+            if (currentPost) {
+                return {
+                    ...page,
+                    data: data.map((item) => {
+                        if (item.id === postId) {
+                            if (type == 'delete-comment') {
+                                return {
+                                    ...item,
+                                    count_comment: item.count_comment - 1,
+                                    comments: item.comments.filter((item) => item.id !== id),
+                                };
+                            }
+                            if (type == 'create-comment') {
+                                return {
+                                    ...item,
+                                    count_comment: item.count_comment + 1,
+                                    comments: [dataResult.data, ...item.comments],
+                                };
+                            }
+                        }
+                        return item;
+                    }),
+                };
+            }
+            return page;
+        });
+
+        queryClient.setQueryData(nameQuery, { ...oldData, pages });
+    };
     const handleSubmit = () => {
         const postId = comment.post_id;
         const parentId = comment.id;
