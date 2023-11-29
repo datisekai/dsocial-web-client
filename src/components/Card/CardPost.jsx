@@ -92,30 +92,10 @@ const CardPost = ({ post, nameQuery, group }) => {
     const { mutate: mutateReaction, isPending: isPendingReaction } = useMutation({
         mutationFn: PostServices.createReaction,
         onSuccess: (data) => {
-            const currenPost = queryClient.getQueryData(nameQuery);
-
-            if (currenPost) {
-                const newPost = {
-                    pageParams: currenPost.pageParams,
-                    pages: [
-                        {
-                            success: currenPost.pages[0].success,
-                            data: currenPost.pages[0].data.map((item) => {
-                                if (item.id === data.data.post_id) {
-                                    return {
-                                        ...item,
-                                        count_reaction: item.count_reaction + 1,
-                                        reactions: [...item.reactions, data.data],
-                                    };
-                                }
-                                return item;
-                            }),
-                            pagination: currenPost.pages[0].pagination,
-                        },
-                    ],
-                };
-                queryClient.setQueryData(nameQuery, newPost);
-            }
+            const postId = data.data.post_id;
+            const reactionId = data.data.id;
+            const type = 'create';
+            updateStateReact(data, type, postId, reactionId);
         },
         onError: (error) => {
             if (error?.message) {
@@ -127,30 +107,10 @@ const CardPost = ({ post, nameQuery, group }) => {
     const { mutate: mutateReactionDel, isPending: isPendingReactionDel } = useMutation({
         mutationFn: PostServices.deleteReaction,
         onSuccess: (data) => {
-            const currenPost = queryClient.getQueryData(nameQuery);
-
-            if (currenPost) {
-                const newPost = {
-                    pageParams: currenPost.pageParams,
-                    pages: [
-                        {
-                            success: currenPost.pages[0].success,
-                            data: currenPost.pages[0].data.map((item) => {
-                                if (item.id === data.data.post_id) {
-                                    return {
-                                        ...item,
-                                        count_reaction: item.count_reaction - 1,
-                                        reactions: item.reactions.filter((item) => item.id !== data.data.id),
-                                    };
-                                }
-                                return item;
-                            }),
-                            pagination: currenPost.pages[0].pagination,
-                        },
-                    ],
-                };
-                queryClient.setQueryData(nameQuery, newPost);
-            }
+            const postId = data.data.post_id;
+            const reactionId = data.data.id;
+            const type = 'delete';
+            updateStateReact(data, type, postId, reactionId);
         },
         onError: (error) => {
             if (error?.message) {
@@ -185,6 +145,42 @@ const CardPost = ({ post, nameQuery, group }) => {
             Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
         },
     });
+
+    const updateStateReact = (data, type, postId, reactionId) => {
+        const dataResult = data;
+        const oldData = queryClient.getQueryData(nameQuery);
+        const pages = oldData.pages.map((page) => {
+            const { data } = page;
+            const currentPost = data.find((item) => item.id == postId);
+            if (currentPost) {
+                return {
+                    ...page,
+                    data: data.map((item) => {
+                        if (item.id === postId) {
+                            if (type == 'create') {
+                                return {
+                                    ...item,
+                                    count_reaction: item.count_reaction + 1,
+                                    reactions: [...item.reactions, dataResult.data],
+                                };
+                            }
+                            if (type == 'delete') {
+                                return {
+                                    ...item,
+                                    count_reaction: item.count_reaction - 1,
+                                    reactions: item.reactions.filter((item) => item.id !== reactionId),
+                                };
+                            }
+                        }
+                        return item;
+                    }),
+                };
+            }
+            return page;
+        });
+
+        queryClient.setQueryData(nameQuery, { ...oldData, pages });
+    };
 
     const updateStatePost = (data, variable) => {
         const oldData = queryClient.getQueryData(nameQuery);
