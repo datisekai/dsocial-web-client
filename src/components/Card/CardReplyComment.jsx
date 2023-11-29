@@ -19,9 +19,9 @@ const CardReplyComment = ({ comment, commentId, nameQuery, post }) => {
     const [isShowComment, setIsShowComment] = useState(false);
     const [showEmoji, setShowEmoji] = React.useState(false);
     const queryClient = useQueryClient();
-    const location = useLocation()
+    const location = useLocation();
 
-    console.log('local', location)
+    console.log('local', location);
 
     const { mutate: deleteComment } = useMutation({
         mutationFn: PostServices.deleteComment,
@@ -105,16 +105,12 @@ const CardReplyComment = ({ comment, commentId, nameQuery, post }) => {
         <div>
             <div className="flex justify-between py-2">
                 <div className="flex gap-2">
-                    <Link to={user.id == comment.user_comment.id ? '/profile' : `/profile/${user.id}`}>
-                        <img
-                            src={getImage(comment.user_comment.avatar)}
-                            className="w-[40px] h-[40px] rounded-full"
-                            alt=""
-                        />
+                    <Link to={user.id == comment.user_comment.id ? '/profile' : `/profile/${comment.user_comment.id}`}>
+                        <img src={getImage(comment.user_comment.avatar)} className="w-10 h-10 rounded-full" alt="" />
                     </Link>
                     <div className="w-full">
                         <Link
-                            to={user.id == comment.user_comment.id ? '/profile' : `/profile/${user.id}`}
+                            to={user.id == comment.user_comment.id ? '/profile' : `/profile/${comment.user_comment.id}`}
                             className="link link-hover"
                         >
                             <h4 className="font-medium">

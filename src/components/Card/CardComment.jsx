@@ -28,8 +28,7 @@ const CardComment = ({ comment, post, nameQuery }) => {
         const pathname = query.pathname;
         if (pathname === '/profile') return 'postsProfile';
         if (pathname == '/profile/') return 'postsUserProfile';
-        if(pathname == '/group/') return 'postsDetailGroup'
-
+        if (pathname == '/group/') return 'postsDetailGroup';
 
         return 'postsHome';
     };
@@ -42,8 +41,7 @@ const CardComment = ({ comment, post, nameQuery }) => {
     const { mutate: deleteComment } = useMutation({
         mutationFn: PostServices.deleteComment,
         onSuccess: (data, variable) => {
-
-            const keyPost = geyKeyPost()
+            const keyPost = geyKeyPost();
             const oldData = queryClient.getQueryData([keyPost, null]);
 
             const pages = oldData.pages.map((page) => {
@@ -52,7 +50,7 @@ const CardComment = ({ comment, post, nameQuery }) => {
                 const currentComment = currentPost.comments.find((item) => item.id == variable);
                 if (currentComment) {
                     const newComments = currentPost.comments.filter((item) => item.id != variable);
-                    console.log('currentPost', currentPost)
+                    console.log('currentPost', currentPost);
                     return { ...page, data: data.map((p) => (p.id == post.id ? { ...p, comments: newComments } : p)) };
                 }
 
@@ -118,16 +116,15 @@ const CardComment = ({ comment, post, nameQuery }) => {
     return (
         <div className="flex py-2 justify-between">
             <div className="flex gap-2 ">
-                <Link to={user.id == comment.user_comment.id ? '/profile' : `/profile/${user.id}`}>
-                    <img
-                        src={getImage(comment.user_comment.avatar)}
-                        className="w-[40px] h-[40px] rounded-full"
-                        alt=""
-                    />
+                <Link
+                    to={user.id == comment.user_comment.id ? '/profile' : `/profile/${comment.user_comment.id}`}
+                    className="w-10 h-10 rounded-full"
+                >
+                    <img src={getImage(comment.user_comment.avatar)} className="w-10 h-10 rounded-full" alt="" />
                 </Link>
                 <div className="w-full">
                     <Link
-                        to={user.id == comment.user_comment.id ? '/profile' : `/profile/${user.id}`}
+                        to={user.id == comment.user_comment.id ? '/profile' : `/profile/${comment.user_comment.id}`}
                         className="link link-hover"
                     >
                         <h4 className="font-medium">{comment.user_comment.name || comment.user_comment.other_name}</h4>
