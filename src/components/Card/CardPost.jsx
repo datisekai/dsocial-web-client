@@ -55,30 +55,10 @@ const CardPost = ({ post, nameQuery, group }) => {
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createComment,
         onSuccess: (data) => {
-            const currenPost = queryClient.getQueryData(nameQuery);
-
-            if (currenPost) {
-                const newPost = {
-                    pageParams: currenPost.pageParams,
-                    pages: [
-                        {
-                            success: currenPost.pages[0].success,
-                            data: currenPost.pages[0].data.map((item) => {
-                                if (item.id === data.data.post_id) {
-                                    return {
-                                        ...item,
-                                        count_comment: item.count_comment + 1,
-                                        comments: [data.data, ...item.comments],
-                                    };
-                                }
-                                return item;
-                            }),
-                            pagination: currenPost.pages[0].pagination,
-                        },
-                    ],
-                };
-                queryClient.setQueryData(nameQuery, newPost);
-            }
+            const postId = data.data.post_id;
+            const reactionId = data.data.id;
+            const type = 'create-comment';
+            updateStateReact(data, type, postId, reactionId);
             setTextMessage('');
         },
         onError: (error) => {
@@ -94,7 +74,7 @@ const CardPost = ({ post, nameQuery, group }) => {
         onSuccess: (data) => {
             const postId = data.data.post_id;
             const reactionId = data.data.id;
-            const type = 'create';
+            const type = 'create-react';
             updateStateReact(data, type, postId, reactionId);
         },
         onError: (error) => {
@@ -109,7 +89,7 @@ const CardPost = ({ post, nameQuery, group }) => {
         onSuccess: (data) => {
             const postId = data.data.post_id;
             const reactionId = data.data.id;
-            const type = 'delete';
+            const type = 'delete-react';
             updateStateReact(data, type, postId, reactionId);
         },
         onError: (error) => {
@@ -157,18 +137,25 @@ const CardPost = ({ post, nameQuery, group }) => {
                     ...page,
                     data: data.map((item) => {
                         if (item.id === postId) {
-                            if (type == 'create') {
+                            if (type == 'create-react') {
                                 return {
                                     ...item,
                                     count_reaction: item.count_reaction + 1,
                                     reactions: [...item.reactions, dataResult.data],
                                 };
                             }
-                            if (type == 'delete') {
+                            if (type == 'delete-react') {
                                 return {
                                     ...item,
                                     count_reaction: item.count_reaction - 1,
                                     reactions: item.reactions.filter((item) => item.id !== reactionId),
+                                };
+                            }
+                            if (type == 'create-comment') {
+                                return {
+                                    ...item,
+                                    count_comment: item.count_comment + 1,
+                                    comments: [dataResult.data, ...item.comments],
                                 };
                             }
                         }
