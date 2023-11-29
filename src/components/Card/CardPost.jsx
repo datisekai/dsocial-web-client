@@ -49,7 +49,7 @@ const CardPost = ({ post, nameQuery, group }) => {
         return false;
     }, [post]);
     const parentComments = useMemo(() => {
-        return post.comments.filter((item) => item.parent_id == 0);
+        return post.comments.reverse().filter((item) => item.parent_id == 0);
     }, [post]);
 
     const { mutate, isPending } = useMutation({

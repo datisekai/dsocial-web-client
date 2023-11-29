@@ -24,15 +24,6 @@ const CardComment = ({ comment, post, nameQuery }) => {
     const queryClient = useQueryClient();
     const query = useLocation();
 
-    const geyKeyPost = () => {
-        const pathname = query.pathname;
-        if (pathname === '/profile') return 'postsProfile';
-        if (pathname == '/profile/') return 'postsUserProfile';
-        if (pathname == '/group/') return 'postsDetailGroup';
-
-        return 'postsHome';
-    };
-
     const handleEmojiClick = (emojiData, event) => {
         setTextMessage((preText) => preText + emojiData.emoji);
         inputRef?.current?.focus();
