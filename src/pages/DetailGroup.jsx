@@ -53,6 +53,7 @@ const DetailGroup = () => {
             return GroupServices.getDetailGroup(id);
         },
     });
+    console.log(dataDetailGroup);
 
     const {
         data: dataAllPosts,
@@ -71,21 +72,7 @@ const DetailGroup = () => {
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createPost,
         onSuccess: (data) => {
-            const currenPostHome = queryClient.getQueryData(['postsDetailGroup', undefined]);
-            if (currenPostHome) {
-                const newPostHome = {
-                    pageParams: currenPostHome.pageParams,
-                    pages: [
-                        {
-                            success: currenPostHome.pages[0].success,
-                            data: [{ ...data.data, created_at: Date.now() }, ...currenPostHome.pages[0].data],
-                            pagination: currenPostHome.pages[0].pagination,
-                        },
-                    ],
-                };
-                queryClient.setQueryData(['postsDetailGroup', undefined], newPostHome);
-                console.log(currenPostHome.data);
-            }
+            updateStatePost(data);
             setTextMessage('');
             setFilePost([]);
             // Swal.fire('Thành công!', data.message, 'success');
@@ -101,20 +88,9 @@ const DetailGroup = () => {
     const { mutate: mutateKickUser, isPending: isPendingKickUser } = useMutation({
         mutationFn: GroupServices.kickUser,
         onSuccess: (data) => {
-            const currentDetailGroup = queryClient.getQueryData(['detailgroup']);
-
-            if (currentDetailGroup) {
-                const newDataDetailGroup = {
-                    success: currentDetailGroup.success,
-                    data: {
-                        ...currentDetailGroup.data,
-                        users_joined: currentDetailGroup.data.users_joined.filter((item) => item.id !== data.data.id),
-                    },
-                };
-                queryClient.setQueryData(['detailgroup'], newDataDetailGroup);
-            }
-            console.log(currentDetailGroup);
-            Swal.fire('Thành công!', data.message, 'success');
+            const id = data.data.id;
+            console.log(data.data);
+            updateStateKickUser(data, id);
         },
         onError: (error) => {
             if (error?.message) {
@@ -127,19 +103,6 @@ const DetailGroup = () => {
     const { mutate: mutateOutGroup, isPending: isPendingOutGroup } = useMutation({
         mutationFn: GroupServices.outGroup,
         onSuccess: (data) => {
-            const currentDetailGroup = queryClient.getQueryData(['detailgroup']);
-
-            if (currentDetailGroup) {
-                const newDataDetailGroup = {
-                    success: currentDetailGroup.success,
-                    data: {
-                        ...currentDetailGroup.data,
-                        users_joined: currentDetailGroup.data.users_joined.filter((item) => item.id !== data.data.id),
-                    },
-                };
-                queryClient.setQueryData(['detailgroup'], newDataDetailGroup);
-            }
-            console.log(currentDetailGroup);
             Swal.fire('Thành công!', data.message, 'success');
             navigate('/group');
         },
@@ -164,6 +127,38 @@ const DetailGroup = () => {
             Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
         },
     });
+
+    const updateStatePost = (data) => {
+        const dataResult = data;
+        const oldData = queryClient.getQueryData(['postsDetailGroup', undefined]);
+        const pages = oldData.pages.map((page) => {
+            const { data } = page;
+            return {
+                ...page,
+                data: [{ ...dataResult.data, created_at: Date.now() }, ...data],
+            };
+        });
+
+        queryClient.setQueryData(['postsDetailGroup', undefined], { ...oldData, pages });
+    };
+    const updateStateKickUser = (data, id) => {
+        const dataResult = data;
+        const oldData = queryClient.getQueryData(['usersDetailGroup', undefined]);
+        const pages = oldData.pages.map((page) => {
+            const { data } = page;
+            const currentPost = data.find((item) => item.id == id);
+            console.log(currentPost);
+            if (currentPost) {
+                return {
+                    ...page,
+                    data: data.filter((item) => item.id !== dataResult.data.id),
+                };
+            }
+            return page;
+        });
+
+        queryClient.setQueryData(['usersDetailGroup', undefined], { ...oldData, pages });
+    };
 
     const handleEmojiClick = (emojiData, event) => {
         setTextMessage((preText) => preText + emojiData.emoji);
@@ -191,6 +186,9 @@ const DetailGroup = () => {
         });
     };
     const handleSubmitPost = async () => {
+        if (textMessage == '') {
+            return Swal.fire('Thất bại!', 'Hãy nhập cảm nghĩ của bạn', 'error');
+        }
         let files = [];
         if (filePost.length !== 0) {
             const resultFilePost = await uploadsServer(filePost);
@@ -299,14 +297,14 @@ const DetailGroup = () => {
                                             />
                                         </div>
                                     ) : (
-                                        <div key={index} className="relative">
+                                        <div key={index} className="relative ml-2">
                                             <IoMdCloseCircle
                                                 onClick={() => handleDeleteFile(index)}
                                                 className="z-[9999] absolute right-0 text-2xl cursor-pointer text-[#6419E6]"
                                             />
                                             <video
                                                 controls
-                                                className="w-[130px] md:w-[180px] h-auto aspect-video md:h-[180px] object-cover"
+                                                className="w-[130px] md:w-[180px] h-[130px] aspect-video md:h-[180px] object-cover"
                                                 src={item.file}
                                                 type={item.type}
                                             />
@@ -389,7 +387,12 @@ const DetailGroup = () => {
                         }
                     >
                         {dataAllPosts.map((item, index) => (
-                            <CardPost group={dataDetailGroup.data} key={index} post={item} nameQuery={['postsDetailGroup', undefined]} />
+                            <CardPost
+                                group={dataDetailGroup.data}
+                                key={index}
+                                post={item}
+                                nameQuery={['postsDetailGroup', undefined]}
+                            />
                         ))}
                     </InfiniteScroll>
                 </div>

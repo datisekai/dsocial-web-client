@@ -49,36 +49,16 @@ const CardPost = ({ post, nameQuery, group }) => {
         return false;
     }, [post]);
     const parentComments = useMemo(() => {
-        return post.comments.filter((item) => item.parent_id == 0);
+        return post.comments.reverse().filter((item) => item.parent_id == 0);
     }, [post]);
 
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createComment,
         onSuccess: (data) => {
-            const currenPost = queryClient.getQueryData(nameQuery);
-
-            if (currenPost) {
-                const newPost = {
-                    pageParams: currenPost.pageParams,
-                    pages: [
-                        {
-                            success: currenPost.pages[0].success,
-                            data: currenPost.pages[0].data.map((item) => {
-                                if (item.id === data.data.post_id) {
-                                    return {
-                                        ...item,
-                                        count_comment: item.count_comment + 1,
-                                        comments: [data.data, ...item.comments],
-                                    };
-                                }
-                                return item;
-                            }),
-                            pagination: currenPost.pages[0].pagination,
-                        },
-                    ],
-                };
-                queryClient.setQueryData(nameQuery, newPost);
-            }
+            const postId = data.data.post_id;
+            const id = data.data.id;
+            const type = 'create-comment';
+            updateState(data, type, postId, id);
             setTextMessage('');
         },
         onError: (error) => {
@@ -92,30 +72,10 @@ const CardPost = ({ post, nameQuery, group }) => {
     const { mutate: mutateReaction, isPending: isPendingReaction } = useMutation({
         mutationFn: PostServices.createReaction,
         onSuccess: (data) => {
-            const currenPost = queryClient.getQueryData(nameQuery);
-
-            if (currenPost) {
-                const newPost = {
-                    pageParams: currenPost.pageParams,
-                    pages: [
-                        {
-                            success: currenPost.pages[0].success,
-                            data: currenPost.pages[0].data.map((item) => {
-                                if (item.id === data.data.post_id) {
-                                    return {
-                                        ...item,
-                                        count_reaction: item.count_reaction + 1,
-                                        reactions: [...item.reactions, data.data],
-                                    };
-                                }
-                                return item;
-                            }),
-                            pagination: currenPost.pages[0].pagination,
-                        },
-                    ],
-                };
-                queryClient.setQueryData(nameQuery, newPost);
-            }
+            const postId = data.data.post_id;
+            const id = data.data.id;
+            const type = 'create-react';
+            updateState(data, type, postId, id);
         },
         onError: (error) => {
             if (error?.message) {
@@ -127,30 +87,10 @@ const CardPost = ({ post, nameQuery, group }) => {
     const { mutate: mutateReactionDel, isPending: isPendingReactionDel } = useMutation({
         mutationFn: PostServices.deleteReaction,
         onSuccess: (data) => {
-            const currenPost = queryClient.getQueryData(nameQuery);
-
-            if (currenPost) {
-                const newPost = {
-                    pageParams: currenPost.pageParams,
-                    pages: [
-                        {
-                            success: currenPost.pages[0].success,
-                            data: currenPost.pages[0].data.map((item) => {
-                                if (item.id === data.data.post_id) {
-                                    return {
-                                        ...item,
-                                        count_reaction: item.count_reaction - 1,
-                                        reactions: item.reactions.filter((item) => item.id !== data.data.id),
-                                    };
-                                }
-                                return item;
-                            }),
-                            pagination: currenPost.pages[0].pagination,
-                        },
-                    ],
-                };
-                queryClient.setQueryData(nameQuery, newPost);
-            }
+            const postId = data.data.post_id;
+            const id = data.data.id;
+            const type = 'delete-react';
+            updateState(data, type, postId, id);
         },
         onError: (error) => {
             if (error?.message) {
@@ -185,6 +125,49 @@ const CardPost = ({ post, nameQuery, group }) => {
             Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
         },
     });
+
+    const updateState = (data, type, postId, reactionId) => {
+        const dataResult = data;
+        const oldData = queryClient.getQueryData(nameQuery);
+        const pages = oldData.pages.map((page) => {
+            const { data } = page;
+            const currentPost = data.find((item) => item.id == postId);
+            if (currentPost) {
+                return {
+                    ...page,
+                    data: data.map((item) => {
+                        if (item.id === postId) {
+                            if (type == 'create-react') {
+                                return {
+                                    ...item,
+                                    count_reaction: item.count_reaction + 1,
+                                    reactions: [...item.reactions, dataResult.data],
+                                };
+                            }
+                            if (type == 'delete-react') {
+                                return {
+                                    ...item,
+                                    count_reaction: item.count_reaction - 1,
+                                    reactions: item.reactions.filter((item) => item.id !== reactionId),
+                                };
+                            }
+                            if (type == 'create-comment') {
+                                return {
+                                    ...item,
+                                    count_comment: item.count_comment + 1,
+                                    comments: [dataResult.data, ...item.comments],
+                                };
+                            }
+                        }
+                        return item;
+                    }),
+                };
+            }
+            return page;
+        });
+
+        queryClient.setQueryData(nameQuery, { ...oldData, pages });
+    };
 
     const updateStatePost = (data, variable) => {
         const oldData = queryClient.getQueryData(nameQuery);
