@@ -14,6 +14,7 @@ import PostServices from '../services/PostService';
 import ProfileServices from '../services/ProfileService';
 import getDate from '../utils/getDate';
 import getImage from '../utils/getImage';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 const UserProfile = () => {
     const { user } = useSelector((state) => state.user);
     const { userId } = useParams();
@@ -189,13 +190,13 @@ const UserProfile = () => {
         <div>
             {!isLoadingProfile && (
                 <div className="relative">
-                    <img
+                    <LazyLoadImage effect='blur'
                         className="w-full h-auto aspect-video md:aspect-auto md:h-[250px] object-cover "
                         src={getImage(dataProfile.data.cover_image)}
                     />
                     <div className="absolute px-4 bottom-[-40px] left-0 right-0 flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <img
+                            <LazyLoadImage effect='blur'
                                 className="rounded-full w-[80px] h-[80px] border-primary border-2"
                                 src={getImage(dataProfile.data.avatar)}
                                 alt=""

@@ -18,6 +18,7 @@ import PostServices from '../services/PostService';
 import { uploadsServer } from '../utils/axiosClient';
 import useInfiniteLoad from '../hooks/useInfiniteLoad';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 const tabs = [
     {
         action: '',
@@ -204,7 +205,7 @@ const DetailGroup = () => {
         <div>
             {!isLoadingDetailGroup && (
                 <div className="relative">
-                    <img
+                    <LazyLoadImage effect='blur'
                         className="w-full h-auto aspect-video md:aspect-auto md:h-[250px] object-cover "
                         src={getImage(dataDetailGroup?.data.cover_image)}
                     />
@@ -226,7 +227,7 @@ const DetailGroup = () => {
                     </div>
                     <div className="absolute px-4 bottom-[-40px] left-0 right-0 flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <img
+                            <LazyLoadImage effect='blur'
                                 className="rounded-full w-[80px] h-[80px] border-primary border-2"
                                 src={getImage(dataDetailGroup?.data.avatar)}
                                 alt=""
@@ -291,7 +292,7 @@ const DetailGroup = () => {
                                                 onClick={() => handleDeleteFile(index)}
                                                 className="absolute right-0 text-2xl cursor-pointer text-[#6419E6]"
                                             />
-                                            <img
+                                            <LazyLoadImage effect='blur'
                                                 className="w-[130px] md:w-[180px] h-auto aspect-square md:h-[180px] object-cover"
                                                 src={item.file}
                                             />
@@ -415,7 +416,7 @@ const DetailGroup = () => {
                         [dataDetailGroup?.data.user_own, ...dataAllUsers]?.map((item, index) => (
                             <div key={index} className="flex items-center justify-between border-b py-2">
                                 <div className="flex items-center gap-2">
-                                    <img
+                                    <LazyLoadImage effect='blur'
                                         className="w-[50px] h-[50px] rounded-full"
                                         src={getImage(item.avatar)}
                                         alt=""

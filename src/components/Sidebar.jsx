@@ -7,6 +7,7 @@ import { BiLogOutCircle } from 'react-icons/bi';
 import { removeTokenAndUser } from '../redux/slices/userSlice';
 import getImage from '../utils/getImage';
 import useUser from '../hooks/useUser';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 const Sidebar = () => {
     const { user, handleLogout } = useUser();
 
@@ -19,7 +20,7 @@ const Sidebar = () => {
             <div className="flex items-center gap-4">
                 <div className="avatar ">
                     <div className="w-12 rounded-full">
-                        <img src={getImage(user?.avatar)} />
+                        <LazyLoadImage effect='blur'  src={getImage(user?.avatar)} />
                     </div>
                 </div>
                 <div>

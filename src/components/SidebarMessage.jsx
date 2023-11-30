@@ -7,6 +7,7 @@ import getImage from '../utils/getImage';
 import { useSelector } from 'react-redux';
 import { SocketContext } from '../contexts/SocketContext';
 import { useMemo } from 'react';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 const SidebarMessage = () => {
     const { data } = useQuery({ queryKey: ['my-messages'], queryFn: MessageService.getMyMessages });
 
@@ -65,7 +66,7 @@ const SidebarMessage = () => {
                                 }`}
                             >
                                 <div className="w-[50px] rounded-full">
-                                    <img src={getImage(item.user_send.avatar)} />
+                                    <LazyLoadImage effect='blur' src={getImage(item.user_send.avatar)} />
                                 </div>
                             </div>
                             <div>

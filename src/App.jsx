@@ -6,6 +6,7 @@ import { privateRoutes, publicRoutes } from './routes';
 import { Fragment } from 'react';
 import 'swiper/css';
 import MainLayout from './layouts/MainLayout';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
 function App() {
     useAuth();

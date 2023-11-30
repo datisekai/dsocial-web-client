@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import GroupServices from '../../services/GroupService';
 import getImage from '../../utils/getImage';
 import Swal from 'sweetalert2';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 const CardGroup = ({ group, isJoin, nameQuery }) => {
     const [currentGroup, setCurrentGroup] = useState(null);
@@ -32,7 +33,7 @@ const CardGroup = ({ group, isJoin, nameQuery }) => {
     return (
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-                <img className="w-[60px] h-[60px] rounded-full " src={getImage(group.avatar)} alt="" />
+                <LazyLoadImage effect='blur' className="w-[60px] h-[60px] rounded-full " src={getImage(group.avatar)} alt="" />
                 <div>
                     <h2 className="text-title">{group.name}</h2>
                     <p>{kFormatter(group.users_joined.length)} thành viên</p>

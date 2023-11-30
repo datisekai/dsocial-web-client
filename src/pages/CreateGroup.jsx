@@ -9,6 +9,7 @@ import { uploadServer } from '../utils/axiosClient';
 import Swal from 'sweetalert2';
 import GroupServices from '../services/GroupService';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 const validateSchema = Yup.object({
     name: Yup.string().required('Vui lòng nhập tên.').max(50, 'Tên không quá 50 kí tự.'),
 });
@@ -92,7 +93,7 @@ const CreateGroup = () => {
                                     onChange={(e) => setCover_Image(e.target.files[0])}
                                     accept="image/*"
                                 />
-                                <img
+                                <LazyLoadImage effect='blur'
                                     className="w-full h-auto aspect-video md:aspect-auto md:h-[250px] object-cover "
                                     src={previewImage}
                                 />
@@ -101,7 +102,7 @@ const CreateGroup = () => {
                             <div className="absolute px-4 bottom-[-40px] left-0 right-0 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <div className="relative">
-                                        <img
+                                        <LazyLoadImage effect='blur'
                                             className="rounded-full w-[80px] h-[80px] border-primary border-2"
                                             src={previewAvatar}
                                             alt=""

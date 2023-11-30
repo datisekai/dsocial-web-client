@@ -11,6 +11,7 @@ import Swal from 'sweetalert2';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { BiDotsVerticalRounded } from 'react-icons/bi';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 const CardReplyComment = ({ comment, commentId, nameQuery, post }) => {
     const [showReply, setShowReply] = useState([]);
     const { user } = useSelector((state) => state.user);
@@ -112,7 +113,7 @@ const CardReplyComment = ({ comment, commentId, nameQuery, post }) => {
                     to={user.id == comment.user_comment.id ? '/profile' : `/profile/${comment.user_comment.id}`}
                     className="w-10 h-10 rounded-full"
                 >
-                    <img src={getImage(comment.user_comment.avatar)} className="w-10 h-10 rounded-full" alt="" />
+                    <LazyLoadImage effect='blur' src={getImage(comment.user_comment.avatar)} className="w-10 h-10 rounded-full" alt="" />
                 </Link>
                 <div className="w-full">
                     <div className="flex justify-between">

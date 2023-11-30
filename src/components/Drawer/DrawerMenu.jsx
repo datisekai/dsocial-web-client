@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import getImage from '../../utils/getImage';
 import useUser from '../../hooks/useUser';
 import { BiLogOutCircle } from 'react-icons/bi';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 const DrawerMenu = ({ visible, onClose }) => {
     const { user, handleLogout } = useUser();
 
@@ -21,7 +22,7 @@ const DrawerMenu = ({ visible, onClose }) => {
                     <div className="flex items-center gap-4">
                         <div className="avatar ">
                             <div className="w-12 rounded-full">
-                                <img src={getImage(user?.avatar)} />
+                                <LazyLoadImage effect='blur' src={getImage(user?.avatar)} />
                             </div>
                         </div>
                         <div>

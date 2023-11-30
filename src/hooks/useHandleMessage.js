@@ -44,11 +44,12 @@ const useHandleMessage = ({ receiveId }) => {
             );
 
             const oldMyMessage = queryClient.getQueryData(['my-messages']) || [];
+            
 
             queryClient.setQueryData(
                 ['my-messages'],
                 oldMyMessage.map((item) =>
-                    item.user_send.id == receiveId
+                    item.user_send.id == receiveId &&  item.last_message.id <= variable
                         ? {
                               ...item,
                               last_message: {

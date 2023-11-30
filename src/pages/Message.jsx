@@ -15,6 +15,7 @@ import { SocketContext } from '../contexts/SocketContext';
 import getImage from '../utils/getImage';
 import CardMessage from '../components/Card/CardMessage';
 import useHandleMessage from '../hooks/useHandleMessage';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 const Message = () => {
     const { user } = useSelector((state) => state.user);
@@ -83,7 +84,7 @@ const Message = () => {
                     <div className="flex items-center py-2 border-b px-4 gap-2 fixed bg-white z-10 right-0 left-0 md:left-[300px] top-[66px]">
                         <div className={`avatar ${isOnline ? 'online' : ''}`}>
                             <div className="w-12 rounded-full">
-                                <img src={getImage(friend?.data.avatar)} />
+                                <LazyLoadImage effect='blur' src={getImage(friend?.data.avatar)} />
                             </div>
                         </div>
                         <div>

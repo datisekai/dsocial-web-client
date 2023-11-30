@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 import { SocketContext } from '../../contexts/SocketContext';
 import MessageService from '../../services/MessageService';
 import getImage from '../../utils/getImage';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 const DrawMessage = ({ visible, onClose }) => {
     const { data } = useQuery({ queryKey: ['my-messages'], queryFn: () => MessageService.getMyMessages() });
@@ -67,7 +68,7 @@ const DrawMessage = ({ visible, onClose }) => {
                                             }`}
                                         >
                                             <div className="w-[50px] rounded-full">
-                                                <img src={getImage(item.user_send.avatar)} />
+                                                <LazyLoadImage effect='blur' src={getImage(item.user_send.avatar)} />
                                             </div>
                                         </div>
                                         <div>
