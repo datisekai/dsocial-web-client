@@ -68,6 +68,9 @@ const Home = () => {
     });
 
     const handleSubmitPost = async () => {
+        if (textMessage == '') {
+            return Swal.fire('Thất bại!', 'Hãy nhập cảm nghĩ của bạn', 'error');
+        }
         let files = [];
         if (filePost.length !== 0) {
             const resultFilePost = await uploadsServer(filePost);
@@ -108,14 +111,14 @@ const Home = () => {
                                     />
                                 </div>
                             ) : (
-                                <div key={index} className="relative">
+                                <div key={index} className="relative ml-2">
                                     <IoMdCloseCircle
                                         onClick={() => handleDeleteFile(index)}
                                         className="z-[9999] absolute right-0 text-2xl cursor-pointer text-[#6419E6]"
                                     />
                                     <video
                                         controls
-                                        className="w-[130px] md:w-[180px] h-auto aspect-video md:h-[180px] object-cover"
+                                        className="w-[130px] md:w-[180px] h-[130px] aspect-video md:h-[180px] object-cover"
                                         src={item.file}
                                         type={item.type}
                                     />

@@ -14,8 +14,6 @@ const CardGroup = ({ group, isJoin, nameQuery }) => {
         mutationFn: GroupServices.joinGroup,
         onSuccess: (data) => {
             const newCurrentGroups = { ...currentGroup, is_joined: data.data.is_joined };
-            updateStateGroupJoined(data, newCurrentGroups);
-            updateStateGroup(data, newCurrentGroups);
             setCurrentGroup(null);
             navigate(`/group/${newCurrentGroups.id}`);
         },
@@ -26,47 +24,6 @@ const CardGroup = ({ group, isJoin, nameQuery }) => {
             Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
         },
     });
-    const updateStateGroupJoined = (data, newCurrentGroups) => {
-        const oldData = queryClient.getQueryData(['joinGroup', undefined]);
-        const pages = oldData.pages.map((page) => {
-            const { data } = page;
-            const currentGroup = data.find((item) => item.id == newCurrentGroups.id);
-            if (currentGroup) {
-                return {
-                    ...page,
-                    data: [newCurrentGroups, ...data],
-                };
-            }
-            return page;
-        });
-
-        queryClient.setQueryData(nameQuery, { ...oldData, pages });
-    };
-
-    const updateStateGroup = (data, newCurrentGroups) => {
-        const oldData = queryClient.getQueryData(nameQuery);
-        const pages = oldData.pages.map((page) => {
-            const { data } = page;
-            const currentGroup = data.find((item) => item.id == newCurrentGroups.id);
-            if (currentGroup) {
-                return {
-                    ...page,
-                    data: data.map((item) => {
-                        if (item.id === postId) {
-                            return {
-                                ...item,
-                                is_joined: newCurrentGroups.is_joined,
-                            };
-                        }
-                        return item;
-                    }),
-                };
-            }
-            return page;
-        });
-
-        queryClient.setQueryData(nameQuery, { ...oldData, pages });
-    };
 
     const handleSubmit = (values) => {
         setCurrentGroup(values);
