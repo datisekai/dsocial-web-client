@@ -16,13 +16,13 @@ const CardMessage = ({ data }) => {
 
     const { id } = useParams();
 
-    const {handleRecallMessage} = useHandleMessage({ receiveId: id });
+    const { handleRecallMessage } = useHandleMessage({ receiveId: id });
 
     return (
         <div className={`chat ${typeChat}`}>
             <div className="chat-image avatar">
                 <div className="w-12 rounded-full">
-                    <LazyLoadImage effect='blur' src={getImage(data.user_send.avatar)} />
+                    <LazyLoadImage effect="blur" src={getImage(data.user_send.avatar)} />
                 </div>
             </div>
             <div className="chat-header">
@@ -30,9 +30,10 @@ const CardMessage = ({ data }) => {
                 <time className="text-xs opacity-50 ml-2">{calculateCreatedTime(data.created_at)}</time>
             </div>
             <div className="chat-bubble relative">
-                {data.type == 'text' && <p>{data.content}</p>}
-                {data.type == 'image' && <LazyLoadImage effect='blur' src={getImage(data.content)} />}
-                {data.type == 'video' && (
+                {!data.is_active && <p>{data.content}</p>}
+                {data.type == 'text' && data.is_active && <p>{data.content}</p>}
+                {data.type == 'image' && data.is_active && <LazyLoadImage effect="blur" src={getImage(data.content)} />}
+                {data.type == 'video' && data.is_active && (
                     <video controls>
                         <source src={getVideo(data.content)} type="video/mp4" />
                     </video>
@@ -40,7 +41,11 @@ const CardMessage = ({ data }) => {
             </div>
             {user?.id == data.user_send.id && (
                 <div className="chat-footer opacity-50 flex gap-2">
-                    {data.is_active && <div className="link link-hover" onClick={() => handleRecallMessage(data.id)}>Thu hồi</div>}
+                    {data.is_active && (
+                        <div className="link link-hover" onClick={() => handleRecallMessage(data.id)}>
+                            Thu hồi
+                        </div>
+                    )}
                     {/* <div>{data.is_seen ? 'Đã xem' : 'Đã gửi'}</div> */}
                 </div>
             )}
