@@ -45,7 +45,7 @@ const DrawMessage = ({ visible, onClose }) => {
                                 type="text"
                                 value={text}
                                 onChange={(e) => setText(e.target.value)}
-                                placeholder="Tìm kiếm tin nhắn"
+                                placeholder="Tìm kiếm người liên hệ"
                                 className="input input-bordered input-sm w-full max-w-xs"
                             />
                         </div>
