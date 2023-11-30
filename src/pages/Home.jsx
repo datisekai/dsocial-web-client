@@ -45,7 +45,6 @@ const Home = () => {
             updateStatePost(data);
             setTextMessage('');
             setFilePost([]);
-            // Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -64,8 +63,8 @@ const Home = () => {
                 data: [{ ...dataResult.data, created_at: Date.now() }, ...data],
             };
         });
-
         queryClient.setQueryData(['postsHome', undefined], { ...oldData, pages });
+        Swal.fire('Thành công!', data.message, 'success');
     };
 
     const handleSubmitPost = async () => {
@@ -86,9 +85,7 @@ const Home = () => {
     return (
         <div className=" px-4 py-2">
             <h1 className="text-primary font-bold">Trang chủ</h1>
-            <div className="mt-2">
-                {/* <Feed /> */}
-            </div>
+            <div className="mt-2">{/* <Feed /> */}</div>
             <div className="mt-4 bg-base-200 p-4 rounded">
                 <div className="bg-base-100 rounded">
                     <textarea
@@ -106,7 +103,8 @@ const Home = () => {
                                         onClick={() => handleDeleteFile(index)}
                                         className="absolute right-0 text-2xl cursor-pointer text-[#6419E6]"
                                     />
-                                    <LazyLoadImage effect='blur'
+                                    <LazyLoadImage
+                                        effect="blur"
                                         className="w-[130px] md:w-[180px] h-auto aspect-square md:h-[180px] object-cover"
                                         src={item.file}
                                     />

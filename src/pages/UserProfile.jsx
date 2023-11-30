@@ -77,7 +77,6 @@ const UserProfile = () => {
                 };
                 queryClient.setQueryData(['myfriendRequests', user.id], newDataMyFriendRequest);
             }
-            // Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -163,7 +162,6 @@ const UserProfile = () => {
 
                 dispatch(reloadMyFriend());
             }
-            // Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
             if (error?.message) {
@@ -190,13 +188,15 @@ const UserProfile = () => {
         <div>
             {!isLoadingProfile && (
                 <div className="relative">
-                    <LazyLoadImage effect='blur'
+                    <LazyLoadImage
+                        effect="blur"
                         className="w-full h-auto aspect-video md:aspect-auto md:h-[250px] object-cover "
                         src={getImage(dataProfile.data.cover_image)}
                     />
                     <div className="absolute px-4 bottom-[-40px] left-0 right-0 flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <LazyLoadImage effect='blur'
+                            <LazyLoadImage
+                                effect="blur"
                                 className="rounded-full w-[80px] h-[80px] border-primary border-2"
                                 src={getImage(dataProfile.data.avatar)}
                                 alt=""
