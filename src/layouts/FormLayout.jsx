@@ -45,11 +45,11 @@ const FormLayout = ({ children }) => {
                         </div>
                         <div className="p-4 md:pl-20">
                             <div className="py-2">{children}</div>
-                            <div className="border-t py-2">
+                            {/* <div className="border-t py-2">
                                 <button className="btn">
                                     <FcGoogle className="text-xl" /> Đăng nhập Google
                                 </button>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>

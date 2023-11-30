@@ -58,7 +58,7 @@ const ChangePasswordModal = ({ visible = false, onClose }) => {
                                 <div className="mt-4">
                                     <span className="font-medium">Mật khẩu mới</span>
                                     <Field
-                                        placeholder="Mật khẩu cũ"
+                                        placeholder="Mật khẩu mới"
                                         type="text"
                                         name="newPassword"
                                         className="input mt-1 input-bordered w-full"
@@ -68,7 +68,7 @@ const ChangePasswordModal = ({ visible = false, onClose }) => {
                                 <div className="mt-4">
                                     <span className="font-medium">Nhập lại mật khẩu mới</span>
                                     <Field
-                                        placeholder="Mật khẩu cũ"
+                                        placeholder="Mật khẩu mới"
                                         type="text"
                                         name="confirm"
                                         className="input mt-1 input-bordered w-full"

@@ -83,7 +83,7 @@ const Home = () => {
         <div className=" px-4 py-2">
             <h1 className="text-primary font-bold">Trang chủ</h1>
             <div className="mt-2">
-                <Feed />
+                {/* <Feed /> */}
             </div>
             <div className="mt-4 bg-base-200 p-4 rounded">
                 <div className="bg-base-100 rounded">
