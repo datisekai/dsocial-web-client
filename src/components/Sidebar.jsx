@@ -30,7 +30,9 @@ const Sidebar = () => {
                         placeholder="Tìm kiếm trên DSocial"
                         onKeyUp={(e) => {
                             if (e.code == 'Enter') {
-                                navigate(`/search?query=${searchText}`);
+                                if (searchText != '') {
+                                    navigate(`/search?query=${searchText}`);
+                                }
                             }
                         }}
                         className="input input-bordered input-sm w-full max-w-xs"
