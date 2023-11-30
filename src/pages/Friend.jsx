@@ -42,36 +42,11 @@ const Friend = () => {
     const { mutate: mutateAcceptFriend, isPending: isPendingAcceptF } = useMutation({
         mutationFn: FriendServices.acceptFriend,
         onSuccess: (data) => {
-            const currentFriend = queryClient.getQueryData(['friends', undefined]);
-            const currentFriendResq = queryClient.getQueryData(['friendRequests', undefined]);
-            if (currentFriend) {
-                const newDataFriend = {
-                    pageParams: currentFriend.pageParams,
-                    pages: [
-                        {
-                            success: currentFriend.pages[0].success,
-                            data: [data.data, ...currentFriend.pages[0].data],
-                            pagination: currentFriend.pages[0].pagination,
-                        },
-                    ],
-                };
+            const type = 'delete-friendRequest';
+            const id = data.data.id;
+            updateStateFriend(data, id);
 
-                queryClient.setQueryData(['friends', undefined], newDataFriend);
-                if (currentFriendResq) {
-                    const newDataFriendRequest = {
-                        pageParams: currentFriendResq.pageParams,
-                        pages: [
-                            {
-                                success: currentFriendResq.pages[0].success,
-                                data: currentFriendResq.pages[0].data.filter((item) => item.id !== data.data.id),
-                                pagination: currentFriendResq.pages[0].pagination,
-                            },
-                        ],
-                    };
-                    queryClient.setQueryData(['friendRequests', undefined], newDataFriendRequest);
-                }
-            }
-            console.log(data);
+            updateStateDelete(data, id, type);
             Swal.fire('Thành công!', data.message, 'success');
         },
         onError: (error) => {
@@ -85,22 +60,9 @@ const Friend = () => {
     const { mutate: mutateDelFriendReq, isPending: isPendingDelFResq } = useMutation({
         mutationFn: FriendServices.deleteFriendRequest,
         onSuccess: (data) => {
-            const currentFriendResq = queryClient.getQueryData(['friendRequests', undefined]);
-            console.log(data.data, currentFriendResq);
-            if (currentFriendResq) {
-                const newDataFriendRequest = {
-                    pageParams: currentFriendResq.pageParams,
-                    pages: [
-                        {
-                            success: currentFriendResq.pages[0].success,
-                            data: currentFriendResq.pages[0].data.filter((item) => item.id !== data.data.id),
-                            pagination: currentFriendResq.pages[0].pagination,
-                        },
-                    ],
-                };
-                queryClient.setQueryData(['friendRequests', undefined], newDataFriendRequest);
-            }
-            Swal.fire('Thành công!', data.message, 'success');
+            const type = 'delete-friendRequest';
+            const id = data.data.id;
+            updateStateDelete(data, id, type);
         },
         onError: (error) => {
             if (error?.message) {
@@ -113,21 +75,9 @@ const Friend = () => {
     const { mutate: mutateDelFriend, isPending: isPendingDelF } = useMutation({
         mutationFn: FriendServices.deleteFriend,
         onSuccess: (data) => {
-            const currentFriend = queryClient.getQueryData(['friends', undefined]);
-            if (currentFriend) {
-                const newDataFriend = {
-                    pageParams: currentFriend.pageParams,
-                    pages: [
-                        {
-                            success: currentFriend.pages[0].success,
-                            data: currentFriend.pages[0].data.filter((item) => item.id !== data.data.id),
-                            pagination: currentFriend.pages[0].pagination,
-                        },
-                    ],
-                };
-                queryClient.setQueryData(['friends', undefined], newDataFriend);
-            }
-            Swal.fire('Thành công!', data.message, 'success');
+            const type = 'delete-friend';
+            const id = data.data.id;
+            updateStateDelete(data, id, type);
         },
         onError: (error) => {
             if (error?.message) {
@@ -136,6 +86,39 @@ const Friend = () => {
             Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
         },
     });
+
+    const updateStateFriend = (data, id) => {
+        const dataResult = data;
+        const oldData = queryClient.getQueryData(['friends', undefined]);
+        const pages = oldData.pages.map((page) => {
+            const { data } = page;
+            return {
+                ...page,
+                data: [dataResult.data, ...data],
+            };
+
+            return page;
+        });
+
+        queryClient.setQueryData(['friends', undefined], { ...oldData, pages });
+    };
+
+    const updateStateDelete = (data, id, type) => {
+        const oldData = queryClient.getQueryData([type == 'delete-friend' ? 'friends' : 'friendRequests', undefined]);
+        const pages = oldData.pages.map((page) => {
+            const { data } = page;
+            const currentPost = data.find((item) => item.id == id);
+            if (currentPost) {
+                return { ...page, data: data.filter((item) => item.id !== id) };
+            }
+            return page;
+        });
+
+        queryClient.setQueryData([type == 'delete-friend' ? 'friends' : 'friendRequests', undefined], {
+            ...oldData,
+            pages,
+        });
+    };
 
     const handleAcceptFriend = (values) => {
         mutateAcceptFriend(values.id);

@@ -89,7 +89,6 @@ const DetailGroup = () => {
         mutationFn: GroupServices.kickUser,
         onSuccess: (data) => {
             const id = data.data.id;
-            console.log(data.data);
             updateStateKickUser(data, id);
         },
         onError: (error) => {
