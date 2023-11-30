@@ -96,8 +96,6 @@ const Friend = () => {
                 ...page,
                 data: [dataResult.data, ...data],
             };
-
-            return page;
         });
 
         queryClient.setQueryData(['friends', undefined], { ...oldData, pages });

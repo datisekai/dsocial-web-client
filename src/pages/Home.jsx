@@ -41,20 +41,7 @@ const Home = () => {
     const { mutate, isPending } = useMutation({
         mutationFn: PostServices.createPost,
         onSuccess: (data) => {
-            const currenPostHome = queryClient.getQueryData(['postsHome', undefined]);
-            if (currenPostHome) {
-                const newPostHome = {
-                    pageParams: currenPostHome.pageParams,
-                    pages: [
-                        {
-                            success: currenPostHome.pages[0].success,
-                            data: [{ ...data.data, created_at: Date.now() }, ...currenPostHome.pages[0].data],
-                            pagination: currenPostHome.pages[0].pagination,
-                        },
-                    ],
-                };
-                queryClient.setQueryData(['postsHome', undefined], newPostHome);
-            }
+            updateStatePost(data);
             setTextMessage('');
             setFilePost([]);
             // Swal.fire('Thành công!', data.message, 'success');
@@ -66,6 +53,19 @@ const Home = () => {
             Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
         },
     });
+    const updateStatePost = (data) => {
+        const dataResult = data;
+        const oldData = queryClient.getQueryData(['postsHome', undefined]);
+        const pages = oldData.pages.map((page) => {
+            const { data } = page;
+            return {
+                ...page,
+                data: [{ ...dataResult.data, created_at: Date.now() }, ...data],
+            };
+        });
+
+        queryClient.setQueryData(['postsHome', undefined], { ...oldData, pages });
+    };
 
     const handleSubmitPost = async () => {
         if (textMessage == '') {
