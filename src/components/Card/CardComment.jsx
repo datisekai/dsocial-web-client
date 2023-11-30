@@ -12,6 +12,7 @@ import PostServices from '../../services/PostService';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { BiDotsVerticalRounded } from 'react-icons/bi';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 const CardComment = ({ comment, post, nameQuery }) => {
     const inputRef = React.useRef(null);
 
@@ -112,7 +113,7 @@ const CardComment = ({ comment, post, nameQuery }) => {
                 to={user.id == comment.user_comment.id ? '/profile' : `/profile/${comment.user_comment.id}`}
                 className="w-10 h-10 rounded-full"
             >
-                <img src={getImage(comment.user_comment.avatar)} className="w-10 h-10 rounded-full" alt="" />
+                <LazyLoadImage effect='blur' src={getImage(comment.user_comment.avatar)} className="w-10 h-10 rounded-full" alt="" />
             </Link>
             <div className="w-full">
                 <div className="flex justify-between">

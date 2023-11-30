@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import getImage from '../../utils/getImage';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 const CardFriend = ({ avatar, name, id, isMessage, disableOnline  }) => {
     return (
@@ -8,7 +9,7 @@ const CardFriend = ({ avatar, name, id, isMessage, disableOnline  }) => {
             <div className="flex items-center gap-4">
                 <div className={`avatar ${!disableOnline ? 'online' : ''}`}>
                     <div className="w-14 rounded-full">
-                        <img src={getImage(avatar)} />
+                        <LazyLoadImage effect='blur' src={getImage(avatar)} />
                     </div>
                 </div>
                 <span className="hover:font-medium">{name}</span>

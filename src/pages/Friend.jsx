@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import getImage from '../utils/getImage';
 import useInfiniteLoad from '../hooks/useInfiniteLoad';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 const tabs = [
     {
@@ -168,7 +169,7 @@ const Friend = () => {
                                     <div key={index} className="flex items-center justify-between">
                                         <Link to={`/profile/${item.id}`} className="link link-hover">
                                             <div className="flex items-center gap-2">
-                                                <img
+                                                <LazyLoadImage effect='blur'
                                                     className="rounded-full w-[70px] h-[70px]"
                                                     src={`${getImage(item.avatar)}`}
                                                     alt=""
@@ -222,7 +223,7 @@ const Friend = () => {
                                         <div className="flex items-center justify-between " key={index}>
                                             <Link to={`/profile/${item.id}`} className="link link-hover">
                                                 <div className="flex items-center gap-2">
-                                                    <img
+                                                    <LazyLoadImage effect='blur'
                                                         className="rounded-full w-[70px] h-[70px]"
                                                         src={`${getImage(item.avatar)}`}
                                                         alt=""

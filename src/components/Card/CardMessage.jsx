@@ -4,6 +4,7 @@ import calculateCreatedTime from '../../utils/calculateCreatedTime';
 import getImage, { getVideo } from '../../utils/getImage';
 import useHandleMessage from '../../hooks/useHandleMessage';
 import { useParams } from 'react-router-dom';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 const CardMessage = ({ data }) => {
     const { user } = useSelector((state) => state.user);
@@ -21,7 +22,7 @@ const CardMessage = ({ data }) => {
         <div className={`chat ${typeChat}`}>
             <div className="chat-image avatar">
                 <div className="w-12 rounded-full">
-                    <img src={getImage(data.user_send.avatar)} />
+                    <LazyLoadImage effect='blur' src={getImage(data.user_send.avatar)} />
                 </div>
             </div>
             <div className="chat-header">
@@ -30,7 +31,7 @@ const CardMessage = ({ data }) => {
             </div>
             <div className="chat-bubble relative">
                 {data.type == 'text' && <p>{data.content}</p>}
-                {data.type == 'image' && <img src={getImage(data.content)} />}
+                {data.type == 'image' && <LazyLoadImage effect='blur' src={getImage(data.content)} />}
                 {data.type == 'video' && (
                     <video controls>
                         <source src={getVideo(data.content)} type="video/mp4" />

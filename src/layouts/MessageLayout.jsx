@@ -55,11 +55,12 @@ const MessageLayout = ({ children }) => {
         );
 
         const oldMyMessage = queryClient.getQueryData(['my-messages']) || [];
+        
 
         queryClient.setQueryData(
             ['my-messages'],
             oldMyMessage.map((item) =>
-                item.user_send.id == authorId
+                item.user_send.id == authorId && item.last_message.id <= messageId
                     ? {
                           ...item,
                           last_message: {

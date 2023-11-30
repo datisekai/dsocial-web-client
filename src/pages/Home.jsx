@@ -13,6 +13,7 @@ import { uploadsServer } from '../utils/axiosClient';
 import Swal from 'sweetalert2';
 import useInfiniteLoad from '../hooks/useInfiniteLoad';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 const Home = () => {
     const { user } = useSelector((state) => state.user);
     const inputRef = React.useRef(null);
@@ -86,7 +87,7 @@ const Home = () => {
         <div className=" px-4 py-2">
             <h1 className="text-primary font-bold">Trang chủ</h1>
             <div className="mt-2">
-                <Feed />
+                {/* <Feed /> */}
             </div>
             <div className="mt-4 bg-base-200 p-4 rounded">
                 <div className="bg-base-100 rounded">
@@ -105,7 +106,7 @@ const Home = () => {
                                         onClick={() => handleDeleteFile(index)}
                                         className="absolute right-0 text-2xl cursor-pointer text-[#6419E6]"
                                     />
-                                    <img
+                                    <LazyLoadImage effect='blur'
                                         className="w-[130px] md:w-[180px] h-auto aspect-square md:h-[180px] object-cover"
                                         src={item.file}
                                     />
