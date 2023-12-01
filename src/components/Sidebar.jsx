@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 
+import { BiLogOutCircle } from 'react-icons/bi';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { NavLink, useNavigate } from 'react-router-dom';
 import tabs from '../data/tabs';
-import { BiLogOutCircle } from 'react-icons/bi';
-import { removeTokenAndUser } from '../redux/slices/userSlice';
-import getImage from '../utils/getImage';
 import useUser from '../hooks/useUser';
-import { LazyLoadImage } from 'react-lazy-load-image-component';
+import getImage from '../utils/getImage';
 const Sidebar = () => {
     const { user, handleLogout } = useUser();
 
@@ -20,7 +18,7 @@ const Sidebar = () => {
             <div className="flex items-center gap-4">
                 <div className="avatar ">
                     <div className="w-12 rounded-full">
-                        <LazyLoadImage effect='blur'  src={getImage(user?.avatar)} />
+                        <LazyLoadImage effect="blur" src={getImage(user?.avatar)} />
                     </div>
                 </div>
                 <div>
@@ -30,10 +28,8 @@ const Sidebar = () => {
                         onChange={(e) => setSearchText(e.target.value)}
                         placeholder="Tìm kiếm trên DSocial"
                         onKeyUp={(e) => {
-                            if (e.code == 'Enter') {
-                                if (searchText != '') {
-                                    navigate(`/search?query=${searchText}`);
-                                }
+                            if (e.code == 'Enter' && searchText.trim().length !== 0) {
+                                navigate(`/search?query=${searchText}`);
                             }
                         }}
                         className="input input-bordered input-sm w-full max-w-xs"

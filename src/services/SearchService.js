@@ -9,7 +9,11 @@ const SearchServices = {
         return result.data;
     },
     searchPosts: async ({ pageParam, q }) => {
-        const result = await axiosClient.get(`/search/post?page=${pageParam}&q=${q}`);
+        const result = await axiosClient.get(`/search/post?page=${pageParam}&q=${q}&limit=2`);
+        return result.data;
+    },
+    searchFriends: async ({ pageParam, q }) => {
+        const result = await axiosClient.get(`/search/friend?page=${pageParam}&q=${q}`);
         return result.data;
     },
 };

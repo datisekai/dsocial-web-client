@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import useQueryParams from '../hooks/useQueryParams';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { kFormatter } from '../utils/common';
 import CardGroup from '../components/Card/CardGroup';
 import { useQuery } from '@tanstack/react-query';
@@ -26,6 +26,7 @@ const Group = () => {
     const query = useQueryParams();
     const action = query.get('action') || '';
     const [text, setText] = React.useState('');
+    const navigate = useNavigate()
 
     const {
         data: dataAllGroups,
@@ -57,6 +58,21 @@ const Group = () => {
                 </Link>
             </div>
 
+            <div className="flex justify-between md:items-center flex-col md:flex-row items-start ">
+                <input
+                    type="text"
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    placeholder="Tìm kiếm nhóm"
+                    onKeyUp={(e) => {
+                        if (e.code == 'Enter' && text.trim().length !== 0) {
+                            navigate(`/search?query=${text}&action=group`);
+                        }
+                    }}
+                    className="input input-bordered mt-2 md:mt-0 input-sm w-full max-w-xs"
+                />
+            </div>
+
             <div className="flex items-center gap-2 flex-wrap mt-4">
                 {tabs.map((tab, index) => (
                     <Link key={index} to={tab.action ? `/group?action=${tab.action}` : '/group'}>
@@ -73,7 +89,6 @@ const Group = () => {
                     next={fetchNextPageAllGroups}
                     hasMore={hasNextpageAllGroups}
                     className="mt-8 space-y-2 no-scrollbar"
-                    
                     loader={
                         <div className="my-2 flex justify-center">
                             <span className="loading loading-dots loading-md"></span>
