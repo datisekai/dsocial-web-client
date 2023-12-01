@@ -113,7 +113,12 @@ const CardReplyComment = ({ comment, commentId, nameQuery, post }) => {
                     to={user.id == comment.user_comment.id ? '/profile' : `/profile/${comment.user_comment.id}`}
                     className="w-10 h-10 rounded-full"
                 >
-                    <LazyLoadImage effect='blur' src={getImage(comment.user_comment.avatar)} className="w-10 h-10 rounded-full" alt="" />
+                    <LazyLoadImage
+                        effect="blur"
+                        src={getImage(comment.user_comment.avatar)}
+                        className="w-10 h-10 rounded-full"
+                        alt=""
+                    />
                 </Link>
                 <div className="w-full">
                     <div className="flex justify-between">
@@ -179,11 +184,13 @@ const CardReplyComment = ({ comment, commentId, nameQuery, post }) => {
                                             placement="bottom"
                                             render={(attrs) => (
                                                 <div {...attrs} className="mb-2">
-                                                    <EmojiPicker
-                                                        emojiVersion={'1.0'}
-                                                        height={'350px'}
-                                                        onEmojiClick={handleEmojiClick}
-                                                    />
+                                                    {showEmoji && (
+                                                        <EmojiPicker
+                                                            emojiVersion={'1.0'}
+                                                            height={'350px'}
+                                                            onEmojiClick={handleEmojiClick}
+                                                        />
+                                                    )}
                                                 </div>
                                             )}
                                         >

@@ -84,7 +84,7 @@ const Message = () => {
                     <div className="flex items-center py-2 border-b px-4 gap-2 fixed bg-white z-10 right-0 left-0 md:left-[300px] top-[66px]">
                         <div className={`avatar ${isOnline ? 'online' : ''}`}>
                             <div className="w-12 rounded-full">
-                                <LazyLoadImage effect='blur' src={getImage(friend?.data.avatar)} />
+                                <LazyLoadImage effect="blur" src={getImage(friend?.data.avatar)} />
                             </div>
                         </div>
                         <div>
@@ -136,11 +136,13 @@ const Message = () => {
                                             placement="top-start"
                                             render={(attrs) => (
                                                 <div {...attrs} className="mb-2">
-                                                    <EmojiPicker
-                                                        emojiVersion={'1.0'}
-                                                        height={'350px'}
-                                                        onEmojiClick={handleEmojiClick}
-                                                    />
+                                                    {showEmoji && (
+                                                        <EmojiPicker
+                                                            emojiVersion={'1.0'}
+                                                            height={'350px'}
+                                                            onEmojiClick={handleEmojiClick}
+                                                        />
+                                                    )}
                                                 </div>
                                             )}
                                         >

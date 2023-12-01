@@ -1,21 +1,19 @@
-import React, { useMemo, useState } from 'react';
-import getImage from '../../utils/getImage';
-import calculateCreatedTime from '../../utils/calculateCreatedTime';
-import { AiOutlineHeart, AiOutlineShareAlt, AiFillHeart } from 'react-icons/ai';
-import { BsArrowReturnRight, BsShare } from 'react-icons/bs';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Tippy from '@tippyjs/react/headless';
 import EmojiPicker from 'emoji-picker-react';
+import React, { useMemo, useState } from 'react';
+import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { BiCommentDetail, BiDotsVerticalRounded } from 'react-icons/bi';
 import { PiSmileyWinkLight } from 'react-icons/pi';
-import { useSelector } from 'react-redux';
-import Swal from 'sweetalert2';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import PostServices from '../../services/PostService';
-import { Link } from 'react-router-dom';
-import CardComment from './CardComment';
-import useUser from '../../hooks/useUser';
-import UpdatePostModal from '../Modal/UpdatePostModal';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import { Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import useUser from '../../hooks/useUser';
+import PostServices from '../../services/PostService';
+import calculateCreatedTime from '../../utils/calculateCreatedTime';
+import getImage from '../../utils/getImage';
+import UpdatePostModal from '../Modal/UpdatePostModal';
+import CardComment from './CardComment';
 
 const CardPost = ({ post, nameQuery, group }) => {
     const [isShowFullImage, setIsShowFullImage] = useState(false);
@@ -242,18 +240,26 @@ const CardPost = ({ post, nameQuery, group }) => {
                         <Link to={user.id == post.user_post.id ? '/profile' : `/profile/${post.user_post.id}`}>
                             <div className="avatar">
                                 <div className="w-12 rounded-full">
-                                    <LazyLoadImage effect='blur' src={getImage(post.user_post.avatar)} />
+                                    <LazyLoadImage effect="blur" src={getImage(post.user_post.avatar)} />
                                 </div>
                             </div>
                         </Link>
                     ) : (
                         <div className="relative">
                             <Link to={`/group/${post.group.id}`}>
-                                <LazyLoadImage effect='blur' className="w-10 h-10 rounded-full" src={getImage(post.group.avatar)} />
+                                <LazyLoadImage
+                                    effect="blur"
+                                    className="w-10 h-10 rounded-full"
+                                    src={getImage(post.group.avatar)}
+                                />
                             </Link>
                             <Link to={user.id == post.user_post.id ? '/profile' : `/profile/${post.user_post.id}`}>
                                 <div className="absolute right-[-4px] bottom-[-4px] border border-primary rounded-full">
-                                    <LazyLoadImage effect='blur' className="w-6 h-6 rounded-full" src={getImage(post.user_post.avatar)} />
+                                    <LazyLoadImage
+                                        effect="blur"
+                                        className="w-6 h-6 rounded-full"
+                                        src={getImage(post.user_post.avatar)}
+                                    />
                                 </div>
                             </Link>
                         </div>
@@ -336,7 +342,8 @@ const CardPost = ({ post, nameQuery, group }) => {
                                 src={getImage(item.src)}
                             />
                         ) : (
-                            <LazyLoadImage effect='blur'
+                            <LazyLoadImage
+                                effect="blur"
                                 src={getImage(item.src)}
                                 key={index}
                                 className="w-full h-[250px] object-cover aspect-video"
@@ -397,11 +404,13 @@ const CardPost = ({ post, nameQuery, group }) => {
                                     placement="bottom"
                                     render={(attrs) => (
                                         <div {...attrs} className="mb-2">
-                                            <EmojiPicker
-                                                emojiVersion={'1.0'}
-                                                height={'350px'}
-                                                onEmojiClick={handleEmojiClick}
-                                            />
+                                            {showEmoji && (
+                                                <EmojiPicker
+                                                    emojiVersion={'1.0'}
+                                                    height={'350px'}
+                                                    onEmojiClick={handleEmojiClick}
+                                                />
+                                            )}
                                         </div>
                                     )}
                                 >

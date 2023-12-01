@@ -12,6 +12,7 @@ const useInfiniteLoad = (getData, queryKey, propsId, keySearch) => {
         isFetchingPreviousPage,
         data,
         isFetching,
+        isLoading
     } = useInfiniteQuery({
         queryKey: [queryKey, keySearch],
         queryFn: ({
@@ -38,6 +39,7 @@ const useInfiniteLoad = (getData, queryKey, propsId, keySearch) => {
         }, []);
     }, [data]);
     return {
+        isLoading,
         fetchNextPage,
         hasNextPage,
         data: dataAllPages,

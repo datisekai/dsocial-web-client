@@ -7,8 +7,17 @@ import CardGroup from '../components/Card/CardGroup';
 import useInfiniteLoad from '../hooks/useInfiniteLoad';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import SearchServices from '../services/SearchService';
+import PeopleList from '../components/PeopleList';
+import PostList from '../components/PostList';
+import GroupList from '../components/GroupList';
+import FriendList from '../components/FriendList';
+import { useNavigate } from 'react-router-dom';
 
 const tabs = [
+    {
+        action: 'friend',
+        title: 'Bạn bè',
+    },
     {
         action: 'people',
         title: 'Mọi người',
@@ -23,114 +32,35 @@ const tabs = [
     },
 ];
 const Search = () => {
-    const query = useQueryParams();
+    const queryParams = useQueryParams();
 
-    const [action, setAction] = useState(tabs[0].action);
-    const {
-        data: dataPeople,
-        isFetchingNextPage: isLoadingPeople,
-        hasNextPage: hasNextpagedataPeople,
-        fetchNextPage: fetchNextPagePeople,
-    } = useInfiniteLoad(SearchServices.searchPeople, 'peopleSearch', null, query.get('query'));
-    const {
-        data: dataGroup,
-        isFetchingNextPage: isLoadingdataGroup,
-        hasNextPage: hasNextpagedataGroup,
-        fetchNextPage: fetchNextPagedataGroup,
-    } = useInfiniteLoad(SearchServices.searchGroups, 'groupSearch', null, query.get('query'));
-    const {
-        data: dataPost,
-        isFetchingNextPage: isLoadingdataPost,
-        hasNextPage: hasNextpagedataPost,
-        fetchNextPage: fetchNextPagedataPost,
-    } = useInfiniteLoad(SearchServices.searchPosts, 'postSearch', null, query.get('query'));
+    const query = queryParams.get('query');
+    const action = queryParams.get('tab') || 'friend'
+    // const [action, setAction] = useState(tab);
+    const navigate = useNavigate()
 
     return (
         <div className="px-4 py-2">
-            <h1>Kết quả tìm kiếm của "{query.get('query')}"</h1>
+            {query && <h1>Kết quả tìm kiếm của "{query}"</h1>}
             <div className="flex items-center gap-2 flex-wrap mt-4">
                 {tabs.map((tab, index) => (
                     <button
                         key={index}
-                        onClick={() => setAction(tab.action)}
+                        onClick={() => navigate(`?query=${query}&tab=${tab.action}`)}
                         className={`btn btn-sm normal-case ${tab.action == action ? 'btn-primary' : ''}`}
                     >
-                        {tab.title}
+                        {tab.title} 
                     </button>
                 ))}
             </div>
 
-            {action == 'people' && !isLoadingPeople && (
-                <InfiniteScroll
-                    dataLength={dataPeople.length}
-                    next={fetchNextPagePeople}
-                    hasMore={hasNextpagedataPeople}
-                    className="mt-8"
-                    loader={
-                        <div className="my-2 flex justify-center">
-                            <span className="loading loading-dots loading-md"></span>
-                        </div>
-                    }
-                >
-                    {dataPeople.length > 0 ? (
-                        dataPeople.map((item, index) => (
-                            <div className="mt-4" key={index}>
-                                <CardFriend key={item.id} disableOnline={true} {...item} />
-                            </div>
-                        ))
-                    ) : (
-                        <div>Không có người dùng nào</div>
-                    )}
-                </InfiniteScroll>
-            )}
+            {action == 'friend' && <FriendList query={query} />}
 
-            {action == 'post' && !isLoadingdataPost && (
-                <InfiniteScroll
-                    dataLength={dataPost.length}
-                    next={fetchNextPagedataPost}
-                    hasMore={hasNextpagedataPost}
-                    className="mt-8"
-                    loader={
-                        <div className="my-2 flex justify-center">
-                            <span className="loading loading-dots loading-md"></span>
-                        </div>
-                    }
-                >
-                    {dataPost.length > 0 ? (
-                        dataPost.map((item, index) => (
-                            <div className="mt-4" key={index}>
-                                <CardPost key={item.id} nameQuery={'postSearch'} post={item} />
-                            </div>
-                        ))
-                    ) : (
-                        <div>Không có bài viết nào</div>
-                    )}
-                </InfiniteScroll>
-            )}
+            {action == 'people' && <PeopleList query={query} />}
 
-            {action == 'group' && !isLoadingdataGroup && (
-                <InfiniteScroll
-                    dataLength={dataGroup.length}
-                    next={fetchNextPagedataGroup}
-                    hasMore={hasNextpagedataGroup}
-                    className="mt-8"
-                    loader={
-                        <div className="my-2 flex justify-center">
-                            <span className="loading loading-dots loading-md"></span>
-                        </div>
-                    }
-                >
-                    {dataGroup.length > 0 ? (
-                        dataGroup.map((item) => (
-                            <div className="mt-4" key={item.id}>
-                                <CardGroup key={item.id} group={item} isJoin={item.is_joined} />
-                            </div>
-                        ))
-                    ) : (
-                        <div>Không có nhóm nào</div>
-                    )}
-                </InfiniteScroll>
-            )}
+            {action == 'post' && <PostList query={query} />}
+
+            {action == 'group' && <GroupList query={query} />}
         </div>
     );
 };

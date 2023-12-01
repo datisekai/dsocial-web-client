@@ -161,11 +161,14 @@ const Home = () => {
                                 placement="bottom"
                                 render={(attrs) => (
                                     <div {...attrs} className="mb-2">
-                                        <EmojiPicker
-                                            emojiVersion={'1.0'}
-                                            height={'350px'}
-                                            onEmojiClick={handleEmojiClick}
-                                        />
+                                        {showEmoji && (
+                                            <EmojiPicker
+                                                emojiVersion={'1.0'}
+                                                height={'350px'}
+                                                lazyLoadEmojis={true}
+                                                onEmojiClick={handleEmojiClick}
+                                            />
+                                        )}
                                     </div>
                                 )}
                             >

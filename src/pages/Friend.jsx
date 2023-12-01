@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useQueryParams from '../hooks/useQueryParams';
 import FriendServices from '../services/FriendService';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -23,8 +23,7 @@ const tabs = [
 const Friend = () => {
     const query = useQueryParams();
     const queryClient = useQueryClient();
-
-    const { user } = useSelector((state) => state.user);
+    const [text, setText] = useState('');
 
     const {
         data: dataFriend,
@@ -87,6 +86,8 @@ const Friend = () => {
             Swal.fire('Thất bại!', 'Có lỗi xảy ra, vui lòng thử lại sau vài phút!', 'error');
         },
     });
+
+    const navigate = useNavigate();
 
     const updateStateFriend = (data, id) => {
         const dataResult = data;
@@ -169,7 +170,8 @@ const Friend = () => {
                                     <div key={index} className="flex items-center justify-between">
                                         <Link to={`/profile/${item.id}`} className="link link-hover">
                                             <div className="flex items-center gap-2">
-                                                <LazyLoadImage effect='blur'
+                                                <LazyLoadImage
+                                                    effect="blur"
                                                     className="rounded-full w-[70px] h-[70px]"
                                                     src={`${getImage(item.avatar)}`}
                                                     alt=""
@@ -203,7 +205,21 @@ const Friend = () => {
                     </>
                 ) : (
                     <>
-                        <h1 className="text-primary font-bold">Bạn bè</h1>
+                        <div className="flex justify-between md:items-center flex-col md:flex-row items-start ">
+                            <h1 className="text-primary font-bold">Bạn bè</h1>
+                            <input
+                                type="text"
+                                value={text}
+                                onChange={(e) => setText(e.target.value)}
+                                placeholder="Tìm kiếm bạn bè"
+                                onKeyUp={(e) => {
+                                    if (e.code == 'Enter' && text.trim().length !== 0) {
+                                        navigate(`/search?query=${text}&action=friend`);
+                                    }
+                                }}
+                                className="input input-bordered mt-2 md:mt-0 input-sm w-full max-w-xs"
+                            />
+                        </div>
                         <InfiniteScroll
                             dataLength={dataFriend.length}
                             next={fetchNextPageFriend}
@@ -223,7 +239,8 @@ const Friend = () => {
                                         <div className="flex items-center justify-between " key={index}>
                                             <Link to={`/profile/${item.id}`} className="link link-hover">
                                                 <div className="flex items-center gap-2">
-                                                    <LazyLoadImage effect='blur'
+                                                    <LazyLoadImage
+                                                        effect="blur"
                                                         className="rounded-full w-[70px] h-[70px]"
                                                         src={`${getImage(item.avatar)}`}
                                                         alt=""

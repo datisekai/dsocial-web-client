@@ -22,7 +22,7 @@ const DrawerMenu = ({ visible, onClose }) => {
                     <div className="flex items-center gap-4">
                         <div className="avatar ">
                             <div className="w-12 rounded-full">
-                                <LazyLoadImage effect='blur' src={getImage(user?.avatar)} />
+                                <LazyLoadImage effect="blur" src={getImage(user?.avatar)} />
                             </div>
                         </div>
                         <div>
@@ -32,10 +32,8 @@ const DrawerMenu = ({ visible, onClose }) => {
                                 onChange={(e) => setSearchText(e.target.value)}
                                 placeholder="Tìm kiếm trên DSocial"
                                 onKeyUp={(e) => {
-                                    if (e.code == 'Enter') {
-                                        if (searchText != '') {
-                                            navigate(`/search?query=${searchText}`);
-                                        }
+                                    if (e.code == 'Enter' && searchText.trim().length !== 0) {
+                                        navigate(`/search?query=${searchText}`);
                                     }
                                 }}
                                 className="input input-bordered input-sm w-full max-w-xs"
