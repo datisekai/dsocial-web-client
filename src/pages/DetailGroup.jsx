@@ -291,7 +291,7 @@ const DetailGroup = () => {
                                         <div key={index} className="relative ml-2">
                                             <IoMdCloseCircle
                                                 onClick={() => handleDeleteFile(index)}
-                                                className="absolute right-0 text-2xl cursor-pointer text-[#6419E6]"
+                                                className="z-[9999] absolute right-0 text-2xl cursor-pointer text-[#6419E6]"
                                             />
                                             <LazyLoadImage
                                                 effect="blur"

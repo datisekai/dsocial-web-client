@@ -96,11 +96,12 @@ const EditProfile = () => {
                             <div className="flex items-center justify-center">
                                 <input
                                     type="file"
-                                    className="absolute"
+                                    className="absolute z-[9999]"
                                     onChange={(e) => setCover_Image(e.target.files[0])}
                                     accept="image/*"
                                 />
-                                <LazyLoadImage effect='blur'
+                                <LazyLoadImage
+                                    effect="blur"
                                     className="w-full h-auto aspect-video md:aspect-auto md:h-[250px] object-cover "
                                     src={previewImage}
                                 />
@@ -109,7 +110,8 @@ const EditProfile = () => {
                             <div className="absolute px-4 bottom-[-40px] left-0 right-0 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <div className="relative">
-                                        <LazyLoadImage effect='blur'
+                                        <LazyLoadImage
+                                            effect="blur"
                                             className="rounded-full w-[80px] h-[80px] border-primary border-2"
                                             src={previewAvatar}
                                             alt=""

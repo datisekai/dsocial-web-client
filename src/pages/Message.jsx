@@ -93,7 +93,7 @@ const Message = () => {
                         </div>
                     </div>
 
-                    <div className="px-4 mt-[70px] overflow-y-auto pb-[100px]">
+                    <div className="px-4 pt-[70px] overflow-y-auto pb-[100px]">
                         {data?.map((item, index) => (
                             <CardMessage key={item.id} data={item} />
                         ))}
