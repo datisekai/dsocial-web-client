@@ -12,6 +12,7 @@ const useUser = () => {
 
     const handleLogout = () => {
         dispatch(removeTokenAndUser());
+        navigate('/login')
 
     };
 

@@ -240,26 +240,18 @@ const CardPost = ({ post, nameQuery, group }) => {
                         <Link to={user.id == post.user_post.id ? '/profile' : `/profile/${post.user_post.id}`}>
                             <div className="avatar">
                                 <div className="w-12 rounded-full">
-                                    <LazyLoadImage effect="blur" src={getImage(post.user_post.avatar)} />
+                                    <img src={getImage(post.user_post.avatar)} />
                                 </div>
                             </div>
                         </Link>
                     ) : (
                         <div className="relative">
                             <Link to={`/group/${post.group.id}`}>
-                                <LazyLoadImage
-                                    effect="blur"
-                                    className="w-10 h-10 rounded-full"
-                                    src={getImage(post.group.avatar)}
-                                />
+                                <img className="w-10 h-10 rounded-full" src={getImage(post.group.avatar)} />
                             </Link>
                             <Link to={user.id == post.user_post.id ? '/profile' : `/profile/${post.user_post.id}`}>
                                 <div className="absolute right-[-4px] bottom-[-4px] border border-primary rounded-full">
-                                    <LazyLoadImage
-                                        effect="blur"
-                                        className="w-6 h-6 rounded-full"
-                                        src={getImage(post.user_post.avatar)}
-                                    />
+                                    <img className="w-6 h-6 rounded-full" src={getImage(post.user_post.avatar)} />
                                 </div>
                             </Link>
                         </div>
@@ -342,8 +334,7 @@ const CardPost = ({ post, nameQuery, group }) => {
                                 src={getImage(item.src)}
                             />
                         ) : (
-                            <LazyLoadImage
-                                effect="blur"
+                            <img
                                 src={getImage(item.src)}
                                 key={index}
                                 className="w-full h-[250px] object-cover aspect-video"

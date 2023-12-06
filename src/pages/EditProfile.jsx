@@ -110,8 +110,7 @@ const EditProfile = () => {
                             <div className="absolute px-4 bottom-[-40px] left-0 right-0 flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <div className="relative">
-                                        <LazyLoadImage
-                                            effect="blur"
+                                        <img
                                             className="rounded-full w-[80px] h-[80px] border-primary border-2"
                                             src={previewAvatar}
                                             alt=""

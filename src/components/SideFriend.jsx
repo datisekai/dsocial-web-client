@@ -27,7 +27,6 @@ const SideFriend = () => {
 
     return (
         <div>
-          
             <div className="mt-4 flex items-center justify-between">
                 <h3 className="font-medium">Người liên hệ</h3>
                 <Link to={'/friend'}>

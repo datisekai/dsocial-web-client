@@ -56,7 +56,7 @@ const ForgotPassword = () => {
 
                             <Field
                                 placeholder="Nhập mật khẩu mới"
-                                type="text"
+                                type="password"
                                 name="password"
                                 className="input input-bordered w-full max-w-md"
                             />
@@ -69,7 +69,7 @@ const ForgotPassword = () => {
 
                             <Field
                                 placeholder="Nhập xác nhận mật khẩu"
-                                type="text"
+                                type="password"
                                 name="confirm"
                                 className="input input-bordered w-full max-w-md"
                             />
